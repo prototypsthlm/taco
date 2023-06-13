@@ -5,3 +5,5 @@
 <svelte:head>
   <title>LLM Portal</title>
 </svelte:head>
+
+<slot />
