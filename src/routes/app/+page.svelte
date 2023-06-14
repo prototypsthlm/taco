@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import ChatInput from '$lib/components/ChatInput.svelte'
   import Sidebar from '$lib/components/Sidebar.svelte'
 </script>
