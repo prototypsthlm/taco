@@ -35,8 +35,9 @@
       {placeholder}
       {disabled}
       {autocomplete}
-      aria-invalid={errors.length ? 'true' : null}
+      aria-invalid={!!errors.length}
       aria-describedby={`${name}-error`}
+      on:keydown={() => (errors = [])}
     />
     {#if errors.length}
       <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
