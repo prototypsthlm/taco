@@ -12,7 +12,7 @@
   export let disabled = false
 </script>
 
-<div>
+<div class={$$props.class}>
   <label for={id} class="block text-sm font-medium leading-6 text-gray-900">{label}</label>
   <div class="relative mt-2 shadow-sm">
     <input
