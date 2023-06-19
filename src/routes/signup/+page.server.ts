@@ -1,5 +1,5 @@
 import { createUser } from '$lib/server/user'
-import type { Actions } from '@sveltejs/kit'
+import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
 import { dev } from '$app/environment'
 import { fail, redirect } from '@sveltejs/kit'
