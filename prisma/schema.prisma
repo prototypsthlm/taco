@@ -20,8 +20,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  UserTeams UserTeams[]
-  Message   Message[]
+  userTeams UserTeams[]
+  message   Message[]
 }
 
 model Team {
@@ -33,7 +33,7 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  UserTeams UserTeams[]
+  userTeams UserTeams[]
 }
 
 model UserTeams {
