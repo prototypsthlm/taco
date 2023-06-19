@@ -21,6 +21,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   UserTeams UserTeams[]
+  Message   Message[]
 }
 
 model Team {
@@ -41,11 +42,42 @@ model UserTeams {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  role   Role @default(MEMBER)
-  user   User @relation(fields: [userId], references: [id])
+  role   Role   @default(MEMBER)
+  user   User   @relation(fields: [userId], references: [id])
   userId Int
-  team   Team @relation(fields: [teamId], references: [id])
+  team   Team   @relation(fields: [teamId], references: [id])
   teamId Int
+  chats  Chat[]
+}
+
+model Chat {
+  id Int @id @default(autoincrement())
+
+  name   String
+  shared Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  message Message[]
+
+  owner   UserTeams @relation(fields: [ownerId], references: [id])
+  ownerId Int
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+
+  text String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chat   Chat @relation(fields: [chatId], references: [id])
+  chatId Int
+
+  author   User @relation(fields: [authorId], references: [id])
+  authorId Int
 }
 
 enum Role {
