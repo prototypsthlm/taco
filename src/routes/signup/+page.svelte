@@ -1,4 +1,4 @@
-<script lang="ts" xmlns:svelte="http://www.w3.org/1999/html">
+<script lang="ts">
   import logo from '$lib/assets/logo.png'
   import Input from '$lib/components/Input.svelte'
 
