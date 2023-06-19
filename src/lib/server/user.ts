@@ -31,6 +31,10 @@ export const getUserIfCredentialsMatch = async (email: string, password: string)
   return user
 }
 
+export const setSessionId = (id: number) => {
+  return prisma.user.update({ data: { sessionId: generateSessionId() }, where: { id } })
+}
+
 export const createUser = async (
   name: string,
   email: string,
