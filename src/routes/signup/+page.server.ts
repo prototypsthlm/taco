@@ -41,8 +41,6 @@ export const actions: Actions = {
         })
       }
 
-      console.log({ data, e })
-
       return fail(500, {
         data,
         errors: e,
