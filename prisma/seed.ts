@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -10,19 +10,27 @@ async function seed() {
     // no worries if it doesn't exist yet
   })
 
-
   await prisma.user.create({
     data: {
       email,
       name: 'Prototyp User',
-      company: {
+      userTeams: {
         create: {
-          name: 'Prototyp',
+          role: Role.ADMIN,
+          team:{
+            create: {
+              name: 'Prototyp',
+            }
+          }
         },
       },
     },
     include: {
-      company: true,
+      userTeams: {
+        include: {
+          team: true,
+        },
+      },
     },
   })
 }
@@ -35,4 +43,3 @@ seed()
   .finally(async () => {
     await prisma.$disconnect()
   })
-
