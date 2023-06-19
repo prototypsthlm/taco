@@ -22,9 +22,14 @@ export const actions: Actions = {
         })
         .parse(data)
 
-      const { id } = await createUser(schema.email, schema.password, schema.teamName)
+      const { sessionId } = await createUser(
+        schema.name,
+        schema.email,
+        schema.password,
+        schema.teamName
+      )
 
-      cookies.set('session_id', id.toString(), {
+      cookies.set('session_id', sessionId || '', {
         path: '/',
         httpOnly: true,
         sameSite: 'strict',
