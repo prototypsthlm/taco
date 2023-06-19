@@ -17,11 +17,11 @@ async function seed() {
       userTeams: {
         create: {
           role: Role.ADMIN,
-          team:{
+          team: {
             create: {
               name: 'Prototyp',
-            }
-          }
+            },
+          },
         },
       },
     },

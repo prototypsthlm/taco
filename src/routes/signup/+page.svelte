@@ -55,12 +55,12 @@
           type="password"
         />
         <Input
-          value={form?.data?.companyName}
-          errors={form?.errors?.companyName}
-          label="Company Name"
-          id="companyName"
-          name="companyName"
-          autocomplete="company"
+          value={form?.data?.teamName}
+          errors={form?.errors?.teamName}
+          label="Team Name"
+          id="teamName"
+          name="teamName"
+          autocomplete="organization"
         />
 
         <div>

@@ -14,7 +14,7 @@ export const actions: Actions = {
           email: z.string().email(),
           password: z.string().min(6),
           confirmPassword: z.string().min(6),
-          companyName: z.string().min(1),
+          teamName: z.string().min(1),
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: "Passwords don't match",
@@ -22,7 +22,7 @@ export const actions: Actions = {
         })
         .parse(data)
 
-      const { id } = await createUser(schema.email, schema.password, schema.companyName)
+      const { id } = await createUser(schema.email, schema.password, schema.teamName)
 
       cookies.set('session_id', id.toString(), {
         path: '/',
