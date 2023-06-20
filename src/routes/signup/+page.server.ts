@@ -29,13 +29,15 @@ export const actions: Actions = {
         schema.teamName
       )
 
-      cookies.set('session_id', sessionId || '', {
-        path: '/',
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: !dev,
-        maxAge: 60 * 60 * 24 * 7, // one week
-      })
+      if (sessionId) {
+        cookies.set('session_id', sessionId, {
+          path: '/',
+          httpOnly: true,
+          sameSite: 'strict',
+          secure: !dev,
+          maxAge: 60 * 60 * 24 * 7, // one week
+        })
+      }
     } catch (e) {
       if (e instanceof ZodError) {
         const errors = e.flatten().fieldErrors
