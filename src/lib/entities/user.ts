@@ -41,6 +41,7 @@ export const createUser = async (
   password: string,
   teamName: string
 ) => {
+  const team = await prisma.team.findUnique({ where: { name: teamName } })
   return prisma.user.create({
     data: {
       email,
@@ -49,10 +50,15 @@ export const createUser = async (
       password: await bcrypt.hash(password, 10),
       userTeams: {
         create: {
-          role: Role.ADMIN,
+          role: team ? Role.ADMIN : Role.MEMBER,
           team: {
-            create: {
-              name: teamName,
+            connectOrCreate: {
+              where: {
+                name: teamName,
+              },
+              create: {
+                name: teamName,
+              },
             },
           },
         },
