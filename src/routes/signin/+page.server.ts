@@ -1,5 +1,5 @@
 import { dev } from '$app/environment'
-import { getUserIfCredentialsMatch, setSessionId } from '$lib/server/user'
+import { getUserIfCredentialsMatch, setSessionId } from '$lib/entities/user'
 import { fail, redirect } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
