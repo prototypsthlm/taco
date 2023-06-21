@@ -37,7 +37,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@prisma/client": "^4.15.0"
+		"@prisma/client": "^4.15.0",
+		"svelte-material-icons": "^3.0.4"
 	},
 	"prisma": {
 		"seed": "ts-node prisma/seed.ts"
