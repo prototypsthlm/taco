@@ -44,10 +44,10 @@ model UserTeams {
   updatedAt DateTime @updatedAt
 
   role   Role   @default(MEMBER)
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId Int
-  team   Team   @relation(fields: [teamId], references: [id])
-  teamId Int
+  team   Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  teamId Int?
   chats  Chat[]
 }
 
@@ -65,7 +65,7 @@ model Chat {
 
   messages Message[]
 
-  owner   UserTeams @relation(fields: [ownerId], references: [id])
+  owner   UserTeams @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ownerId Int
 }
 
@@ -80,11 +80,11 @@ model Message {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  chat   Chat @relation(fields: [chatId], references: [id])
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   chatId Int
 
-  author   User @relation(fields: [authorId], references: [id])
-  authorId Int
+  author   User? @relation(fields: [authorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  authorId Int?
 }
 
 enum Role {

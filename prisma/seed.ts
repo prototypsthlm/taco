@@ -7,9 +7,13 @@ const prisma = new PrismaClient()
 
 async function seed() {
   const email = 'user@prototyp.se'
+  const teamName = 'Prototyp'
 
   // cleanup the existing database
   await prisma.user.delete({ where: { email } }).catch(() => {
+    // no worries if it doesn't exist yet
+  })
+  await prisma.team.delete({ where: { name: teamName } }).catch(() => {
     // no worries if it doesn't exist yet
   })
 
@@ -42,7 +46,7 @@ async function seed() {
         createMany: {
           data: [
             {
-              question: 'Are you a helpful assistant?',
+              question: 'OGOGAre you a helpful assistant?',
               authorId: user.id,
             },
           ],
