@@ -45,7 +45,7 @@ Follow these steps to initialize Prisma in your project:
 3. Run the Prisma migration command to apply database schema changes:
 
    ```bash
-   npx prisma migrate
+   npx prisma migrate dev
    ```
 
 4. (Optional) Seed the database with initial data (no need to manually do it, since it's done

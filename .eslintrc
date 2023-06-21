@@ -4,7 +4,8 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:svelte/recommended",
-    "prettier"
+    "prettier",
+    "plugin:prettier/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "plugins": [
@@ -35,9 +36,6 @@
     }
   ],
   "rules": {
-    "semi": [
-      "error",
-      "never"
-    ]
+    "prettier/prettier": "error"
   }
 }

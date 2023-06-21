@@ -15,9 +15,11 @@
 		"@faker-js/faker": "^8.0.2",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.5.0",
+		"@tailwindcss/forms": "^0.5.3",
+		"@types/bcryptjs": "^2.4.2",
 		"@types/node": "^20.3.0",
-		"@typescript-eslint/eslint-plugin": "^5.45.0",
-		"@typescript-eslint/parser": "^5.45.0",
+		"@typescript-eslint/eslint-plugin": "^5.59.11",
+		"@typescript-eslint/parser": "^5.59.11",
 		"autoprefixer": "^10.4.14",
 		"eslint": "^8.42.0",
 		"eslint-config-prettier": "^8.8.0",
@@ -38,7 +40,10 @@
 	"type": "module",
 	"dependencies": {
 		"@prisma/client": "^4.15.0",
-		"svelte-material-icons": "^3.0.4"
+		"svelte-material-icons": "^3.0.4",
+		"bcryptjs": "^2.4.3",
+		"classnames": "^2.3.2",
+		"zod": "^3.21.4"
 	},
 	"prisma": {
 		"seed": "ts-node prisma/seed.ts"

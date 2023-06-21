@@ -13,9 +13,10 @@ datasource db {
 model User {
   id Int @id @default(autoincrement())
 
-  email    String  @unique
-  name     String?
-  password String?
+  email     String  @unique
+  name      String
+  password  String?
+  sessionId String? @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -27,7 +28,7 @@ model User {
 model Team {
   id Int @id @default(autoincrement())
 
-  name         String
+  name         String  @unique
   openAiApiKey String?
 
   createdAt DateTime @default(now())

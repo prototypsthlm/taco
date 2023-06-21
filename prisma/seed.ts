@@ -1,4 +1,7 @@
 import { PrismaClient, Role } from '@prisma/client'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -14,14 +17,15 @@ async function seed() {
     data: {
       email,
       name: 'Prototyp User',
+      password: await bcrypt.hash('password', 10),
       userTeams: {
         create: {
           role: Role.ADMIN,
-          team:{
+          team: {
             create: {
               name: 'Prototyp',
-            }
-          }
+            },
+          },
         },
       },
     },
