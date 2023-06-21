@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from '$app/forms'
   import logo from '$lib/assets/logo.png'
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
@@ -24,7 +25,7 @@
         <Alert message={form?.error} />
       {/if}
 
-      <form class="space-y-6 mt-4" method="POST" novalidate>
+      <form class="space-y-6 mt-4" method="POST" novalidate use:enhance>
         <Input
           value={form?.data?.email}
           errors={form?.errors?.email}
