@@ -54,13 +54,16 @@ model UserTeams {
 model Chat {
   id Int @id @default(autoincrement())
 
-  name   String
-  shared Boolean @default(false)
+  name        String
+  shared      Boolean @default(false)
+  model       String  @default("gpt-3.5-turbo")
+  temperature Decimal @default(0.6) @db.Decimal(2, 1)
+  roleContent String  @default("You are a helpful assistant.")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  message Message[]
+  messages Message[]
 
   owner   UserTeams @relation(fields: [ownerId], references: [id])
   ownerId Int
@@ -69,7 +72,10 @@ model Chat {
 model Message {
   id Int @id @default(autoincrement())
 
-  text String
+  question    String
+  answer      String?
+  model       String? // defaults to chat setting
+  temperature Decimal? @db.Decimal(2, 1) // defaults to chat setting
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

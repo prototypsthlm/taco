@@ -13,7 +13,7 @@ async function seed() {
     // no worries if it doesn't exist yet
   })
 
-  await prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       email,
       name: 'Prototyp User',
@@ -30,9 +30,22 @@ async function seed() {
       },
     },
     include: {
-      userTeams: {
-        include: {
-          team: true,
+      userTeams: true,
+    },
+  })
+
+  await prisma.chat.create({
+    data: {
+      name: 'Test Chat',
+      ownerId: user.userTeams[0].id,
+      messages: {
+        createMany: {
+          data: [
+            {
+              question: 'Are you a helpful assistant?',
+              authorId: user.id,
+            },
+          ],
         },
       },
     },
