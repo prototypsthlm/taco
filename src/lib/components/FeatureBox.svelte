@@ -5,14 +5,14 @@
   export let isImplemented: boolean
 </script>
 
-<div class="flex flex-col justify-between gap-4 p-4 bg-primary rounded-xl max-w-sm">
-  <div class="flex items-center gap-4">
-    <p class="text-4xl">
+<div class="flex flex-col justify-between gap-3 md:gap-6 p-4 bg-primary rounded-xl max-w-sm">
+  <div class="flex items-center gap-6">
+    <p class="text-2xl md:text-4xl">
       {emoji}
     </p>
     <div class="flex flex-col">
-      <h1 class="text-accent text-2xl font-bold">{title}</h1>
-      <p class="text-accent text-xl">{description}</p>
+      <h1 class="text-accent text-xl md:text-2xl font-bold">{title}</h1>
+      <p class="text-accent text-lg md:text-xl">{description}</p>
     </div>
   </div>
   <div class="text-center">
