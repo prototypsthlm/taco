@@ -14,6 +14,8 @@
     <div class="flex-grow">
       <slot />
     </div>
-    <ChatInput />
+    <div class="p-4 md:p-8">
+      <ChatInput />
+    </div>
   </div>
 </div>
