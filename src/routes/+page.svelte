@@ -1,8 +1,11 @@
 <script lang="ts">
   import ButtonLink from '$lib/components/ButtonLink.svelte'
-import FeatureBox from '$lib/components/FeatureBox.svelte'
+  import FeatureBox from '$lib/components/FeatureBox.svelte'
+  import type { PageData } from './$types'
+  
+  export let data: PageData
 
-  let isLoggedIn: boolean = false
+  let isLoggedIn: boolean = data.isLoggedIn
 </script>
 
 <div
