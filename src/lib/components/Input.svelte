@@ -26,20 +26,20 @@
         'disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200',
         {
           'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-sky-600':
-            !errors.length,
+            !errors?.length,
           'pr-10 text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500':
-            errors.length,
+            errors?.length,
         }
       )}
       {value}
       {placeholder}
       {disabled}
       {autocomplete}
-      aria-invalid={!!errors.length}
+      aria-invalid={!!errors?.length}
       aria-describedby={`${name}-error`}
       on:keydown={() => (errors = [])}
     />
-    {#if errors.length}
+    {#if errors?.length}
       <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
         <svg
           class="h-5 w-5 text-red-500"
@@ -56,7 +56,9 @@
       </div>
     {/if}
   </div>
-  {#each errors as error}
-    <p class="mt-2 text-sm text-red-600" id="email-error">{error}</p>
-  {/each}
+  {#if errors?.length}
+    {#each errors as error}
+      <p class="mt-2 text-sm text-red-600" id="email-error">{error}</p>
+    {/each}
+  {/if}
 </div>

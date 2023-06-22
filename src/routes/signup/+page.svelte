@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from '$app/forms'
   import logo from '$lib/assets/logo.png'
   import Input from '$lib/components/Input.svelte'
 
@@ -19,7 +20,7 @@
 
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
     <div class="bg-white px-6 py-12 shadow sm:px-12">
-      <form class="space-y-6" method="POST" novalidate>
+      <form class="space-y-6" method="POST" novalidate use:enhance>
         <Input
           value={form?.data?.name}
           errors={form?.errors?.name}

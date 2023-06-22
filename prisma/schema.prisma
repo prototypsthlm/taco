@@ -44,41 +44,47 @@ model UserTeams {
   updatedAt DateTime @updatedAt
 
   role   Role   @default(MEMBER)
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId Int
-  team   Team   @relation(fields: [teamId], references: [id])
-  teamId Int
+  team   Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  teamId Int?
   chats  Chat[]
 }
 
 model Chat {
   id Int @id @default(autoincrement())
 
-  name   String
-  shared Boolean @default(false)
+  name        String
+  shared      Boolean @default(false)
+  model       String  @default("gpt-3.5-turbo")
+  temperature Decimal @default(0.6) @db.Decimal(2, 1)
+  roleContent String  @default("You are a helpful assistant.")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  message Message[]
+  messages Message[]
 
-  owner   UserTeams @relation(fields: [ownerId], references: [id])
+  owner   UserTeams @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ownerId Int
 }
 
 model Message {
   id Int @id @default(autoincrement())
 
-  text String
+  question    String
+  answer      String?
+  model       String? // defaults to chat setting
+  temperature Decimal? @db.Decimal(2, 1) // defaults to chat setting
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  chat   Chat @relation(fields: [chatId], references: [id])
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   chatId Int
 
-  author   User @relation(fields: [authorId], references: [id])
-  authorId Int
+  author   User? @relation(fields: [authorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  authorId Int?
 }
 
 enum Role {
