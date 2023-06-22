@@ -1,6 +1,4 @@
-export const load = ({ cookies }) => {
-  const sessionId = cookies.get('session_id')
-  console.log(sessionId)
-  if (sessionId) return { isLoggedIn: true }
+export const load = ({ locals }) => {
+  if (locals.currentUser) return { isLoggedIn: true }
   else return { isLoggedIn: false }
 }
