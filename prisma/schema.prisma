@@ -54,7 +54,7 @@ model UserTeams {
 model Chat {
   id Int @id @default(autoincrement())
 
-  name        String
+  name        String?
   shared      Boolean @default(false)
   model       String  @default("gpt-3.5-turbo")
   temperature Decimal @default(0.6) @db.Decimal(2, 1)
