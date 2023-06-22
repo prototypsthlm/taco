@@ -5,7 +5,7 @@ import {
   getUserChats,
   storeAnswer,
 } from '$lib/entities/chat'
-import { fail, json, redirect } from '@sveltejs/kit'
+import { fail } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { PageServerLoad, Actions } from './$types'
 
