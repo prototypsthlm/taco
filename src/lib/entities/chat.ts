@@ -3,7 +3,7 @@ import type { Chat } from '@prisma/client'
 export type ChatWithRelations = Awaited<ReturnType<typeof getChatWithRelationsById>>
 
 export const getChatWithRelationsById = async (id: number) => {
-  return prisma.chat.findUnique({
+  return prisma.chat.findUniqueOrThrow({
     where: { id },
     include: {
       owner: {

@@ -34,33 +34,19 @@ export const actions: Actions = {
 
       const chatWithQuestion = await addMessageToChat(userChats[0], schema.message)
 
-      try {
-        const maybeResponse = await ask(chatWithQuestion)
+      const response = await ask(chatWithQuestion)
 
-        if (maybeResponse) {
-          const lastMessage = chatWithQuestion.messages[chatWithQuestion.messages.length - 1]
+      const lastMessage = chatWithQuestion.messages[chatWithQuestion.messages.length - 1]
 
-          await storeAnswer(lastMessage.id, maybeResponse)
+      await storeAnswer(lastMessage.id, response)
 
-          const updatedChat = await getChatWithRelationsById(chatWithQuestion.id)
+      const updatedChat = await getChatWithRelationsById(chatWithQuestion.id)
 
-          if (!updatedChat) {
-            return fail(500, { error: 'very very bad.' })
-          }
-
-          return {
-            chat: {
-              ...updatedChat,
-              temperature: Number(updatedChat.temperature),
-            },
-          }
-        }
-      } catch (e) {
-        console.log({ e })
-        return fail(500, { error: 'very bad.' })
+      return {
+        chat: updatedChat,
       }
     } catch (error) {
-      console.log({ error })
+      console.error(error)
       if (error instanceof ZodError) {
         const errors = error.flatten().fieldErrors
 
@@ -75,7 +61,5 @@ export const actions: Actions = {
         error,
       })
     }
-
-    throw redirect(303, '/app')
   },
 }

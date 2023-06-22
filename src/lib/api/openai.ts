@@ -13,7 +13,7 @@ const getClient = (apiKey: string) => {
 
 export const ask = async (chat: ChatWithRelations) => {
   if (!chat?.owner?.team?.openAiApiKey) {
-    return null
+    throw new Error('Open AI API key is not set!')
   }
 
   const client = getClient(chat.owner.team.openAiApiKey)
@@ -28,18 +28,18 @@ export const ask = async (chat: ChatWithRelations) => {
     return [...question, ...answer]
   })
 
-  try {
-    const completion = await client.createChatCompletion({
-      model: chat.model,
-      messages: [
-        { role: ChatCompletionRequestMessageRoleEnum.System, content: chat.roleContent },
-        ...messages,
-      ],
-      temperature: Number(chat.temperature),
-    })
+  const completion = await client.createChatCompletion({
+    model: chat.model,
+    messages: [
+      { role: ChatCompletionRequestMessageRoleEnum.System, content: chat.roleContent },
+      ...messages,
+    ],
+    temperature: Number(chat.temperature),
+  })
 
-    return completion.data.choices[0].message?.content
-  } catch (e) {
-    console.error(e)
+  if (!completion.data.choices[0].message?.content) {
+    throw new Error('Error getting an answer from API.')
   }
+
+  return completion.data.choices[0].message.content
 }
