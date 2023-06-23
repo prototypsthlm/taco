@@ -7,8 +7,17 @@ export const getUserByEmail = async (email: string) => {
   return prisma.user.findUnique({ where: { email } })
 }
 
-export const getUserById = async (id: number) => {
-  return prisma.user.findUnique({ where: { id } })
+export const getUserWithRelationsById = async (id: number) => {
+  return prisma.user.findUnique({
+    where: { id },
+    include: {
+      userTeams: {
+        include: {
+          team: true,
+        },
+      },
+    },
+  })
 }
 
 export const getUserBySessionId = async (sessionId: string) => {
