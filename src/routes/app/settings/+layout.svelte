@@ -3,7 +3,7 @@
   import { page } from '$app/stores'
 </script>
 
-<div class="min-h-screen bg-gray-900">
+<div class="min-h-screen bg-bg">
   <main>
     <header class="border-b border-white/5">
       <!-- Secondary navigation -->
