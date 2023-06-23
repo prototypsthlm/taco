@@ -15,14 +15,14 @@
           <li>
             <a
               href="account"
-              class={classNames({ 'text-indigo-400': $page.url.pathname.includes('account') })}
+              class={classNames({ 'text-indigo-400': $page?.url?.pathname?.includes('account') })}
               >Account</a
             >
           </li>
           <li>
             <a
               href="teams"
-              class={classNames({ 'text-indigo-400': $page.url.pathname.includes('teams') })}
+              class={classNames({ 'text-indigo-400': $page?.url?.pathname?.includes('teams') })}
               >Teams</a
             >
           </li>
