@@ -3,9 +3,9 @@
   import logo from '$lib/assets/logo.png'
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
-  import type { PageData } from './$types'
+  import type { ActionData } from './$types'
 
-  export let data: PageData
+  export let form: ActionData
 </script>
 
 <svelte:head>
@@ -22,21 +22,21 @@
 
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
     <div class="bg-white px-6 py-12 shadow sm:px-12">
-      {#if data?.form?.error}
-        <Alert message={data?.form?.error} />
+      {#if form?.error}
+        <Alert message={form?.error} />
       {/if}
       <form class="space-y-6" method="POST" novalidate use:enhance>
         <Input
-          value={data?.form?.fields?.name}
-          errors={data?.form?.errors?.name}
+          value={form?.fields?.name}
+          errors={form?.errors?.name}
           label="Name"
           id="name"
           name="name"
           autocomplete="name"
         />
         <Input
-          value={data?.form?.fields?.email}
-          errors={data?.form?.errors?.email}
+          value={form?.fields?.email}
+          errors={form?.errors?.email}
           label="Email"
           id="email"
           name="email"
@@ -44,8 +44,8 @@
           autocomplete="email"
         />
         <Input
-          value={data?.form?.fields?.password}
-          errors={data?.form?.errors?.password}
+          value={form?.fields?.password}
+          errors={form?.errors?.password}
           label="Password"
           id="password"
           name="password"
@@ -53,16 +53,16 @@
           autocomplete="new-password"
         />
         <Input
-          value={data?.form?.fields?.confirmPassword}
-          errors={data?.form?.errors?.confirmPassword}
+          value={form?.fields?.confirmPassword}
+          errors={form?.errors?.confirmPassword}
           label="Confirm Password"
           id="confirmPassword"
           name="confirmPassword"
           type="password"
         />
         <Input
-          value={data?.form?.fields?.teamName}
-          errors={data?.form?.errors?.teamName}
+          value={form?.fields?.teamName}
+          errors={form?.errors?.teamName}
           label="Team Name"
           id="teamName"
           name="teamName"

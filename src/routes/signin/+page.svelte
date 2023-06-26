@@ -3,9 +3,9 @@
   import logo from '$lib/assets/logo.png'
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
-  import type { PageData } from './$types'
+  import type { ActionData } from './$types'
 
-  export let data: PageData
+  export let form: ActionData
 </script>
 
 <svelte:head>
@@ -22,14 +22,14 @@
 
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
     <div class="bg-white px-6 py-12 shadow sm:px-12">
-      {#if data?.error}
-        <Alert message={data?.error} />
+      {#if form?.error}
+        <Alert message={form?.error} />
       {/if}
 
       <form class="space-y-6 mt-4" method="POST" novalidate use:enhance>
         <Input
-          value={data?.fields?.email}
-          errors={data?.errors?.email}
+          value={form?.fields?.email}
+          errors={form?.errors?.email}
           label="Email"
           id="email"
           name="email"
@@ -37,8 +37,8 @@
           autocomplete="email"
         />
         <Input
-          value={data?.fields?.password}
-          errors={data?.errors?.password}
+          value={form?.fields?.password}
+          errors={form?.errors?.password}
           label="Password"
           id="password"
           name="password"

@@ -6,7 +6,7 @@ import { fail, redirect } from '@sveltejs/kit'
 
 export const actions: Actions = {
   default: async ({ request, cookies }) => {
-    const data = Object.fromEntries(await request.formData())
+    const fields = Object.fromEntries(await request.formData())
     try {
       const schema = z
         .object({
@@ -20,7 +20,7 @@ export const actions: Actions = {
           message: "Passwords don't match",
           path: ['confirmPassword'], // path of error
         })
-        .parse(data)
+        .parse(fields)
 
       const { sessionId } = await createUser(
         schema.name,
@@ -43,13 +43,13 @@ export const actions: Actions = {
         const errors = error.flatten().fieldErrors
 
         return fail(422, {
-          data,
+          fields,
           errors,
         })
       }
 
       return fail(500, {
-        data,
+        fields,
         error,
       })
     }
