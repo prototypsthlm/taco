@@ -14,14 +14,14 @@
         >
           <li>
             <a
-              href="account"
+              href="/app/settings/account"
               class={classNames({ 'text-indigo-400': $page?.url?.pathname?.includes('account') })}
               >Account</a
             >
           </li>
           <li>
             <a
-              href="teams"
+              href="/app/settings/teams"
               class={classNames({ 'text-indigo-400': $page?.url?.pathname?.includes('teams') })}
               >Teams</a
             >
@@ -29,7 +29,6 @@
         </ul>
       </nav>
     </header>
-
     <slot />
   </main>
 </div>
