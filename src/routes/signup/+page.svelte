@@ -1,9 +1,11 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import logo from '$lib/assets/logo.png'
+  import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
+  import type { PageData } from './$types'
 
-  export let form
+  export let data: PageData
 </script>
 
 <svelte:head>
@@ -20,18 +22,21 @@
 
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
     <div class="bg-white px-6 py-12 shadow sm:px-12">
+      {#if data?.form?.error}
+        <Alert message={data?.form?.error} />
+      {/if}
       <form class="space-y-6" method="POST" novalidate use:enhance>
         <Input
-          value={form?.data?.name}
-          errors={form?.errors?.name}
+          value={data?.form?.fields?.name}
+          errors={data?.form?.errors?.name}
           label="Name"
           id="name"
           name="name"
           autocomplete="name"
         />
         <Input
-          value={form?.data?.email}
-          errors={form?.errors?.email}
+          value={data?.form?.fields?.email}
+          errors={data?.form?.errors?.email}
           label="Email"
           id="email"
           name="email"
@@ -39,8 +44,8 @@
           autocomplete="email"
         />
         <Input
-          value={form?.data?.password}
-          errors={form?.errors?.password}
+          value={data?.form?.fields?.password}
+          errors={data?.form?.errors?.password}
           label="Password"
           id="password"
           name="password"
@@ -48,16 +53,16 @@
           autocomplete="new-password"
         />
         <Input
-          value={form?.data?.confirmPassword}
-          errors={form?.errors?.confirmPassword}
+          value={data?.form?.fields?.confirmPassword}
+          errors={data?.form?.errors?.confirmPassword}
           label="Confirm Password"
           id="confirmPassword"
           name="confirmPassword"
           type="password"
         />
         <Input
-          value={form?.data?.teamName}
-          errors={form?.errors?.teamName}
+          value={data?.form?.fields?.teamName}
+          errors={data?.form?.errors?.teamName}
           label="Team Name"
           id="teamName"
           name="teamName"

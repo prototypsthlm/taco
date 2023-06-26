@@ -38,9 +38,9 @@ export const actions: Actions = {
           maxAge: 60 * 60 * 24 * 7, // one week
         })
       }
-    } catch (e) {
-      if (e instanceof ZodError) {
-        const errors = e.flatten().fieldErrors
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const errors = error.flatten().fieldErrors
 
         return fail(422, {
           data,
@@ -50,7 +50,7 @@ export const actions: Actions = {
 
       return fail(500, {
         data,
-        errors: e,
+        error,
       })
     }
 
