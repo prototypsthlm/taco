@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let text: string
+  export let text: string | null
 </script>
 
 <div class="w-full min-h-[4rem] flex gap-4 md:gap-8 p-4 md:p-8 bg-accent bg-opacity-10">
