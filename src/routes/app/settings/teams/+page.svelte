@@ -1,186 +1,47 @@
 <script lang="ts">
-  export let data
+  import type { PageServerData } from './$types'
+
+  export let data: PageServerData
 </script>
 
-<!-- Settings forms -->
-<div class="divide-y divide-white/5">
-  <div
-    class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8"
-  >
-    <div>
-      <h2 class="text-base font-semibold leading-7 text-white">
-        Personal Information {data.user.name}
-      </h2>
-      <p class="mt-1 text-sm leading-6 text-gray-400">
-        Use a permanent address where you can receive mail.
-      </p>
-    </div>
-
-    <form class="md:col-span-2">
-      <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-        <div class="col-span-full">
-          <label for="name" class="block text-sm font-medium leading-6 text-white">Name</label>
-          <div class="mt-2">
-            <input
-              id="name"
-              name="name"
-              type="text"
-              autocomplete="name"
-              class="block w-full border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-            />
+<header
+  class="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8"
+>
+  <h1 class="text-base font-semibold leading-7 text-white">Teams</h1>
+</header>
+<!-- Deployment list -->
+{#if data?.user?.userTeams}
+  <div class="flex flex-col lg:flex-row justify-between divide-x divide-white/5">
+    <ul role="list" class="divide-y divide-white/5 flex-grow">
+      {#each [...data?.user?.userTeams, ...data?.user?.userTeams] as userTeam}
+        <li class="relative flex items-center space-x-4 px-4 py-4 sm:px-6 lg:px-8">
+          <div class="min-w-0 flex-auto">
+            <div class="flex items-center gap-x-3">
+              <div class="flex-none rounded-full p-1 text-gray-500 bg-gray-100/10">
+                <div class="h-2 w-2 rounded-full bg-current" />
+              </div>
+              <h2 class="min-w-0 text-sm font-semibold leading-6 text-white">
+                <a href="/app/settings/teams/{userTeam?.team?.id}" class="flex gap-x-2">
+                  <span class="truncate">{userTeam?.team?.name}</span>
+                </a>
+              </h2>
+            </div>
           </div>
-        </div>
-
-        <div class="col-span-full">
-          <label for="email" class="block text-sm font-medium leading-6 text-white"
-            >Email address</label
+          <svg
+            class="h-5 w-5 flex-none text-gray-400"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
           >
-          <div class="mt-2">
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autocomplete="email"
-              class="block w-full border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+            <path
+              fill-rule="evenodd"
+              d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+              clip-rule="evenodd"
             />
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-8 flex">
-        <button
-          type="submit"
-          class="bg-sky-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"
-          >Save</button
-        >
-      </div>
-    </form>
+          </svg>
+        </li>
+      {/each}
+    </ul>
+    <slot />
   </div>
-
-  <div
-    class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8"
-  >
-    <div>
-      <h2 class="text-base font-semibold leading-7 text-white">Change password</h2>
-      <p class="mt-1 text-sm leading-6 text-gray-400">
-        Update your password associated with your account.
-      </p>
-    </div>
-
-    <form class="md:col-span-2">
-      <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-        <div class="col-span-full">
-          <label for="current-password" class="block text-sm font-medium leading-6 text-white"
-            >Current password</label
-          >
-          <div class="mt-2">
-            <input
-              id="current-password"
-              name="current_password"
-              type="password"
-              autocomplete="current-password"
-              class="block w-full border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-
-        <div class="col-span-full">
-          <label for="new-password" class="block text-sm font-medium leading-6 text-white"
-            >New password</label
-          >
-          <div class="mt-2">
-            <input
-              id="new-password"
-              name="new_password"
-              type="password"
-              autocomplete="new-password"
-              class="block w-full border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-
-        <div class="col-span-full">
-          <label for="confirm-password" class="block text-sm font-medium leading-6 text-white"
-            >Confirm password</label
-          >
-          <div class="mt-2">
-            <input
-              id="confirm-password"
-              name="confirm_password"
-              type="password"
-              autocomplete="new-password"
-              class="block w-full border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-8 flex">
-        <button
-          type="submit"
-          class="bg-sky-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"
-          >Save</button
-        >
-      </div>
-    </form>
-  </div>
-
-  <div
-    class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8"
-  >
-    <div>
-      <h2 class="text-base font-semibold leading-7 text-white">Log out other sessions</h2>
-      <p class="mt-1 text-sm leading-6 text-gray-400">
-        Please enter your password to confirm you would like to log out of your other sessions
-        across all of your devices.
-      </p>
-    </div>
-
-    <form class="md:col-span-2">
-      <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-        <div class="col-span-full">
-          <label for="logout-password" class="block text-sm font-medium leading-6 text-white"
-            >Your password</label
-          >
-          <div class="mt-2">
-            <input
-              id="logout-password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              class="block w-full border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-8 flex">
-        <button
-          type="submit"
-          class="bg-sky-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"
-          >Log out other sessions</button
-        >
-      </div>
-    </form>
-  </div>
-
-  <div
-    class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8"
-  >
-    <div>
-      <h2 class="text-base font-semibold leading-7 text-white">Delete account</h2>
-      <p class="mt-1 text-sm leading-6 text-gray-400">
-        No longer want to use our service? You can delete your account here. This action is not
-        reversible. All information related to this account will be deleted permanently.
-      </p>
-    </div>
-
-    <form class="flex items-start md:col-span-2">
-      <button
-        type="submit"
-        class="bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400"
-        >Yes, delete my account</button
-      >
-    </form>
-  </div>
-</div>
+{/if}

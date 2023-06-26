@@ -1,7 +1,7 @@
 <script lang="ts">
   import classNames from 'classnames'
 
-  export let name = ''
+  export let name: string
   export let id = name
   export let placeholder = name
   export let errors: string[] = []

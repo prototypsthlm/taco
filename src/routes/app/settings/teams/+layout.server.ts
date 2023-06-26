@@ -1,7 +1,7 @@
 import { getUserWithRelationsById } from '$lib/entities/user'
-import type { PageServerLoad } from './$types'
+import type { LayoutServerLoad } from './$types'
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: LayoutServerLoad = async ({ locals }) => {
   const userWithRelations = await getUserWithRelationsById(locals.currentUser.id)
   return {
     user: userWithRelations,
