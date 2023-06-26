@@ -2,10 +2,10 @@
   import classNames from 'classnames'
 
   export let name = ''
-  export let id = ''
-  export let placeholder = ''
+  export let id = name
+  export let placeholder = name
   export let errors: string[] = []
-  export let label = ''
+  export let label = name
   export let type = 'text'
   export let autocomplete = 'off'
   export let value = ''
