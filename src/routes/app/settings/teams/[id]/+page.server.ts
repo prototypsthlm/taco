@@ -3,7 +3,7 @@ import { getUserWithRelationsById } from '$lib/entities/user'
 import { Role } from '@prisma/client'
 import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
-import { fail, redirect } from '@sveltejs/kit'
+import { fail } from '@sveltejs/kit'
 
 export const actions: Actions = {
   default: async ({ request, params, locals }) => {
@@ -28,6 +28,10 @@ export const actions: Actions = {
       }
 
       await updateTeam(parseInt(params.id, 10), schema.name, schema.openAiApiKey)
+
+      return {
+        success: 'Team updated successfully.',
+      }
     } catch (error) {
       if (error instanceof ZodError) {
         const errors = error.flatten().fieldErrors
@@ -43,7 +47,5 @@ export const actions: Actions = {
         error,
       })
     }
-
-    throw redirect(303, `/app/settings/teams/${params.id}`)
   },
 }
