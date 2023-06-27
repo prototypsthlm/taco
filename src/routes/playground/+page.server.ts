@@ -43,7 +43,10 @@ export const actions: Actions = {
       const updatedChat = await getChatWithRelationsById(chatWithQuestion.id)
 
       return {
-        chat: updatedChat,
+        chat: {
+          ...updatedChat,
+          temperature: Number(updatedChat.temperature),
+        },
       }
     } catch (error) {
       console.error(error)
