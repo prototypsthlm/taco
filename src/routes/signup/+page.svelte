@@ -64,7 +64,7 @@
           value={form?.fields?.confirmPassword}
           errors={form?.errors?.confirmPassword}
           label="Confirm Password"
-          id="confirmPassword"
+          id="confirm-password"
           name="confirmPassword"
           type="password"
         />
@@ -72,7 +72,7 @@
           value={form?.fields?.teamName}
           errors={form?.errors?.teamName}
           label="Team Name"
-          id="teamName"
+          id="team-name"
           name="teamName"
           autocomplete="organization"
         />
