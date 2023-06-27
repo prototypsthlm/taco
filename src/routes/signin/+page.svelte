@@ -22,11 +22,19 @@
 
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
     <div class="bg-white px-6 py-12 shadow sm:px-12">
-      {#if form?.error}
-        <Alert message={form?.error} />
-      {/if}
+      <Alert
+        type={(form?.error && 'error') || (form?.success && 'success')}
+        message={form?.error || form?.success}
+      />
 
-      <form class="space-y-6 mt-4" method="POST" novalidate use:enhance>
+      <form
+        class="space-y-6 mt-4"
+        method="POST"
+        novalidate
+        use:enhance={() => {
+          return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
+        }}
+      >
         <Input
           value={form?.fields?.email}
           errors={form?.errors?.email}

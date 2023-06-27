@@ -2,7 +2,7 @@ import { createUser } from '$lib/entities/user'
 import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
 import { dev } from '$app/environment'
-import { fail, redirect } from '@sveltejs/kit'
+import { fail } from '@sveltejs/kit'
 
 export const actions: Actions = {
   default: async ({ request, cookies }) => {
@@ -38,6 +38,10 @@ export const actions: Actions = {
           maxAge: 60 * 60 * 24 * 7, // one week
         })
       }
+
+      return {
+        success: 'Signed up successfully.',
+      }
     } catch (error) {
       if (error instanceof ZodError) {
         const errors = error.flatten().fieldErrors
@@ -53,7 +57,5 @@ export const actions: Actions = {
         error,
       })
     }
-
-    throw redirect(303, '/app')
   },
 }
