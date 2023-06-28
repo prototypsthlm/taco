@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   return {
     chats: chats.map((chat) => ({
       ...chat,
-      temperature: String(chat?.temperature),
+      temperature: Number(chat?.temperature),
     })),
   }
 }
