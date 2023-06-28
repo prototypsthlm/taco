@@ -1,10 +1,12 @@
 import { ask } from '$lib/api/openai'
 import {
   addMessageToChat,
+  createChat,
   getChatWithRelationsById,
   getUserChats,
   storeAnswer,
 } from '$lib/entities/chat'
+import type { Chat } from '@prisma/client'
 import { fail, json, redirect } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { PageServerLoad, Actions } from './$types'
@@ -15,7 +17,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   return {
     chat: {
       ...userChats[0],
-      temperature: Number(userChats[0].temperature),
+      temperature: Number(userChats[0]?.temperature),
     },
   }
 }
@@ -32,7 +34,11 @@ export const actions: Actions = {
 
       const userChats = await getUserChats(locals.currentUser.id)
 
-      const chatWithQuestion = await addMessageToChat(userChats[0], schema.message)
+      let currentChat: Chat = userChats[0]
+
+      if (!currentChat) currentChat = await createChat(locals.currentUser.id)
+
+      const chatWithQuestion = await addMessageToChat(currentChat, schema.message)
 
       const response = await ask(chatWithQuestion)
 
@@ -43,7 +49,8 @@ export const actions: Actions = {
       const updatedChat = await getChatWithRelationsById(chatWithQuestion.id)
 
       return {
-        chat: updatedChat,
+        ...updatedChat,
+        temperature: Number(updatedChat?.temperature),
       }
     } catch (error) {
       console.error(error)

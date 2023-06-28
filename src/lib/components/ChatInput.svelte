@@ -7,7 +7,6 @@
   function dispatchMessage() {
     if (text) {
       dispatch('message', text)
-      text = ''
     }
   }
 
@@ -27,6 +26,7 @@
     <div class="flex justify-centermin-h-[4rem] w-full bg-primary rounded-l-xl">
       <textarea
         rows="1"
+        name="message"
         bind:value={text}
         on:input={handleTextAreaSize}
         placeholder="Type your message"
