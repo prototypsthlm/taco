@@ -12,16 +12,16 @@
   <title>Signup</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-gray-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
   <div class="sm:mx-auto sm:w-full sm:max-w-md">
     <img class="mx-auto h-10 w-auto" src={logo} alt="LLM Portal" />
-    <h2 class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+    <h2 class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-100">
       Create an account
     </h2>
   </div>
 
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-    <div class="bg-white px-6 py-12 shadow sm:px-12">
+    <div class="bg-gray-900 px-6 py-12 shadow sm:px-12">
       <Alert
         type={(form?.error && 'error') || (form?.success && 'success')}
         message={form?.error || form?.success}
@@ -80,7 +80,7 @@
         <div>
           <button
             type="submit"
-            class="flex w-full justify-center bg-sky-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            class="flex w-full justify-center bg-sky-400 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
             >Sign up
           </button>
         </div>
@@ -92,7 +92,7 @@
             <div class="w-full border-t border-gray-200" />
           </div>
           <div class="relative flex justify-center text-sm font-medium leading-6">
-            <span class="bg-white px-6 text-gray-900">Or continue with</span>
+            <span class="bg-gray-800 px-6 text-gray-100">Or continue with</span>
           </div>
         </div>
 
