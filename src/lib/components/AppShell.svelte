@@ -54,7 +54,9 @@
               class="min-h-screen flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10"
             >
               <div class="flex h-16 shrink-0 items-center">
-                <img class="h-8 w-auto" src={logo} alt="LLM Portal" />
+                <a href="/app">
+                  <img class="h-8 w-auto" src={logo} alt="LLM Portal" />
+                </a>
               </div>
               <nav class="flex flex-1 flex-col">
                 <div class="flex flex-1 flex-col gap-y-7">
@@ -121,9 +123,7 @@
     </a>
   </div>
 
-  <main class="py-10 lg:pl-72">
-    <div class="px-4 sm:px-6 lg:px-8">
-      <slot name="main" />
-    </div>
+  <main class="lg:pl-72">
+    <slot name="main" />
   </main>
 </div>
