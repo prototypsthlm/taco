@@ -38,6 +38,15 @@ export const getUserChats = async (userId: number) => {
   })
 }
 
+export const createChat = async (userId: number) => {
+  return prisma.chat.create({
+    data: {
+      name: 'Chat',
+      ownerId: userId,
+    },
+  })
+}
+
 export const addMessageToChat = async (chat: Chat, question: string) => {
   return prisma.chat.update({
     where: {
