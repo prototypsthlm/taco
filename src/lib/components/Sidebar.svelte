@@ -1,15 +1,13 @@
+<!-- THIS CAN COMPLETELLY BE WIPED JUST DEMO CONENT FOR THE SIDEBAR -->
 <script lang="ts">
   import {
-    Bars3Icon,
     CalendarIcon,
     ChartPieIcon,
     DocumentDuplicateIcon,
     FolderIcon,
     HomeIcon,
     UsersIcon,
-    XMarkIcon,
   } from '@babeard/svelte-heroicons/outline'
-  import { Dialog, TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
   import classNames from 'classnames'
 
   const navigation = [
@@ -27,10 +25,10 @@
   ]
 </script>
 
-<li>
-  <ul role="list" class="-mx-2 space-y-1">
+<div class="side-foo-1">
+  <div role="list" class="-mx-2 space-y-1">
     {#each navigation as item}
-      <li>
+      <div>
         <a
           href={item.href}
           class={classNames(
@@ -43,15 +41,15 @@
           <svelte:component this={item.icon} class="h-6 w-6 shrink-0" aria-hidden="true" />
           {item.name}
         </a>
-      </li>
+      </div>
     {/each}
-  </ul>
-</li>
-<li>
+  </div>
+</div>
+<div class="side-foo-2">
   <div class="text-xs font-semibold leading-6 text-gray-400">Your teams</div>
-  <ul role="list" class="-mx-2 mt-2 space-y-1">
+  <div role="list" class="-mx-2 mt-2 space-y-1">
     {#each teams as team}
-      <li>
+      <div>
         <a
           href={team.href}
           class={classNames(
@@ -68,7 +66,7 @@
           </span>
           <span class="truncate">{team.name}</span>
         </a>
-      </li>
+      </div>
     {/each}
-  </ul>
-</li>
+  </div>
+</div>
