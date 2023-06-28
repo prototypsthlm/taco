@@ -108,7 +108,9 @@
       <span class="sr-only">Open sidebar</span>
       <Bars3Icon class="h-6 w-6" aria-hidden="true" />
     </button>
-    <div class="flex-1 text-sm font-semibold leading-6 text-white">LLM Portal</div>
+    <div class="flex-1 text-sm font-semibold leading-6 text-white">
+      <slot name="title" />
+    </div>
     <a href="/app/settings">
       <span class="sr-only">Your profile</span>
       <img
