@@ -17,14 +17,8 @@
       ...messages,
       {
         question: message,
-        id: 0,
-        model: null,
-        temperature: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-        answer: null,
-        chatId: 0,
-        authorId: null,
       },
     ]
   }
