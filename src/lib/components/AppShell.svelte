@@ -29,7 +29,7 @@
   let sidebarOpen = false
 </script>
 
-<div>
+<div class="min-h-screen">
   <TransitionRoot show={sidebarOpen}>
     <Dialog as="div" class="relative z-50 lg:hidden" on:close={() => (sidebarOpen = false)}>
       <TransitionChild

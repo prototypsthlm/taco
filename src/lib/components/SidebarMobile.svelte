@@ -27,7 +27,9 @@
   ]
 </script>
 
-<div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10">
+<div
+  class=" min-h-screen flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10"
+>
   <div class="flex h-16 shrink-0 items-center">
     <img
       class="h-8 w-auto"
