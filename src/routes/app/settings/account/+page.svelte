@@ -148,7 +148,10 @@
     >
       <button
         class="bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400"
-        on:click={() => (isModalOpen = true)}
+        on:click={(e) => {
+          e.preventDefault()
+          isModalOpen = true
+        }}
         >Yes, delete my account
       </button>
       <ModalCancelConfirm bind:open={isModalOpen} on:confirm={() => deleteForm.requestSubmit()}>
@@ -158,7 +161,7 @@
           All of your data will be permanently removed from our servers forever. This action cannot
           be undone.
         </p>
-        <svelte:fragment slot="cancel-button">I changed my mind.</svelte:fragment>
+        <svelte:fragment slot="cancel-button">I changed my mind</svelte:fragment>
         <svelte:fragment slot="confirm-button">Yes, delete it all!</svelte:fragment>
       </ModalCancelConfirm>
     </form>
