@@ -1,6 +1,6 @@
 import { dev } from '$app/environment'
 import { getUserIfCredentialsMatch, setSessionId } from '$lib/entities/user'
-import { fail } from '@sveltejs/kit'
+import { fail, redirect } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
 
@@ -34,10 +34,6 @@ export const actions: Actions = {
         secure: !dev,
         maxAge: schema.remember ? 60 * 60 * 24 * 7 : undefined, // one week or undefined
       })
-
-      return {
-        success: 'Singed in successfully.',
-      }
     } catch (error) {
       if (error instanceof ZodError) {
         const errors = error.flatten().fieldErrors
@@ -53,5 +49,6 @@ export const actions: Actions = {
         error,
       })
     }
+    throw redirect(303, '/app')
   },
 }
