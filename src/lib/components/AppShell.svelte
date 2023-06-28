@@ -1,7 +1,11 @@
 <script lang="ts">
   import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
+  import type { User } from '@prisma/client'
   import { Dialog, TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
   import logo from '$lib/assets/logo.png'
+  import md5 from 'crypto-js/md5'
+
+  export let user: User
 
   let sidebarOpen = false
 </script>
@@ -81,11 +85,11 @@
             >
               <img
                 class="h-8 w-8 rounded-full bg-gray-800"
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                src={`https://www.gravatar.com/avatar/${md5(user.email)}`}
                 alt=""
               />
               <span class="sr-only">Your profile</span>
-              <span aria-hidden="true">Tom Cook</span>
+              <span aria-hidden="true">{user.name}</span>
             </a>
           </div>
         </div>
@@ -104,12 +108,12 @@
       <span class="sr-only">Open sidebar</span>
       <Bars3Icon class="h-6 w-6" aria-hidden="true" />
     </button>
-    <div class="flex-1 text-sm font-semibold leading-6 text-white">Dashboard</div>
+    <div class="flex-1 text-sm font-semibold leading-6 text-white">LLM Portal</div>
     <a href="/app/settings">
       <span class="sr-only">Your profile</span>
       <img
         class="h-8 w-8 rounded-full bg-gray-800"
-        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+        src={`https://www.gravatar.com/avatar/${md5(user.email)}`}
         alt=""
       />
     </a>
