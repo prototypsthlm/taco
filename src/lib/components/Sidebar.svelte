@@ -17,7 +17,7 @@
       <ForumPlus class="w-8 h-8 text-accent" />
       <p class="text-white text-2xl">New Chat</p>
     </a>
-    <hr class="border-accent mx-4 my-4 border-opacity-50" />
+    <hr class="border-accent mx-4 my-2 border-opacity-50" />
     {#each sortedChats as chat}
       <ChatLink
         chatId={chat.id}
