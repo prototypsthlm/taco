@@ -1,5 +1,5 @@
-import { updatePassword, updateUserPersonalData } from '$lib/entities/user'
-import { fail } from '@sveltejs/kit'
+import { deleteUser, updatePassword, updateUserPersonalData } from '$lib/entities/user'
+import { fail, redirect } from '@sveltejs/kit'
 import bcrypt from 'bcryptjs'
 import { z, ZodError } from 'zod'
 import type { Actions, PageServerLoad } from './$types'
@@ -101,5 +101,20 @@ export const actions: Actions = {
         },
       })
     }
+  },
+  delete: async ({ cookies, locals }) => {
+    try {
+      await deleteUser(locals.currentUser.id)
+
+      // delete cookie
+      await cookies.delete('session_id', { path: '/' })
+    } catch (error) {
+      return fail(500, {
+        password: {
+          error: `${error}`,
+        },
+      })
+    }
+    throw redirect(303, '/')
   },
 }

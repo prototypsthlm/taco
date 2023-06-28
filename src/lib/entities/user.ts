@@ -90,3 +90,7 @@ export const updatePassword = async (id: number, password: string) => {
     },
   })
 }
+
+export const deleteUser = (id: number) => {
+  return prisma.user.delete({ where: { id } })
+}

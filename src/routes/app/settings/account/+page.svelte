@@ -2,10 +2,14 @@
   import { enhance } from '$app/forms'
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
+  import ModalCancelConfirm from '$lib/components/ModalCancelConfirm.svelte'
   import type { ActionData, PageData } from './$types'
+
+  let isModalOpen = false
 
   export let data: PageData
   export let form: ActionData
+  let deleteForm
 </script>
 
 <!-- Settings forms -->
@@ -136,12 +140,27 @@
       </p>
     </div>
 
-    <form class="flex items-start md:col-span-2">
+    <form
+      method="post"
+      action="?/delete"
+      class="flex items-start md:col-span-2"
+      bind:this={deleteForm}
+    >
       <button
-        type="submit"
         class="bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400"
+        on:click={() => (isModalOpen = true)}
         >Yes, delete my account
       </button>
+      <ModalCancelConfirm bind:open={isModalOpen} on:confirm={() => deleteForm.requestSubmit()}>
+        <svelte:fragment slot="title">Are you sure you want to delete your account?</svelte:fragment
+        >
+        <p slot="body" class="text-sm text-gray-500">
+          All of your data will be permanently removed from our servers forever. This action cannot
+          be undone.
+        </p>
+        <svelte:fragment slot="cancel-button">I changed my mind.</svelte:fragment>
+        <svelte:fragment slot="confirm-button">Yes, delete it all!</svelte:fragment>
+      </ModalCancelConfirm>
     </form>
   </div>
 </div>
