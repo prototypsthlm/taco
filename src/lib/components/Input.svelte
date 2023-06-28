@@ -1,6 +1,6 @@
 <script lang="ts">
   import classNames from 'classnames'
-  import { Icon, ExclamationCircle } from 'svelte-hero-icons'
+  import { ExclamationCircleIcon } from '@babeard/svelte-heroicons/solid'
 
   export let name: string
   export let id = name
@@ -41,7 +41,7 @@
     />
     {#if errors?.length}
       <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-        <Icon solid src={ExclamationCircle} class="h-5 w-5 text-red-500" aria-hidden="true" />
+        <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
       </div>
     {/if}
   </div>

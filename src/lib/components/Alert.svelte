@@ -1,12 +1,11 @@
 <script lang="ts">
   import classNames from 'classnames'
   import {
-    Icon,
-    CheckCircle,
-    XCircle,
-    ExclamationTriangle,
-    InformationCircle,
-  } from 'svelte-hero-icons'
+    CheckCircleIcon,
+    ExclamationTriangleIcon,
+    InformationCircleIcon,
+    XCircleIcon,
+  } from '@babeard/svelte-heroicons/solid'
   export let message: string
   export let type = 'info'
 
@@ -15,25 +14,25 @@
       bg: 'bg-green-50',
       text: 'text-green-700',
       iconColor: 'text-green-400',
-      icon: CheckCircle,
+      icon: CheckCircleIcon,
     },
     warning: {
       bg: 'bg-yellow-50',
       text: 'text-yellow-700',
       iconColor: 'text-yellow-400',
-      icon: ExclamationTriangle,
+      icon: ExclamationTriangleIcon,
     },
     error: {
       bg: 'bg-red-50',
       text: 'text-red-700',
       iconColor: 'text-red-400',
-      icon: XCircle,
+      icon: XCircleIcon,
     },
     info: {
       bg: 'bg-blue-50',
       text: 'text-blue-700',
       iconColor: 'text-blue-400',
-      icon: InformationCircle,
+      icon: InformationCircleIcon,
     },
   }
 </script>
@@ -42,9 +41,9 @@
   <div class={classNames('p-4', typeMap[type].bg, $$props.class)}>
     <div class="flex">
       <div class="flex-shrink-0">
-        <Icon
+        <svelte:component
+          this={typeMap[type].icon}
           class={classNames('w-5', typeMap[type].iconColor)}
-          src={typeMap[type].icon}
           aria-hidden="true"
         />
       </div>
