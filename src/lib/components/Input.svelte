@@ -23,7 +23,7 @@
       {name}
       {type}
       class={classNames(
-        'block w-full border-0 py-1.5 shadow-sm ring-1 ring-inset dark:bg-white/5',
+        'block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset dark:bg-white/5',
         'sm:text-sm sm:leading-6',
         'focus:ring-2 focus:ring-inset',
         'disabled:cursor-not-allowed disabled:bg-gray-50 dark:disabled:bg-white/7 disabled:text-gray-500 dark:disabled:text-gray-600 disabled:ring-gray-200',

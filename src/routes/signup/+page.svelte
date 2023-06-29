@@ -25,7 +25,7 @@
   </div>
 
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-    <div class="bg-white dark:bg-gray-900 px-6 py-12 shadow sm:px-12">
+    <div class="bg-white dark:bg-gray-900 px-6 py-12 shadow sm:rounded-lg sm:px-12">
       <Alert
         type={(form?.error && 'error') || (form?.success && 'success')}
         message={form?.error || form?.success}
@@ -84,7 +84,7 @@
         <div>
           <button
             type="submit"
-            class="flex w-full justify-center bg-indigo-600 dark:bg-indigo-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="flex w-full justify-center rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >Sign up
           </button>
         </div>
@@ -105,7 +105,7 @@
         <div class="mt-6 grid grid-cols-2 gap-4">
           <a
             href="#"
-            class="flex w-full items-center justify-center gap-3 bg-[#1D9BF0] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
+            class="flex w-full items-center justify-center gap-3 rounded-md bg-[#1D9BF0] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
           >
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path
@@ -117,7 +117,7 @@
 
           <a
             href="#"
-            class="flex w-full items-center justify-center gap-3 bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
+            class="flex w-full items-center justify-center gap-3 rounded-md bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
           >
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path

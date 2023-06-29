@@ -64,7 +64,7 @@
               id="remember"
               name="remember"
               type="checkbox"
-              class="h-4 w-4 border-gray-300 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-600 dark:bg-white/5"
+              class="h-4 w-4 rounded border-gray-300 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-600 dark:bg-white/5"
             />
             <label
               for="remember"
@@ -85,7 +85,7 @@
         <div>
           <button
             type="submit"
-            class="flex w-full justify-center bg-indigo-600 dark:bg-indigo-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            class="flex w-full justify-center rounded-md bg-indigo-600 dark:bg-indigo-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >Sign in
           </button>
         </div>
@@ -106,7 +106,7 @@
         <div class="mt-6 grid grid-cols-2 gap-4">
           <a
             href="#"
-            class="flex w-full items-center justify-center gap-3 bg-[#1D9BF0] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
+            class="flex w-full items-center justify-center gap-3 rounded-md bg-[#1D9BF0] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
           >
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path
@@ -118,7 +118,7 @@
 
           <a
             href="#"
-            class="flex w-full items-center justify-center gap-3 bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
+            class="flex w-full items-center justify-center gap-3 rounded-md bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
           >
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path
