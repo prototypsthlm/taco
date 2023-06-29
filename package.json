@@ -1,6 +1,7 @@
 {
 	"name": "llm-portal",
 	"version": "0.0.1",
+  "type": "module",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -44,7 +45,6 @@
 		"vite": "^4.3.0",
 		"vitest": "^0.32.2"
 	},
-	"type": "module",
 	"dependencies": {
 		"@prisma/client": "^4.16.0",
 		"bcryptjs": "^2.4.3",
