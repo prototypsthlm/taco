@@ -133,6 +133,23 @@
     class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8"
   >
     <div>
+      <h2 class="text-base font-semibold leading-7 text-white">Log out</h2>
+    </div>
+
+    <div class="md:col-span-2">
+      <div class="flex">
+        <a
+          class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+          href="/signout">Log out</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8"
+  >
+    <div>
       <h2 class="text-base font-semibold leading-7 text-white">Delete account</h2>
       <p class="mt-1 text-sm leading-6 text-gray-400">
         No longer want to use our service? You can delete your account here. This action is not
