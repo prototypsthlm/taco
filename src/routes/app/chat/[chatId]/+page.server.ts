@@ -3,15 +3,18 @@ import { sendMessage } from '$lib/utils/chatting'
 import { fail, type Actions } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, parent }) => {
+  const { chats, user } = await parent()
   const chatId = Number(params.chatId)
   const chat = await getChatWithRelationsById(chatId)
 
   return {
+    user,
+    chats,
     chatId,
     chat: {
       ...chat,
-      temperature: String(chat?.temperature),
+      temperature: Number(chat?.temperature),
     },
   }
 }

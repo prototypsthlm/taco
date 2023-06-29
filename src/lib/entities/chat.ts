@@ -33,7 +33,6 @@ export const getUserChats = async (userId: number) => {
           team: true,
         },
       },
-      messages: true,
     },
   })
 }
