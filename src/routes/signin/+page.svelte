@@ -12,16 +12,20 @@
   <title>Signin</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+<div
+  class="min-h-screen bg-gray-50 dark:bg-gray-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+>
   <div class="sm:mx-auto sm:w-full sm:max-w-md">
     <img class="mx-auto h-10 w-auto" src={logo} alt="LLM Portal" />
-    <h2 class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-100">
+    <h2
+      class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-gray-100"
+    >
       Sign in to your account
     </h2>
   </div>
 
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-    <div class="bg-gray-900 px-6 py-12 shadow sm:px-12">
+    <div class="bg-white dark:bg-gray-900 px-6 py-12 shadow sm:px-12">
       <Alert
         type={(form?.error && 'error') || (form?.success && 'success')}
         message={form?.error || form?.success}
@@ -60,22 +64,26 @@
               id="remember"
               name="remember"
               type="checkbox"
-              class="h-4 w-4 border-gray-300 text-sky-400 focus:ring-sky-600 bg-white/5"
+              class="h-4 w-4 border-gray-300 text-sky-600 dark:text-sky-400 focus:ring-sky-600 dark:bg-white/5"
             />
-            <label for="remember" class="ml-3 block text-sm leading-6 text-gray-100"
+            <label
+              for="remember"
+              class="ml-3 block text-sm leading-6 text-gray-900 dark:text-gray-100"
               >Remember me</label
             >
           </div>
 
           <div class="text-sm leading-6">
-            <a href="#" class="font-semibold text-sky-400 hover:text-sky-500">Forgot password?</a>
+            <a href="#" class="font-semibold text-sky-600 dark:text-sky-400 hover:text-sky-500"
+              >Forgot password?</a
+            >
           </div>
         </div>
 
         <div>
           <button
             type="submit"
-            class="flex w-full justify-center bg-sky-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            class="flex w-full justify-center bg-sky-600 dark:bg-sky-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
             >Sign in
           </button>
         </div>
@@ -87,7 +95,9 @@
             <div class="w-full border-t border-gray-200" />
           </div>
           <div class="relative flex justify-center text-sm font-medium leading-6">
-            <span class="bg-gray-800 px-6 text-gray-100">Or continue with</span>
+            <span class="bg-white dark:bg-gray-900 px-6 text-gray-900 dark:text-gray-100"
+              >Or continue with</span
+            >
           </div>
         </div>
 
@@ -123,7 +133,10 @@
 
     <p class="mt-10 text-center text-sm text-gray-500">
       Not a member?
-      <a href="/signup" class="font-semibold leading-6 text-sky-400 hover:text-sky-500">Sign up</a>
+      <a
+        href="/signup"
+        class="font-semibold leading-6 text-sky-600 dark:text-sky-400 hover:text-sky-500">Sign up</a
+      >
     </p>
   </div>
 </div>

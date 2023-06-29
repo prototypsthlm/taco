@@ -14,20 +14,23 @@
 </script>
 
 <div class={$$props.class}>
-  <label for={id} class="block text-sm font-medium leading-6 text-white">{label}</label>
+  <label for={id} class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+    >{label}</label
+  >
   <div class="relative mt-2 shadow-sm">
     <input
       {id}
       {name}
       {type}
       class={classNames(
-        'block w-full border-0 py-1.5 shadow-sm ring-1 ring-inset bg-white/5',
+        'block w-full border-0 py-1.5 shadow-sm ring-1 ring-inset dark:bg-white/5',
         'sm:text-sm sm:leading-6',
         'focus:ring-2 focus:ring-inset',
-        'disabled:cursor-not-allowed disabled:bg-white/7 disabled:text-gray-600 disabled:ring-gray-200',
+        'disabled:cursor-not-allowed disabled:bg-gray-50 dark:disabled:bg-white/7 disabled:text-gray-500 dark:disabled:text-gray-600 disabled:ring-gray-200',
         {
-          'text-white ring-white/10 placeholder:text-gray-400 focus:ring-sky-500': !errors?.length,
-          'pr-10 text-red-600 ring-red-300 placeholder:text-red-300 focus:ring-red-500':
+          'text-gray-900 ring-gray-300 dark:text-white dark:ring-white/10 placeholder:text-gray-400 focus:ring-sky-500':
+            !errors?.length,
+          'pr-10 text-red-900 dark:text-red-600 ring-red-300 placeholder:text-red-300 focus:ring-red-500':
             errors?.length,
         }
       )}
