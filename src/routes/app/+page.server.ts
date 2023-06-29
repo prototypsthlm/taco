@@ -1,12 +1,6 @@
 import { sendMessage } from '$lib/utils/chatting'
 import { fail } from '@sveltejs/kit'
-import type { Actions, PageServerLoad } from './$types'
-
-export const load: PageServerLoad = async ({ locals }) => {
-  return {
-    user: locals.currentUser,
-  }
-}
+import type { Actions } from './$types'
 
 export const actions: Actions = {
   sendMessage: async ({ request, locals }) => {

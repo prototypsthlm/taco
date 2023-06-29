@@ -1,7 +1,7 @@
 <script lang="ts">
   import ForumPlus from 'svelte-material-icons/ForumPlus.svelte'
   import { page } from '$app/stores'
-  import ChatLink from './ChatLink.svelte'
+  import ChatLink from '$lib/components/ChatLink.svelte'
 
   export let chats = []
 

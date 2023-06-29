@@ -1,8 +1,14 @@
-<script>
+<script lang="ts">
+  import AppShell from '$lib/components/AppShell.svelte'
   import ChatRoom from '$lib/components/ChatRoom.svelte'
+  import Sidebar from '$lib/components/Sidebar.svelte'
 
-  export let data
-  export let form
+  import type { PageData } from './$types'
+
+  export let data: PageData
 </script>
 
-<ChatRoom chat={data?.chat || null} />
+<AppShell user={data.user}>
+  <Sidebar slot="sidebar" chats={data.chats} />
+  <ChatRoom slot="main" chat={data?.chat || null} />
+</AppShell>
