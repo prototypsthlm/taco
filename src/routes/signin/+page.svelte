@@ -3,31 +3,44 @@
   import logo from '$lib/assets/logo.png'
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
+  import type { ActionData } from './$types'
 
-  export let form
+  export let form: ActionData
 </script>
 
 <svelte:head>
   <title>Signin</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+<div
+  class="min-h-screen bg-gray-50 dark:bg-gray-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+>
   <div class="sm:mx-auto sm:w-full sm:max-w-md">
     <img class="mx-auto h-10 w-auto" src={logo} alt="LLM Portal" />
-    <h2 class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+    <h2
+      class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-gray-100"
+    >
       Sign in to your account
     </h2>
   </div>
 
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-    <div class="bg-white px-6 py-12 shadow sm:px-12">
-      {#if form?.error}
-        <Alert message={form?.error} />
-      {/if}
+    <div class="bg-white dark:bg-gray-900 px-6 py-12 shadow sm:px-12">
+      <Alert
+        type={(form?.error && 'error') || (form?.success && 'success')}
+        message={form?.error || form?.success}
+      />
 
-      <form class="space-y-6 mt-4" method="POST" novalidate use:enhance>
+      <form
+        class="space-y-6 mt-4"
+        method="POST"
+        novalidate
+        use:enhance={() => {
+          return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
+        }}
+      >
         <Input
-          value={form?.data?.email}
+          value={form?.fields?.email}
           errors={form?.errors?.email}
           label="Email"
           id="email"
@@ -36,7 +49,7 @@
           autocomplete="email"
         />
         <Input
-          value={form?.data?.password}
+          value={form?.fields?.password}
           errors={form?.errors?.password}
           label="Password"
           id="password"
@@ -51,22 +64,28 @@
               id="remember"
               name="remember"
               type="checkbox"
-              class="h-4 w-4 border-gray-300 text-sky-600 focus:ring-sky-600"
+              class="h-4 w-4 rounded border-gray-300 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-600 dark:bg-white/5"
             />
-            <label for="remember" class="ml-3 block text-sm leading-6 text-gray-900"
+            <label
+              for="remember"
+              class="ml-3 block text-sm leading-6 text-gray-900 dark:text-gray-100"
               >Remember me</label
             >
           </div>
 
           <div class="text-sm leading-6">
-            <a href="#" class="font-semibold text-sky-600 hover:text-sky-500">Forgot password?</a>
+            <a
+              href="#"
+              class="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
+              >Forgot password?</a
+            >
           </div>
         </div>
 
         <div>
           <button
             type="submit"
-            class="flex w-full justify-center bg-sky-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            class="flex w-full justify-center rounded-md bg-indigo-600 dark:bg-indigo-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >Sign in
           </button>
         </div>
@@ -78,14 +97,16 @@
             <div class="w-full border-t border-gray-200" />
           </div>
           <div class="relative flex justify-center text-sm font-medium leading-6">
-            <span class="bg-white px-6 text-gray-900">Or continue with</span>
+            <span class="bg-white dark:bg-gray-900 px-6 text-gray-900 dark:text-gray-100"
+              >Or continue with</span
+            >
           </div>
         </div>
 
         <div class="mt-6 grid grid-cols-2 gap-4">
           <a
             href="#"
-            class="flex w-full items-center justify-center gap-3 bg-[#1D9BF0] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
+            class="flex w-full items-center justify-center gap-3 rounded-md bg-[#1D9BF0] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9BF0]"
           >
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path
@@ -97,7 +118,7 @@
 
           <a
             href="#"
-            class="flex w-full items-center justify-center gap-3 bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
+            class="flex w-full items-center justify-center gap-3 rounded-md bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
           >
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path
@@ -114,7 +135,11 @@
 
     <p class="mt-10 text-center text-sm text-gray-500">
       Not a member?
-      <a href="/signup" class="font-semibold leading-6 text-sky-600 hover:text-sky-500">Sign up</a>
+      <a
+        href="/signup"
+        class="font-semibold leading-6 text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
+        >Sign up</a
+      >
     </p>
   </div>
 </div>

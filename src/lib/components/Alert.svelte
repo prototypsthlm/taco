@@ -1,24 +1,57 @@
 <script lang="ts">
   import classNames from 'classnames'
+  import {
+    CheckCircleIcon,
+    ExclamationTriangleIcon,
+    InformationCircleIcon,
+    XCircleIcon,
+  } from '@babeard/svelte-heroicons/solid'
+  export let message: string
+  export let type = 'info'
 
-  export let message = ''
+  const typeMap = {
+    success: {
+      bg: 'bg-green-50',
+      text: 'text-green-700',
+      iconColor: 'text-green-400',
+      icon: CheckCircleIcon,
+    },
+    warning: {
+      bg: 'bg-yellow-50',
+      text: 'text-yellow-700',
+      iconColor: 'text-yellow-400',
+      icon: ExclamationTriangleIcon,
+    },
+    error: {
+      bg: 'bg-red-50',
+      text: 'text-red-700',
+      iconColor: 'text-red-400',
+      icon: XCircleIcon,
+    },
+    info: {
+      bg: 'bg-blue-50',
+      text: 'text-blue-700',
+      iconColor: 'text-blue-400',
+      icon: InformationCircleIcon,
+    },
+  }
 </script>
 
-<div class={classNames('bg-red-50 p-4', $$props.class)}>
-  <div class="flex">
-    <div class="flex-shrink-0">
-      <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path
-          fill-rule="evenodd"
-          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-          clip-rule="evenodd"
+{#if message}
+  <div class={classNames('p-4', typeMap[type].bg, $$props.class)}>
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svelte:component
+          this={typeMap[type].icon}
+          class={classNames('w-5', typeMap[type].iconColor)}
+          aria-hidden="true"
         />
-      </svg>
-    </div>
-    <div class="ml-3 flex-1 md:flex md:justify-between">
-      <p class="text-sm text-red-700">
-        {message}
-      </p>
+      </div>
+      <div class="ml-3 flex-1 md:flex md:justify-between">
+        <p class={classNames('text-sm', typeMap[type].text)}>
+          {message}
+        </p>
+      </div>
     </div>
   </div>
-</div>
+{/if}
