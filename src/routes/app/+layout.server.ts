@@ -1,4 +1,4 @@
-import { getUserChats } from '$lib/entities/chat'
+import { getUserChats } from '$lib/server/entities/chat'
 import type { LayoutServerLoad } from './$types'
 
 export const load: LayoutServerLoad = async ({ locals }) => {

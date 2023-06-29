@@ -1,5 +1,5 @@
-import { prisma } from '$lib/prisma'
-import { generateSessionId } from '$lib/utils/crypto'
+import { prisma } from '$lib/server/prisma'
+import { generateSessionId } from '$lib/server/utils/crypto'
 import { Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 

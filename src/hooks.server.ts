@@ -1,4 +1,4 @@
-import { getUserBySessionId } from '$lib/entities/user'
+import { getUserBySessionId } from '$lib/server/entities/user'
 import type { Handle } from '@sveltejs/kit'
 import { redirect } from '@sveltejs/kit'
 

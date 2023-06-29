@@ -1,10 +1,10 @@
-import { ask } from '$lib/api/openai'
+import { ask } from '$lib/server/api/openai'
 import {
   addMessageToChat,
   createChat,
   getChatWithRelationsById,
   storeAnswer,
-} from '$lib/entities/chat'
+} from '$lib/server/entities/chat'
 import type { Chat } from '@prisma/client'
 import { z, ZodError } from 'zod'
 

@@ -1,4 +1,4 @@
-import { createUser } from '$lib/entities/user'
+import { createUser } from '$lib/server/entities/user'
 import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
 import { dev } from '$app/environment'

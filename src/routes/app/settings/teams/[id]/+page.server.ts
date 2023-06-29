@@ -1,5 +1,5 @@
-import { updateTeam } from '$lib/entities/team'
-import { getUserWithRelationsById } from '$lib/entities/user'
+import { updateTeam } from '$lib/server/entities/team'
+import { getUserWithRelationsById } from '$lib/server/entities/user'
 import { Role } from '@prisma/client'
 import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
