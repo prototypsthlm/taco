@@ -37,6 +37,7 @@
       <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
         <div class="col-span-full">
           <Input
+            class="dark"
             name="openAiApiKey"
             value={form?.fields?.openAiApiKey ?? data.userTeam.team.openAiApiKey}
             errors={form?.errors?.openAiApiKey}
@@ -45,6 +46,7 @@
 
         <div class="col-span-full">
           <Input
+            class="dark"
             name="name"
             value={form?.fields?.name ?? data.userTeam.team.name}
             errors={form?.errors?.name}

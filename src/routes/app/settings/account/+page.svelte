@@ -34,7 +34,7 @@
     >
       <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
         <Input
-          class="col-span-full"
+          class="dark col-span-full"
           label="Name"
           name="name"
           value={form?.personal?.fields?.name || data.user.name}
@@ -42,7 +42,7 @@
         />
 
         <Input
-          class="col-span-full"
+          class="dark col-span-full"
           label="Email"
           name="email"
           type="email"
@@ -85,7 +85,7 @@
     >
       <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
         <Input
-          class="col-span-full"
+          class="dark col-span-full"
           label="Current password"
           id="current-password"
           name="currentPassword"
@@ -95,7 +95,7 @@
         />
 
         <Input
-          class="col-span-full"
+          class="dark col-span-full"
           label="New password"
           id="new-password"
           name="newPassword"
@@ -105,7 +105,7 @@
         />
 
         <Input
-          class="col-span-full"
+          class="dark col-span-full"
           label="Confirm password"
           id="confirm-password"
           name="confirmPassword"
