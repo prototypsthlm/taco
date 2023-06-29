@@ -28,7 +28,7 @@
         'focus:ring-2 focus:ring-inset',
         'disabled:cursor-not-allowed disabled:bg-gray-50 dark:disabled:bg-white/7 disabled:text-gray-500 dark:disabled:text-gray-600 disabled:ring-gray-200',
         {
-          'text-gray-900 ring-gray-300 dark:text-white dark:ring-white/10 placeholder:text-gray-400 focus:ring-sky-500':
+          'text-gray-900 ring-gray-300 dark:text-white dark:ring-white/10 placeholder:text-gray-400 focus:ring-indigo-500':
             !errors?.length,
           'pr-10 text-red-900 dark:text-red-600 ring-red-300 placeholder:text-red-300 focus:ring-red-500':
             errors?.length,

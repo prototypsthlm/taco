@@ -64,7 +64,7 @@
               id="remember"
               name="remember"
               type="checkbox"
-              class="h-4 w-4 border-gray-300 text-sky-600 dark:text-sky-400 focus:ring-sky-600 dark:bg-white/5"
+              class="h-4 w-4 border-gray-300 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-600 dark:bg-white/5"
             />
             <label
               for="remember"
@@ -74,7 +74,9 @@
           </div>
 
           <div class="text-sm leading-6">
-            <a href="#" class="font-semibold text-sky-600 dark:text-sky-400 hover:text-sky-500"
+            <a
+              href="#"
+              class="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
               >Forgot password?</a
             >
           </div>
@@ -83,7 +85,7 @@
         <div>
           <button
             type="submit"
-            class="flex w-full justify-center bg-sky-600 dark:bg-sky-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            class="flex w-full justify-center bg-indigo-600 dark:bg-indigo-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >Sign in
           </button>
         </div>
@@ -135,7 +137,8 @@
       Not a member?
       <a
         href="/signup"
-        class="font-semibold leading-6 text-sky-600 dark:text-sky-400 hover:text-sky-500">Sign up</a
+        class="font-semibold leading-6 text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
+        >Sign up</a
       >
     </p>
   </div>
