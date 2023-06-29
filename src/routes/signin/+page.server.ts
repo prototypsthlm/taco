@@ -6,7 +6,7 @@ import type { Actions } from './$types'
 
 export const actions: Actions = {
   default: async ({ request, cookies }) => {
-    const data = Object.fromEntries(await request.formData())
+    const fields = Object.fromEntries(await request.formData())
     try {
       const schema = z
         .object({
@@ -14,13 +14,13 @@ export const actions: Actions = {
           password: z.string().min(1),
           remember: z.preprocess((value) => value === 'on', z.boolean()),
         })
-        .parse(data)
+        .parse(fields)
 
       const maybeUser = await getUserIfCredentialsMatch(schema.email, schema.password)
 
       if (!maybeUser) {
         return fail(401, {
-          data,
+          fields,
           error: 'Wrong credentials',
         })
       }
@@ -39,17 +39,16 @@ export const actions: Actions = {
         const errors = error.flatten().fieldErrors
 
         return fail(422, {
-          data,
+          fields,
           errors,
         })
       }
 
       return fail(500, {
-        data,
+        fields,
         error,
       })
     }
-
     throw redirect(303, '/app')
   },
 }

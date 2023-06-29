@@ -12,7 +12,9 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
+		"@babeard/svelte-heroicons": "^2.0.0-rc.0",
 		"@faker-js/faker": "^8.0.2",
+		"@rgossiaux/svelte-headlessui": "^2.0.0",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.5.0",
 		"@tailwindcss/forms": "^0.5.3",
@@ -40,10 +42,11 @@
 	"type": "module",
 	"dependencies": {
 		"@prisma/client": "^4.16.0",
-    "svelte-material-icons": "^3.0.4",
 		"bcryptjs": "^2.4.3",
 		"classnames": "^2.3.2",
+		"crypto-js": "^4.1.1",
 		"openai": "^3.3.0",
+		"svelte-material-icons": "^3.0.4",
 		"zod": "^3.21.4"
 	},
 	"prisma": {
