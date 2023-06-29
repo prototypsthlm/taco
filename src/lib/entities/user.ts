@@ -3,12 +3,17 @@ import { generateSessionId } from '$lib/utils/crypto'
 import { Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-export const getUserByEmail = async (email: string) => {
-  return prisma.user.findUnique({ where: { email } })
-}
-
-export const getUserById = async (id: number) => {
-  return prisma.user.findUnique({ where: { id } })
+export const getUserWithRelationsById = async (id: number) => {
+  return prisma.user.findUnique({
+    where: { id },
+    include: {
+      userTeams: {
+        include: {
+          team: true,
+        },
+      },
+    },
+  })
 }
 
 export const getUserBySessionId = async (sessionId: string) => {
@@ -65,4 +70,27 @@ export const createUser = async (
       },
     },
   })
+}
+
+export const updateUserPersonalData = (id: number, name: string, email: string) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      name,
+      email,
+    },
+  })
+}
+
+export const updatePassword = async (id: number, password: string) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      password: await bcrypt.hash(password, 10),
+    },
+  })
+}
+
+export const deleteUser = (id: number) => {
+  return prisma.user.delete({ where: { id } })
 }
