@@ -38,7 +38,7 @@
           label="Name"
           name="name"
           value={form?.personal?.fields?.name || data.user.name}
-          errors={form?.errors?.name}
+          errors={form?.personal?.errors?.name}
         />
 
         <Input
@@ -47,7 +47,7 @@
           name="email"
           type="email"
           value={form?.personal?.fields?.email || data.user.email}
-          errors={form?.errors?.name}
+          errors={form?.personal?.errors?.email}
         />
       </div>
 
