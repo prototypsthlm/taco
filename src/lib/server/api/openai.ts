@@ -42,14 +42,14 @@ export const ask = async (chat: ChatWithRelations) => {
       ],
       temperature: Number(chat.temperature),
     })
+
+    if (!completion?.data?.choices?.[0].message?.content) {
+      throw new Error('Error getting an answer from API.')
+    }
+
+    return completion.data.choices[0].message.content
   } catch (error) {
     console.error(error)
-    throw new Error('Error getting an answer from API: ' + error?.response?.data?.error)
+    throw new Error(`Error getting an answer from API: ${error}`)
   }
-
-  if (!completion.data.choices[0].message?.content) {
-    throw new Error('Error getting an answer from API.')
-  }
-
-  return completion.data.choices[0].message.content
 }
