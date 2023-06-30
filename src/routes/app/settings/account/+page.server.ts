@@ -1,4 +1,4 @@
-import { deleteUser, updatePassword, updateUserPersonalData } from '$lib/entities/user'
+import { deleteUser, updatePassword, updateUserPersonalData } from '$lib/server/entities/user'
 import { fail, redirect } from '@sveltejs/kit'
 import bcrypt from 'bcryptjs'
 import { z, ZodError } from 'zod'

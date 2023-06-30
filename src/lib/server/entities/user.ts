@@ -1,10 +1,10 @@
-import { prisma } from '$lib/prisma'
-import { generateSessionId } from '$lib/utils/crypto'
+import { prisma } from '$lib/server/prisma'
+import { decrypt, generateSessionId } from '$lib/server/utils/crypto'
 import { Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 export const getUserWithRelationsById = async (id: number) => {
-  return prisma.user.findUnique({
+  const userWithRelations = await prisma.user.findUnique({
     where: { id },
     include: {
       userTeams: {
@@ -14,6 +14,25 @@ export const getUserWithRelationsById = async (id: number) => {
       },
     },
   })
+
+  if (!userWithRelations?.userTeams) {
+    return userWithRelations
+  }
+
+  userWithRelations.userTeams = userWithRelations?.userTeams.map((userTeam) => {
+    if (!userTeam?.team?.openAiApiKey) {
+      return userTeam
+    }
+
+    if (!process.env.SECRET_KEY) {
+      throw new Error('You must have SECRET_KEY set in your env.')
+    }
+
+    userTeam.team.openAiApiKey = decrypt(userTeam.team.openAiApiKey, process.env.SECRET_KEY)
+    return userTeam
+  })
+
+  return userWithRelations
 }
 
 export const getUserBySessionId = async (sessionId: string) => {

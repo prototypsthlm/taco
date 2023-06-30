@@ -1,4 +1,4 @@
-import { getUserWithRelationsById } from '$lib/entities/user'
+import { getUserWithRelationsById } from '$lib/server/entities/user'
 import type { LayoutServerLoad } from './$types'
 
 export const load: LayoutServerLoad = async ({ locals }) => {

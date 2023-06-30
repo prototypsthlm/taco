@@ -1,4 +1,4 @@
-import { sendMessage } from '$lib/utils/chatting'
+import { sendMessage } from '$lib/server/utils/chatting'
 import { fail } from '@sveltejs/kit'
 import type { Actions } from './$types'
 

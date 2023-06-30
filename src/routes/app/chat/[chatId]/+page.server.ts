@@ -1,5 +1,5 @@
-import { getChatWithRelationsById } from '$lib/entities/chat'
-import { sendMessage } from '$lib/utils/chatting'
+import { getChatWithRelationsById } from '$lib/server/entities/chat'
+import { sendMessage } from '$lib/server/utils/chatting'
 import { fail, type Actions } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
