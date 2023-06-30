@@ -1,7 +1,7 @@
 {
 	"name": "llm-portal",
 	"version": "0.0.1",
-  "type": "module",
+	"type": "module",
 	"private": true,
 	"scripts": {
 		"postinstall": "ts-node initialize.ts",
@@ -22,6 +22,7 @@
 		"@playwright/test": "^1.35.1",
 		"@rgossiaux/svelte-headlessui": "^2.0.0",
 		"@sveltejs/adapter-auto": "^2.0.0",
+		"@sveltejs/adapter-node": "^1.2.4",
 		"@sveltejs/kit": "^1.5.0",
 		"@tailwindcss/forms": "^0.5.3",
 		"@types/bcryptjs": "^2.4.2",
