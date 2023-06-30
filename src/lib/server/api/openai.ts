@@ -1,4 +1,5 @@
 import type { ChatWithRelations } from '$lib/server/entities/chat'
+import { decrypt } from '$lib/server/utils/crypto'
 import type { ChatCompletionRequestMessage } from 'openai'
 import { Configuration, OpenAIApi } from 'openai'
 import { ChatCompletionRequestMessageRoleEnum } from 'openai/api'
@@ -16,7 +17,11 @@ export const ask = async (chat: ChatWithRelations) => {
     throw new Error('Open AI API key is not set!')
   }
 
-  const client = getClient(chat.owner.team.openAiApiKey)
+  if (!process.env.SECRET_KEY) {
+    throw new Error('You must have SECRET_KEY set in your env.')
+  }
+
+  const client = getClient(decrypt(chat.owner.team.openAiApiKey, process.env.SECRET_KEY))
 
   const messages: ChatCompletionRequestMessage[] = chat.messages.flatMap((message) => {
     const question = [
