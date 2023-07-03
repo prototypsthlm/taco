@@ -4,8 +4,7 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-    "prepare": "svelte-kit sync",
-		"postinstall": "ts-node initialize.ts",
+		"postinstall": "svelte-kit sync && ts-node initialize.ts",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
