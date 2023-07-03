@@ -38,7 +38,7 @@
 </script>
 
 {#if message}
-  <div class={classNames('p-4', typeMap[type].bg, $$props.class)}>
+  <div class={classNames('rounded-md p-4', typeMap[type].bg, $$props.class)}>
     <div class="flex">
       <div class="flex-shrink-0">
         <svelte:component

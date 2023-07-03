@@ -58,6 +58,7 @@
           >Save</button
         >
         <Alert
+          class="ml-4"
           type={(form?.personal?.error && 'error') || (form?.personal?.success && 'success')}
           message={form?.personal?.error || form?.personal?.success}
         />
@@ -122,6 +123,7 @@
           >Save
         </button>
         <Alert
+          class="ml-4"
           type={(form?.password?.error && 'error') || (form?.password?.success && 'success')}
           message={form?.password?.error || form?.password?.success}
         />
