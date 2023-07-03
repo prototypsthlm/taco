@@ -36,7 +36,7 @@ if (fs.existsSync(envPath)) {
 console.log('.env file updated successfully with a new SECRET_KEY.')
 
 // Function to update the .env file with a new SECRET_KEY
-function updateEnvFile(filePath: string, envContents: string) {
+const updateEnvFile = (filePath, envContents) => {
   // Generate a new secret key
   const newSecretKey = generateSecretKey()
 
@@ -53,7 +53,7 @@ function updateEnvFile(filePath: string, envContents: string) {
 }
 
 // Function to generate a random secret key using crypto module
-function generateSecretKey(): string {
+const generateSecretKey = () => {
   const randomBytes = crypto.randomBytes(32)
   return randomBytes.toString('hex')
 }
