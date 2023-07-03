@@ -10,7 +10,7 @@
   let sidebarOpen = false
 </script>
 
-<div class="min-h-screen bg-black">
+<div class="min-h-screen bg-gray-900">
   <TransitionRoot show={sidebarOpen}>
     <Dialog as="div" class="relative z-50 lg:hidden" on:close={() => (sidebarOpen = false)}>
       <TransitionChild
@@ -54,8 +54,8 @@
               class="min-h-screen flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10"
             >
               <div class="flex h-16 shrink-0 items-center">
-                <a href="/app">
-                  <img class="h-8 w-auto" src={logo} alt="LLM Portal" />
+                <a class="flex text-white items-center gap-4 text-2xl" href="/app">
+                  <img class="h-8 w-auto" src={logo} alt="LLM Portal" /> LLM Portal
                 </a>
               </div>
               <nav class="flex flex-1 flex-col">
@@ -75,7 +75,9 @@
     <!-- Sidebar component, swap this element with another sidebar if you like -->
     <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6">
       <div class="flex h-16 shrink-0 items-center">
-        <img class="h-8 w-auto" src={logo} alt="LLM Portal" />
+        <a class="flex text-white items-center gap-4 text-2xl" href="/app">
+          <img class="h-8 w-auto" src={logo} alt="LLM Portal" /> LLM Portal
+        </a>
       </div>
       <nav class="flex flex-1 flex-col">
         <div class="flex flex-1 flex-col gap-y-7">
