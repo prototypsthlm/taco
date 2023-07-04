@@ -2,10 +2,9 @@
   import ForumPlus from 'svelte-material-icons/ForumPlus.svelte'
   import { page } from '$app/stores'
   import ChatLink from '$lib/components/ChatLink.svelte'
+  import type { ChatWithRelations } from '$lib/server/entities/chat'
 
-  export let chats = []
-
-  $: sortedChats = chats.sort((a, b) => a.updatedAt - b.updatedAt).reverse()
+  export let chats: ChatWithRelations[] = []
 </script>
 
 <div class="h-full w-96 bg-primary">
@@ -18,11 +17,11 @@
       <p class="text-white text-2xl">New Chat</p>
     </a>
     <hr class="border-accent mx-4 my-2 border-opacity-50" />
-    {#each sortedChats as chat}
+    {#each chats as chat}
       <ChatLink
         chatId={chat.id}
         name={chat.name}
-        isCurrentPage={$page.url.pathname == `/app/chat/${chat.id}`}
+        isCurrentPage={$page.url.pathname === `/app/chat/${chat.id}`}
       />
     {/each}
   </div>

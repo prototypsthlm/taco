@@ -34,6 +34,9 @@ export const getUserChats = async (userId: number) => {
         },
       },
     },
+    orderBy: {
+      updatedAt: 'desc',
+    },
   })
 }
 
