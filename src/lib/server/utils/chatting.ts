@@ -13,7 +13,7 @@ export async function sendMessage(formData: unknown, userId: number) {
     const schema = z
       .object({
         message: z.string(),
-        chatId: z.union([z.number(), z.undefined()]),
+        chatId: z.union([z.string(), z.undefined()]),
       })
       .parse(formData)
 
@@ -21,7 +21,8 @@ export async function sendMessage(formData: unknown, userId: number) {
     if (schema.chatId === undefined) {
       chat = await createChat(userId)
     } else {
-      chat = await getChatWithRelationsById(schema.chatId)
+      const chatId = Number(schema.chatId)
+      chat = await getChatWithRelationsById(chatId)
     }
 
     const chatWithQuestion = await addMessageToChat(chat, schema.message)
