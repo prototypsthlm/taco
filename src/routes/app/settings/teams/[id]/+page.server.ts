@@ -27,7 +27,7 @@ export const actions: Actions = {
         })
       }
 
-      await updateTeam(parseInt(params.id, 10), schema.name, schema.openAiApiKey)
+      await updateTeam(Number(params.id), schema.name, schema.openAiApiKey)
 
       return {
         success: 'Team updated successfully.',
