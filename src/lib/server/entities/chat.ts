@@ -46,10 +46,19 @@ export const createChat = async (userId: number) => {
       name: 'Chat',
       ownerId: userId,
     },
+    include: {
+      owner: {
+        include: {
+          user: true,
+          team: true,
+        },
+      },
+      messages: true,
+    },
   })
 }
 
-export const addMessageToChat = async (chat: Chat, question: string) => {
+export const addMessageToChat = async (chat: ChatWithRelations, question: string) => {
   return prisma.chat.update({
     where: {
       id: chat.id,
