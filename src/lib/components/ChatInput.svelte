@@ -31,11 +31,11 @@
         bind:value={text}
         on:input={handleTextAreaSize}
         placeholder="Type your message"
-        class="no-border w-full items-center my-auto resize-none m-4 text-2xl placeholder-white placeholder-opacity-50 bg-primary text-white"
+        class="no-border w-full items-center my-auto resize-none m-2 text-xl placeholder-white placeholder-opacity-50 bg-primary text-white"
       />
     </div>
-    <button on:click={dispatchMessage} class="p-4 pr-14 w-16 rounded-r-xl bg-primary group">
-      <PaperAirplaneIcon class="text-white h-10 w-10 opacity-40 group-hover:opacity-95 duration-200" />
+    <button on:click={dispatchMessage} class="p-3 pr-14 w-12 rounded-r-xl bg-primary group">
+      <PaperAirplaneIcon class="text-white h-8 w-10 opacity-40 group-hover:opacity-95 duration-200" />
     </button>
   </div>
 </div>
