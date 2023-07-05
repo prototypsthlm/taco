@@ -1,5 +1,4 @@
 import { prisma } from '$lib/server/prisma'
-import type { Chat } from '@prisma/client'
 export type ChatWithRelations = Awaited<ReturnType<typeof getChatWithRelationsById>>
 
 export const getChatWithRelationsById = async (id: number) => {
