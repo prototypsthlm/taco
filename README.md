@@ -63,3 +63,26 @@ the `.env` file before running the migration and seed commands.
 
 For more information on Prisma and its usage, refer to
 the [Prisma documentation](https://www.prisma.io/docs/).
+
+## Tailwind UI
+
+We use Tailwind UI to style the app. Tailwind UI relies on Headless UI in some parts. We use
+a svelte implementation of that library: @rgossiaux/svelte-headlessui. TWUI also relies on
+Heroicons, there is also a svelte port of that icon collection @babeard/svelte-heroicons.
+
+You can see all that in action in `src/lib/components/ModalCancelConfirm.svelte`.
+
+## Dark Mode
+
+We changed the default dark mode styling strategy in Tailwind to be class based (see tailwind
+config) instead of based in the system preference only. So now, the site respects user pref on dark
+mode but also allows us to force dark mode where there's no "non-dark" mode implemented. that can be
+done just adding the class `dark` to any part we want to force dark mode. See `Input` component
+usage in signin and signup for reference.
+
+We control the dark mode toggling here: `src/routes/+layout.svelte`.
+
+## Form validations
+
+We use zod validation library to validate forms. See settings and auth routes for ref. There is
+probably a good opportunity for an abstraction there given we use everywhere the same pattern.
