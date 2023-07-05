@@ -2,7 +2,6 @@
   import ChatInput from '$lib/components/ChatInput.svelte'
   import Question from '$lib/components/Question.svelte'
   import Answer from '$lib/components/Answer.svelte'
-  import { enhance } from '$app/forms'
   import { fade } from 'svelte/transition'
 
   export let chat: any | null
@@ -12,7 +11,9 @@
     messages = chat.messages
   }
 
-  function addPlaceholderMessage(message: string) {
+  function addPlaceholderMessage(event) {
+    const message = event.detail
+
     messages = [
       ...messages,
       {
@@ -44,19 +45,6 @@
   {/if}
 
   <div class="m-4 md:m-8 w-full">
-    <form
-      method="POST"
-      action="?/sendMessage"
-      novalidate
-      use:enhance={(formElement) => {
-        const message = String(formElement.formData.get('message'))
-        addPlaceholderMessage(message)
-      }}
-    >
-      <ChatInput />
-      {#if chat?.id}
-        <input type="hidden" name="chatId" value={chat.id} />
-      {/if}
-    </form>
+    <ChatInput chatId={chat?.id} on:message={addPlaceholderMessage} />
   </div>
 </div>
