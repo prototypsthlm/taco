@@ -1,28 +1,27 @@
 import { ask } from '$lib/server/api/openai'
+import type { ChatWithRelations } from '$lib/server/entities/chat'
 import {
   addMessageToChat,
   createChat,
   getChatWithRelationsById,
   storeAnswer,
 } from '$lib/server/entities/chat'
-import type { Chat } from '@prisma/client'
 import { z, ZodError } from 'zod'
 
-export async function sendMessage(formData: any, userId: number) {
+export async function sendMessage(formData: unknown, userId: number) {
   try {
     const schema = z
       .object({
         message: z.string(),
-        chatId: z.union([z.string(), z.undefined()]),
+        chatId: z.union([z.number(), z.undefined()]),
       })
       .parse(formData)
 
-    let chat: Chat
+    let chat: ChatWithRelations
     if (schema.chatId === undefined) {
       chat = await createChat(userId)
     } else {
-      const chatId = Number(schema.chatId)
-      chat = await getChatWithRelationsById(chatId)
+      chat = await getChatWithRelationsById(schema.chatId)
     }
 
     const chatWithQuestion = await addMessageToChat(chat, schema.message)
@@ -34,8 +33,7 @@ export async function sendMessage(formData: any, userId: number) {
 
     return {
       data: {
-        ...updatedChat,
-        temperature: Number(updatedChat?.temperature),
+        updatedChat,
       },
     }
   } catch (error) {

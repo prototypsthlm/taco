@@ -12,10 +12,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
     user,
     chats,
     chatId,
-    chat: {
-      ...chat,
-      temperature: Number(chat?.temperature),
-    },
+    chat,
   }
 }
 
