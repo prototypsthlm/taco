@@ -9,6 +9,6 @@
 </script>
 
 <AppShell user={data.user}>
-  <Sidebar slot="sidebar" chats={data.chats} />
+  <Sidebar slot="sidebar" chats={data.chats} currentChat={form?.chat || null} />
   <ChatRoom slot="main" chat={form?.chat || null} />
 </AppShell>

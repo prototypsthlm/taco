@@ -9,7 +9,7 @@
 </script>
 
 <AppShell user={data.user}>
-  <Sidebar slot="sidebar" />
+  <Sidebar slot="sidebar" chats={data.chats} />
   <div slot="main" class="min-h-screen bg-gray-900">
     <main>
       <header class="border-b border-white/5">

@@ -1,11 +1,11 @@
 <script lang="ts">
   import { PlusIcon } from '@babeard/svelte-heroicons/solid'
 
-  import { page } from '$app/stores'
   import ChatLink from '$lib/components/ChatLink.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
 
   export let chats: ChatWithRelations[] = []
+  export let currentChat: ChatWithRelations = null
 </script>
 
 <aside class="w-full">
@@ -26,7 +26,7 @@
         name={chat.name || 'New Chat'}
         updatedAt={chat.updatedAt}
         roleContent={chat.roleContent}
-        isCurrentPage={$page.url.pathname === `/app/chat/${chat.id}`}
+        isCurrentPage={chat.id === currentChat?.id}
       />
     {/each}
   </ul>
