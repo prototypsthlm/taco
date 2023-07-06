@@ -44,7 +44,7 @@
     </div>
   {/if}
 
-  <div class="m-4 md:m-8 w-full">
+  <div class="self-end py-3 md:py-6 w-full bg-gray-900">
     <ChatInput chatId={chat?.id} on:message={addPlaceholderMessage} />
   </div>
 </div>

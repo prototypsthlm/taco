@@ -45,7 +45,7 @@
 >
   <div class="flex flex-col items-center gap-1">
     <div class="w-full flex justify-center">
-      <div class="flex w-5/6 max-w-6xl shadow-xl">
+      <div class="flex w-5/6 max-w-5xl shadow-xl">
         <div class="flex justify-centermin-h-[4rem] w-full bg-primary rounded-l-xl">
           <textarea
             rows="1"
@@ -78,7 +78,6 @@
         </button>
       </div>
     </div>
-
     <p class="text-accent text-opacity-50">Press <strong> Shift + Enter </strong> for a new line</p>
   </div>
   {#if chatId}
