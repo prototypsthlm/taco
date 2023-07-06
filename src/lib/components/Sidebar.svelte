@@ -23,7 +23,7 @@
     {#each chats as chat}
       <ChatLink
         chatId={chat.id}
-        name={chat.name + ' Nr. ' + chat.id}
+        name={chat.name || 'New Chat'}
         updatedAt={chat.updatedAt}
         roleContent={chat.roleContent}
         isCurrentPage={$page.url.pathname === `/app/chat/${chat.id}`}
