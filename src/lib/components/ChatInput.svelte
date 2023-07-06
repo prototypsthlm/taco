@@ -8,6 +8,7 @@
   let text: string = ''
   let isShiftPressed: boolean = false
   let loading: boolean = false
+  let chatForm: HTMLFormElement
 
   const dispatch = createEventDispatcher()
 
@@ -34,6 +35,7 @@
   method="POST"
   action="?/sendMessage"
   novalidate
+  bind:this={chatForm}
   use:enhance={() => {
     dispatchMessage()
 
@@ -55,7 +57,7 @@
               if (e.key === 'Enter') {
                 if (!isShiftPressed) {
                   dispatchMessage()
-                  document.getElementById('chat-input')?.submit()
+                  chatForm.submit()
                   e.preventDefault()
                 } else handleTextAreaSize(e.target)
               } else if (e.key === 'Shift') isShiftPressed = true
