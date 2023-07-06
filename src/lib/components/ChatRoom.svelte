@@ -13,7 +13,9 @@
     messages = chat?.messages
   }
 
-  function addPlaceholderMessage(message: string) {
+  function addPlaceholderMessage(event) {
+    const message = event.detail
+
     messages = [
       ...messages,
       {
@@ -44,20 +46,7 @@
     </div>
   {/if}
 
-  <div class="m-4 md:m-8 w-full">
-    <form
-      method="POST"
-      action="?/sendMessage"
-      novalidate
-      use:enhance={(formElement) => {
-        const message = String(formElement.formData.get('message'))
-        addPlaceholderMessage(message)
-      }}
-    >
-      <ChatInput />
-      {#if chat?.id}
-        <input type="hidden" name="chatId" value={chat.id} />
-      {/if}
-    </form>
+  <div class="self-end py-3 md:py-6 w-full bg-gray-900">
+    <ChatInput chatId={chat?.id} on:message={addPlaceholderMessage} />
   </div>
 </div>

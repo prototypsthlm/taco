@@ -1,5 +1,6 @@
 <script lang="ts">
-  import ForumPlus from 'svelte-material-icons/ForumPlus.svelte'
+  import { PlusIcon } from '@babeard/svelte-heroicons/solid'
+
   import { page } from '$app/stores'
   import ChatLink from '$lib/components/ChatLink.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
@@ -7,22 +8,26 @@
   export let chats: ChatWithRelations[] = []
 </script>
 
-<div class="h-full w-96 bg-primary">
-  <div class="h-full flex flex-col gap-1 overflow-scroll">
+<aside class="w-full">
+  <ul class="flex flex-col gap-4">
     <a
       href="/app"
-      class="mx-3 mt-2 px-4 py-4 rounded-xl hover:bg-secondary flex gap-4 duration-150"
+      class="px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl"
     >
-      <ForumPlus class="w-8 h-8 text-accent" />
-      <p class="text-white text-2xl">New Chat</p>
+      <div class="flex items-center gap-x-3">
+        <PlusIcon class="h-6 w-6 text-white flex-none" />
+        <h3 class="flex-auto truncate text-md font-semibold leading-6 text-white">New Chat</h3>
+      </div>
     </a>
-    <hr class="border-accent mx-4 my-2 border-opacity-50" />
+    <hr class="w-full border-white/20" />
     {#each chats as chat}
       <ChatLink
         chatId={chat.id}
-        name={chat.name}
+        name={chat.name + ' Nr. ' + chat.id}
+        updatedAt={chat.updatedAt}
+        roleContent={chat.roleContent}
         isCurrentPage={$page.url.pathname === `/app/chat/${chat.id}`}
       />
     {/each}
-  </div>
-</div>
+  </ul>
+</aside>

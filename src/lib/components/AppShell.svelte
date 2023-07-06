@@ -10,7 +10,7 @@
   let sidebarOpen = false
 </script>
 
-<div class="min-h-screen bg-gray-900">
+<div class="flex flex-col justify-between h-screen bg-gray-900">
   <TransitionRoot show={sidebarOpen}>
     <Dialog as="div" class="relative z-50 lg:hidden" on:close={() => (sidebarOpen = false)}>
       <TransitionChild
@@ -125,7 +125,7 @@
     </a>
   </div>
 
-  <main class="lg:pl-72 min-h-full">
+  <main class="lg:ml-72 h-full">
     <slot name="main" />
   </main>
 </div>
