@@ -57,7 +57,7 @@
               if (e.key === 'Enter') {
                 if (!isShiftPressed) {
                   dispatchMessage()
-                  chatForm.submit()
+                  chatForm.requestSubmit()
                   e.preventDefault()
                 } else handleTextAreaSize(e.target)
               } else if (e.key === 'Shift') isShiftPressed = true
