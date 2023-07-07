@@ -9,6 +9,18 @@
 
   import UserProfileAvatar from './UserProfileAvatar.svelte'
 
+  function formatDate(date: Date) {
+    const options = {
+      hour: '2-digit',
+      minute: '2-digit',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }
+
+    return date.toLocaleString('sv-SE', options)
+  }
+
   export let members: TeamMember[] | undefined
 </script>
 
@@ -48,7 +60,7 @@
             <p class="text-sm leading-6 text-white">{person.role}</p>
             <p class="mt-1 text-xs leading-5 text-gray-400">
               Added to team <time datetime={person.addedAt.toISOString()}
-                >{person.addedAt.toLocaleTimeString()}</time
+                >{formatDate(person.addedAt)}</time
               >
             </p>
           </div>
