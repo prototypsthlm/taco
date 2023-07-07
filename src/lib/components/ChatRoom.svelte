@@ -1,14 +1,16 @@
 <script lang="ts">
+  import { enhance } from '$app/forms'
+  import Answer from '$lib/components/Answer.svelte'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import Question from '$lib/components/Question.svelte'
-  import Answer from '$lib/components/Answer.svelte'
+  import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { fade } from 'svelte/transition'
 
-  export let chat: any | null
-  let messages: any = []
+  export let chat: ChatWithRelations | null
+  let messages: ChatWithRelations['messages'][number] = []
 
   $: if (chat) {
-    messages = chat.messages
+    messages = chat?.messages
   }
 
   function addPlaceholderMessage(event) {
@@ -26,7 +28,7 @@
 </script>
 
 <div class="flex flex-col justify-between items-center h-full w-full">
-  {#if messages.length === 0}
+  {#if !messages.length}
     <div class="flex flex-col justify-center items-center flex-grow h-full">
       <h1 class="text-accent text-5xl font-bold">New Chat!</h1>
       <p class="text-accent text-2xl">Choose your LLM personality</p>

@@ -1,14 +1,15 @@
-import { ask } from '$lib/server/api/openai'
+import { ask, generateChatName } from '$lib/server/api/openai'
+import type { ChatWithRelations } from '$lib/server/entities/chat'
 import {
   addMessageToChat,
   createChat,
   getChatWithRelationsById,
+  setChatName,
   storeAnswer,
 } from '$lib/server/entities/chat'
-import type { Chat } from '@prisma/client'
 import { z, ZodError } from 'zod'
 
-export async function sendMessage(formData: any, userId: number) {
+export async function sendMessage(formData: unknown, userId: number) {
   try {
     const schema = z
       .object({
@@ -17,7 +18,7 @@ export async function sendMessage(formData: any, userId: number) {
       })
       .parse(formData)
 
-    let chat: Chat
+    let chat: ChatWithRelations
     if (schema.chatId === undefined) {
       chat = await createChat(userId)
     } else {
@@ -25,18 +26,24 @@ export async function sendMessage(formData: any, userId: number) {
       chat = await getChatWithRelationsById(chatId)
     }
 
-    const chatWithQuestion = await addMessageToChat(chat, schema.message)
-    const llmResponse = await ask(chatWithQuestion)
+    try {
+      if (!chat.name && chat.messages.some((x) => x.answer)) {
+        const name = await generateChatName(chat)
+        chat = await setChatName(chat.id, name)
+      }
+    } catch (e) {
+      console.error(`something went south ${e}`)
+    }
 
-    const lastMessage = chatWithQuestion.messages[chatWithQuestion.messages.length - 1]
+    chat = await addMessageToChat(chat, schema.message)
+    const llmResponse = await ask(chat)
+
+    const lastMessage = chat.messages[chat.messages.length - 1]
     await storeAnswer(lastMessage.id, llmResponse)
-    const updatedChat = await getChatWithRelationsById(chatWithQuestion.id)
+    chat = await getChatWithRelationsById(chat.id)
 
     return {
-      data: {
-        ...updatedChat,
-        temperature: Number(updatedChat?.temperature),
-      },
+      chat,
     }
   } catch (error) {
     console.error(error)
@@ -47,7 +54,7 @@ export async function sendMessage(formData: any, userId: number) {
         error: {
           httpStatusCode: 422,
           data: formData,
-          error: errors,
+          errors: errors,
         },
       }
     }
@@ -56,7 +63,7 @@ export async function sendMessage(formData: any, userId: number) {
       error: {
         httpStatusCode: 500,
         data: formData,
-        error,
+        error: `${error}`,
       },
     }
   }

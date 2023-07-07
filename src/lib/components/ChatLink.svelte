@@ -12,7 +12,7 @@
   $: href = `/app/chat/${chatId}`
 </script>
 
-<a {href}>
+<a {href} title={name}>
   <li
     class="px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl"
     class:bg-accent={isCurrentPage}
