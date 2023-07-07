@@ -3,6 +3,8 @@
   import Input from '$lib/components/Input.svelte'
   import type { PageData, ActionData } from './$types'
   import { enhance } from '$app/forms'
+  import TeamStats from '$lib/components/TeamStats.svelte'
+  import TeamMemberList from '$lib/components/TeamMemberList.svelte'
 
   export let data: PageData
   export let form: ActionData
@@ -11,9 +13,16 @@
 <header
   class="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8"
 >
-  <h1 class="text-base font-semibold leading-7 text-white">Team {data.userTeam.team.name}</h1>
+  <h1 class="text-lg font-semibold leading-7 text-white">Team {data.userTeam.team.name}</h1>
 </header>
+
 <div class="divide-y divide-white/5">
+  <TeamStats
+    estimatedCost={1}
+    numberChats={1}
+    numberMembers={data?.members?.length || 0}
+    createdAt={data.userTeam?.createdAt}
+  />
   <div
     class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8"
   >
@@ -62,5 +71,8 @@
         />
       </div>
     </form>
+  </div>
+  <div class="px-4 sm:px-6 lg:px-8 max-w-6xl">
+    <TeamMemberList members={data.members} />
   </div>
 </div>

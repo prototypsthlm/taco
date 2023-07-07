@@ -14,3 +14,10 @@ export const updateTeam = async (id: number, name: string, openAiApiKey: string)
     },
   })
 }
+
+export const getTeamWithMembers = async (id: number) => {
+  return prisma.team.findFirst({
+    where: { id },
+    include: { userTeams: { include: { user: true } } },
+  })
+}

@@ -1,9 +1,40 @@
 import { updateTeam } from '$lib/server/entities/team'
 import { getUserWithRelationsById } from '$lib/server/entities/user'
 import { Role } from '@prisma/client'
-import type { Actions } from './$types'
+import type { Actions, PageServerLoad } from './$types'
 import { z, ZodError } from 'zod'
 import { fail } from '@sveltejs/kit'
+
+import { getTeamWithMembers } from '$lib/server/entities/team'
+
+export type TeamMember = {
+  id: number
+  name: string
+  email: string
+  role: Role
+  addedAt: Date
+}
+
+export const load: PageServerLoad = async ({ params, parent }) => {
+  const { user } = await parent()
+
+  const team = await getTeamWithMembers(Number(params.id))
+
+  const members = team?.userTeams.map((userTeam) => {
+    return {
+      id: userTeam?.user?.id,
+      name: userTeam?.user?.name,
+      email: userTeam?.user?.email,
+      role: userTeam?.role,
+      addedAt: userTeam?.createdAt,
+    } as TeamMember
+  })
+
+  return {
+    members,
+    userTeam: user?.userTeams.find((x) => x.teamId?.toString() === params.id),
+  }
+}
 
 export const actions: Actions = {
   default: async ({ request, params, locals }) => {
