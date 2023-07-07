@@ -6,9 +6,6 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
   return {
     user: locals.currentUser,
-    chats: chats.map((chat) => ({
-      ...chat,
-      temperature: Number(chat?.temperature),
-    })),
+    chats,
   }
 }

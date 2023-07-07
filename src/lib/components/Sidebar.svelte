@@ -1,12 +1,11 @@
 <script lang="ts">
   import { PlusIcon } from '@babeard/svelte-heroicons/solid'
 
-  import { page } from '$app/stores'
   import ChatLink from '$lib/components/ChatLink.svelte'
+  import type { ChatWithRelations } from '$lib/server/entities/chat'
 
-  export let chats = []
-
-  $: sortedChats = chats.sort((a, b) => a.updatedAt - b.updatedAt).reverse()
+  export let chats: ChatWithRelations[] = []
+  export let currentChat: ChatWithRelations = null
 </script>
 
 <aside class="w-full">
@@ -21,13 +20,13 @@
       </div>
     </a>
     <hr class="w-full border-white/20" />
-    {#each sortedChats as chat}
+    {#each chats as chat}
       <ChatLink
         chatId={chat.id}
-        name={chat.name + ' Nr. ' + chat.id}
+        name={chat.name || 'New Chat'}
         updatedAt={chat.updatedAt}
         roleContent={chat.roleContent}
-        isCurrentPage={$page.url.pathname == `/app/chat/${chat.id}`}
+        isCurrentPage={chat.id === currentChat?.id}
       />
     {/each}
   </ul>

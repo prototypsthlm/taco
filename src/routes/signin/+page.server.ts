@@ -46,7 +46,7 @@ export const actions: Actions = {
 
       return fail(500, {
         fields,
-        error,
+        error: `${error}`,
       })
     }
     throw redirect(303, '/app')

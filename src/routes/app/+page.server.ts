@@ -14,10 +14,8 @@ export const actions: Actions = {
         data: res.error.data,
         errors: res.error.error,
       })
-    } else {
-      return {
-        chat: res.data,
-      }
     }
+
+    return res
   },
 }
