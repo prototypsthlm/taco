@@ -3,7 +3,7 @@
   import type { User } from '@prisma/client'
   import { Dialog, TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
   import logo from '$lib/assets/logo.png'
-  import md5 from 'crypto-js/md5'
+  import UserProfileAvatar from './UserProfileAvatar.svelte'
 
   export let user: User
 
@@ -87,11 +87,7 @@
               href="/app/settings"
               class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
             >
-              <img
-                class="h-8 w-8 rounded-full bg-gray-800"
-                src={`https://www.gravatar.com/avatar/${md5(user.email)}`}
-                alt=""
-              />
+              <UserProfileAvatar class="h-8 w-8 rounded-full bg-gray-800" userEmail={user.email} />
               <span class="sr-only">Your profile</span>
               <span aria-hidden="true">{user.name}</span>
             </a>
@@ -117,11 +113,7 @@
     </div>
     <a href="/app/settings">
       <span class="sr-only">Your profile</span>
-      <img
-        class="h-8 w-8 rounded-full bg-gray-800"
-        src={`https://www.gravatar.com/avatar/${md5(user.email)}`}
-        alt=""
-      />
+      <UserProfileAvatar class="h-8 w-8 rounded-full bg-gray-800" userEmail={user.email} />
     </a>
   </div>
 
