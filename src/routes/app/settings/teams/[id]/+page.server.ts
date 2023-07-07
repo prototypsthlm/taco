@@ -1,4 +1,4 @@
-import { updateTeam } from '$lib/server/entities/team'
+import { countTeamChats, updateTeam } from '$lib/server/entities/team'
 import { getUserWithRelationsById } from '$lib/server/entities/user'
 import { Role } from '@prisma/client'
 import type { Actions, PageServerLoad } from './$types'
@@ -32,6 +32,7 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 
   return {
     members,
+    chatCount: await countTeamChats(Number(params.id)),
     userTeam: user?.userTeams.find((x) => x.teamId?.toString() === params.id),
   }
 }

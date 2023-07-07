@@ -18,8 +18,8 @@
 
 <div class="divide-y divide-white/5">
   <TeamStats
-    estimatedCost={1}
-    numberChats={1}
+    estimatedCost={data.estimatedCost}
+    numberChats={data.chatCount}
     numberMembers={data?.members?.length || 0}
     createdAt={data.userTeam?.createdAt}
   />

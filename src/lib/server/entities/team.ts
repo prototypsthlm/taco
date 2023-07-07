@@ -21,3 +21,13 @@ export const getTeamWithMembers = async (id: number) => {
     include: { userTeams: { include: { user: true } } },
   })
 }
+
+export const countTeamChats = async (id: number) => {
+  return prisma.chat.count({
+    where: {
+      owner: {
+        teamId: id,
+      },
+    },
+  })
+}
