@@ -33,6 +33,7 @@
 
     <form
       method="post"
+      action="?/updateTeamDetails"
       class="md:col-span-2"
       use:enhance={() => {
         return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
@@ -43,8 +44,8 @@
           <Input
             class="dark"
             name="openAiApiKey"
-            value={form?.fields?.openAiApiKey ?? data.userTeam.team.openAiApiKey}
-            errors={form?.errors?.openAiApiKey}
+            value={form?.teamSection?.fields?.openAiApiKey ?? data.userTeam.team.openAiApiKey}
+            errors={form?.teamSection?.errors?.openAiApiKey}
           />
         </div>
 
@@ -52,8 +53,8 @@
           <Input
             class="dark"
             name="name"
-            value={form?.fields?.name ?? data.userTeam.team.name}
-            errors={form?.errors?.name}
+            value={form?.teamSection?.fields?.name ?? data.userTeam.team.name}
+            errors={form?.teamSection?.errors?.name}
           />
         </div>
       </div>
@@ -66,13 +67,13 @@
         >
         <Alert
           class="ml-4"
-          type={(form?.error && 'error') || (form?.success && 'success')}
-          message={form?.error || form?.success}
+          type={(form?.teamSection?.error && 'error') || (form?.teamSection?.success && 'success')}
+          message={form?.teamSection?.error || form?.teamSection?.success}
         />
       </div>
     </form>
   </div>
   <div class="px-4 sm:px-6 lg:px-8 max-w-6xl">
-    <TeamMemberList members={data.members} />
+    <TeamMemberList form={form?.userSection} members={data.members} isAdmin={data.isAdmin} />
   </div>
 </div>

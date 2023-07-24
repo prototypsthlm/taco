@@ -8,6 +8,8 @@
   import type { TeamMember } from '../../routes/app/settings/teams/[id]/+page.server'
 
   import UserProfileAvatar from './UserProfileAvatar.svelte'
+  import { enhance } from '$app/forms'
+  import Alert from './Alert.svelte'
 
   function formatDate(date: Date) {
     const options = {
@@ -22,6 +24,8 @@
   }
 
   export let members: TeamMember[] | undefined
+  export let isAdmin: boolean = false
+  export let form: Record<string, string> = {}
 </script>
 
 {#if members}
@@ -43,6 +47,10 @@
         </button>
       </div>
     </div>
+    <Alert
+      type={(form?.error && 'error') || (form?.success && 'success')}
+      message={form?.error || form?.success}
+    />
     <ul class="divide-y divide-gray-800">
       {#each members as person}
         <li class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-6 py-5">
@@ -64,33 +72,45 @@
               >
             </p>
           </div>
-          <div class="md:place-self-end flex gap-2">
-            <button
-              type="button"
-              class="flex gap-1 items-center rounded-md bg-red-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+          {#if isAdmin}
+            <form
+              class="md:place-self-end flex gap-2"
+              method="post"
+              action="?/updateUser"
+              use:enhance
             >
-              Remove
-              <TrashIcon class="h-4 w-4" />
-            </button>
+              <button
+                type="submit"
+                name="remove"
+                class="flex gap-1 items-center rounded-md bg-red-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+              >
+                Remove
+                <TrashIcon class="h-4 w-4" />
+              </button>
 
-            {#if person.role === 'ADMIN'}
-              <button
-                type="button"
-                class="flex gap-1 items-center rounded-md bg-yellow-600 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-              >
-                Downgrade
-                <ArrowDownIcon class="h-4 w-4" />
-              </button>
-            {:else}
-              <button
-                type="button"
-                class="flex gap-1 items-center rounded-md bg-green-600 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-              >
-                Upgrade
-                <ChevronUpIcon class="h-4 w-4" />
-              </button>
-            {/if}
-          </div>
+              {#if person.role === 'ADMIN'}
+                <button
+                  type="submit"
+                  name="downgrade"
+                  class="flex gap-1 items-center rounded-md bg-yellow-600 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-yellow-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                >
+                  Downgrade
+                  <ArrowDownIcon class="h-4 w-4" />
+                </button>
+              {:else}
+                <button
+                  type="submit"
+                  name="upgrade"
+                  class="flex gap-1 items-center rounded-md bg-green-600 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                >
+                  Upgrade
+                  <ChevronUpIcon class="h-4 w-4" />
+                </button>
+              {/if}
+
+              <input type="hidden" name="email" value={person.email} />
+            </form>
+          {/if}
         </li>
       {/each}
     </ul>
