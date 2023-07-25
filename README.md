@@ -12,6 +12,16 @@ npm run dev
 npm run dev -- --open
 ```
 
+### Helpers
+
+run
+
+```
+npx prisma studio
+```
+
+to get a browser view of the database
+
 ## Building
 
 To create a production version of your app:
