@@ -3,6 +3,8 @@
   import Input from '$lib/components/Input.svelte'
   import type { PageData, ActionData } from './$types'
   import { enhance } from '$app/forms'
+  import TeamStats from '$lib/components/TeamStats.svelte'
+  import TeamMemberList from '$lib/components/TeamMemberList.svelte'
 
   export let data: PageData
   export let form: ActionData
@@ -11,9 +13,16 @@
 <header
   class="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8"
 >
-  <h1 class="text-base font-semibold leading-7 text-white">Team {data.userTeam.team.name}</h1>
+  <h1 class="text-lg font-semibold leading-7 text-white">Team {data.userTeam.team.name}</h1>
 </header>
+
 <div class="divide-y divide-white/5">
+  <TeamStats
+    estimatedCost={data.estimatedCost}
+    numberChats={data.chatCount}
+    numberMembers={data?.members?.length || 0}
+    createdAt={data.userTeam?.createdAt}
+  />
   <div
     class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8"
   >
@@ -24,6 +33,7 @@
 
     <form
       method="post"
+      action="?/updateTeamDetails"
       class="md:col-span-2"
       use:enhance={() => {
         return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
@@ -34,8 +44,8 @@
           <Input
             class="dark"
             name="openAiApiKey"
-            value={form?.fields?.openAiApiKey ?? data.userTeam.team.openAiApiKey}
-            errors={form?.errors?.openAiApiKey}
+            value={form?.teamSection?.fields?.openAiApiKey ?? data.userTeam.team.openAiApiKey}
+            errors={form?.teamSection?.errors?.openAiApiKey}
           />
         </div>
 
@@ -43,8 +53,8 @@
           <Input
             class="dark"
             name="name"
-            value={form?.fields?.name ?? data.userTeam.team.name}
-            errors={form?.errors?.name}
+            value={form?.teamSection?.fields?.name ?? data.userTeam.team.name}
+            errors={form?.teamSection?.errors?.name}
           />
         </div>
       </div>
@@ -57,10 +67,13 @@
         >
         <Alert
           class="ml-4"
-          type={(form?.error && 'error') || (form?.success && 'success')}
-          message={form?.error || form?.success}
+          type={(form?.teamSection?.error && 'error') || (form?.teamSection?.success && 'success')}
+          message={form?.teamSection?.error || form?.teamSection?.success}
         />
       </div>
     </form>
+  </div>
+  <div class="px-4 sm:px-6 lg:px-8 max-w-6xl">
+    <TeamMemberList userId={data.userId} form={form?.userSection} members={data.members} isAdmin={data.isAdmin} />
   </div>
 </div>
