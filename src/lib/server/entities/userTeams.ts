@@ -1,7 +1,7 @@
 import { prisma } from '$lib/server/prisma'
 import type { Role } from '@prisma/client'
 
-export const updateRole = async (userId: number, teamId: number, role: Role) => {
+export const findUserTeam = async (userId: number, teamId: number) => {
   const userWithTeams = await prisma.user.findUniqueOrThrow({
     where: { id: userId },
     include: {
@@ -13,7 +13,11 @@ export const updateRole = async (userId: number, teamId: number, role: Role) => 
     },
   })
 
-  const userTeam = userWithTeams.userTeams?.find((x) => x.teamId === teamId)
+  return userWithTeams.userTeams?.find((x) => x.teamId === teamId)
+}
+
+export const updateRole = async (userId: number, teamId: number, role: Role) => {
+  const userTeam = findUserTeam(userId, teamId)
 
   if (!userTeam) {
     throw new Error('User is not in team.')
@@ -28,18 +32,7 @@ export const updateRole = async (userId: number, teamId: number, role: Role) => 
 }
 
 export const removeUserFromTeam = async (userId: number, teamId: number) => {
-  const userWithTeams = await prisma.user.findUniqueOrThrow({
-    where: { id: userId },
-    include: {
-      userTeams: {
-        include: {
-          team: true,
-        },
-      },
-    },
-  })
-
-  const userTeam = userWithTeams.userTeams?.find((x) => x.teamId === teamId)
+  const userTeam = findUserTeam(userId, teamId)
 
   if (!userTeam) {
     throw new Error('User is not in team.')
