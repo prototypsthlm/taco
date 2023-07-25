@@ -19,9 +19,8 @@ export const load: PageServerLoad = async ({ params, parent }) => {
 export const actions: Actions = {
   sendMessage: async ({ request, locals }) => {
     const data = Object.fromEntries(await request.formData())
-    const userId = locals.currentUser.id
 
-    const res = await sendMessage(data, userId)
+    const res = await sendMessage(data, locals.currentUser)
 
     if (res.error) {
       return fail(res.error.httpStatusCode, {
