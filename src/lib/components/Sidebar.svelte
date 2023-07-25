@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PlusIcon } from '@babeard/svelte-heroicons/solid'
+  import { ChevronDownIcon, ChevronUpIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
 
   import ChatLink from '$lib/components/ChatLink.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
@@ -8,35 +8,67 @@
   export let chats: ChatWithRelations[] | null = []
   export let currentChat: ChatWithRelations = null
   export let teams: Team[] = []
+  export let currentTeam: Team = null
+
+  let selectTeamView = false
 </script>
 
 <aside class="w-full">
-  {#if chats === null}
-    <p class="text-white font-bold text-lg">Select a Team</p>
-    <form method="post" action="app?/selectTeam" class="flex flex-col gap-4 py-2">
-      {#each teams as team}
-        <button
-          type="submit"
-          name="teamId"
-          value={team.id}
-          class="text-left p-4 bg-slate-400 bg-opacity-10 hover:bg-opacity-20 rounded-lg"
-        >
-          <h4 class="text-white font-semibold text-sm">{team.name}</h4>
-        </button>
-      {/each}
-    </form>
+  <button
+    on:click={() => (selectTeamView = !selectTeamView)}
+    class="flex justify-between items-center pb-6 w-full"
+  >
+    <div class="flex gap-2 items-center">
+      <img
+        class="w-8 h-8 rounded-lg"
+        src={`https://www.gravatar.com/avatar/${currentTeam.name}?d=identicon`}
+        alt=""
+      />
+      <div class="flex flex-col items-start leading-none">
+        <p class="text-gray-400 text-opacity-60 text-xs">Selected Team</p>
+        <p class="text-white">{currentTeam.name}</p>
+      </div>
+    </div>
+    {#if !selectTeamView}
+      <ChevronDownIcon class="h-4 w-4 text-white" />
+    {:else}
+      <ChevronUpIcon class="h-4 w-4 text-white" />
+    {/if}
+  </button>
+
+  {#if chats === null || selectTeamView}
+    <div class="pt-2">
+      <p class="text-white font-bold text-lg">Select a Team</p>
+      <form method="post" action="app?/selectTeam" class="flex flex-col gap-4 py-2">
+        {#each teams as team}
+          <button
+            type="submit"
+            name="teamId"
+            value={team.id}
+            disabled={team.id === currentTeam.id}
+            class="text-left p-4 bg-slate-400 bg-opacity-10 hover:bg-opacity-20 rounded-lg"
+          >
+            <h4 class="text-white font-semibold text-sm">
+              {team.name}
+              {#if team.id === currentTeam.id}
+                <span class="text-xs text-gray-400 text-opacity-60"> (current)</span>
+              {/if}
+            </h4>
+          </button>
+        {/each}
+      </form>
+    </div>
   {:else}
-    <ul class="flex flex-col gap-4">
+    <ul class="flex flex-col gap-2 pt-4">
       <a
         href="/app"
-        class="px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl"
+        class="mb-2 px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl border-2 border-white border-opacity-20"
       >
         <div class="flex items-center gap-x-3">
           <PlusIcon class="h-6 w-6 text-white flex-none" />
           <h3 class="flex-auto truncate text-md font-semibold leading-6 text-white">New Chat</h3>
         </div>
       </a>
-      <hr class="w-full border-white/20" />
       {#each chats as chat}
         <ChatLink
           chatId={chat.id}

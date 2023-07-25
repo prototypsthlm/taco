@@ -3,23 +3,19 @@ import { findAllTeamsFromUser } from '$lib/server/entities/user'
 import type { LayoutServerLoad } from './$types'
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-  const activeTeam = locals.currentUser.activeTeamId
+  const activeTeamId = locals.currentUser.activeTeamId
   const userId = locals.currentUser.id
-  const userTeams = findAllTeamsFromUser(userId)
+  const userTeams = await findAllTeamsFromUser(userId)
+  let chats = null
 
-  if (!activeTeam) {
-    return {
-      user: locals.currentUser,
-      chats: null,
-      teams: userTeams,
-    }
+  if (activeTeamId) {
+    chats = await getUserTeamChats(userId, activeTeamId)
   }
-
-  const chats = await getUserTeamChats(userId, activeTeam)
 
   return {
     user: locals.currentUser,
     chats,
     teams: userTeams,
+    currentTeam: userTeams?.find((x) => x.id === activeTeamId),
   }
 }

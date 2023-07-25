@@ -14,7 +14,7 @@
 
 <a {href} title={name}>
   <li
-    class="px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl"
+    class="px-2 py-3 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl"
     class:bg-accent={isCurrentPage}
   >
     <div class="flex items-center gap-x-3">
