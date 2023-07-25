@@ -89,6 +89,11 @@
               use:enhance
             >
               <button
+                on:click={(event) => {
+                  if (!confirm(`Are you sure you want to remove ${person.email} from the team?`)) {
+                    event.preventDefault()
+                  }
+                }}
                 type="submit"
                 name="submit"
                 value="remove"

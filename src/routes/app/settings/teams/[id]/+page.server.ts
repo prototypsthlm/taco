@@ -6,7 +6,7 @@ import { fail } from '@sveltejs/kit'
 
 import { getTeamWithMembers } from '$lib/server/entities/team'
 import { isUserAdmin, isUserInTeam } from '$lib/server/utils/database'
-import { updateRole } from '$lib/server/entities/userTeams'
+import { removeUserFromTeam, updateRole } from '$lib/server/entities/userTeams'
 
 export type TeamMember = {
   id: number
@@ -124,10 +124,10 @@ export const actions: Actions = {
     }
 
     if (buttonAction == 'remove') {
-      // remove user from team
+      removeUserFromTeam(userId, teamId)
       return {
         userSection: {
-          success: `User ${userEmail} successfully removed from team.`,
+          success: `User ${userEmail} successfully removed from the team.`,
         },
       }
     } else if (buttonAction == 'downgrade') {

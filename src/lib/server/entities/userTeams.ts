@@ -26,3 +26,26 @@ export const updateRole = async (userId: number, teamId: number, role: Role) => 
     },
   })
 }
+
+export const removeUserFromTeam = async (userId: number, teamId: number) => {
+  const userWithTeams = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    include: {
+      userTeams: {
+        include: {
+          team: true,
+        },
+      },
+    },
+  })
+
+  const userTeam = userWithTeams.userTeams?.find((x) => x.teamId === teamId)
+
+  if (!userTeam) {
+    throw new Error('User is not in team.')
+  }
+
+  return prisma.userTeams.delete({
+    where: { id: userTeam?.id },
+  })
+}
