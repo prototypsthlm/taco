@@ -1,12 +1,12 @@
 import { countTeamChats, updateTeam } from '$lib/server/entities/team'
-import { getUserWithRelationsById } from '$lib/server/entities/user'
 import { Role } from '@prisma/client'
 import type { Actions, PageServerLoad } from './$types'
 import { z, ZodError } from 'zod'
 import { fail } from '@sveltejs/kit'
 
 import { getTeamWithMembers } from '$lib/server/entities/team'
-import { isUserAdmin } from '$lib/server/utils/database'
+import { isUserAdmin, isUserInTeam } from '$lib/server/utils/database'
+import { updateRole } from '$lib/server/entities/userTeams'
 
 export type TeamMember = {
   id: number
@@ -21,6 +21,7 @@ export const load: PageServerLoad = async ({ params, parent, locals }) => {
 
   const teamId = Number(params.id)
   const team = await getTeamWithMembers(teamId)
+  const userId = locals.currentUser.id
 
   const members = team?.userTeams.map((userTeam) => {
     return {
@@ -34,7 +35,8 @@ export const load: PageServerLoad = async ({ params, parent, locals }) => {
 
   return {
     members,
-    isAdmin: isUserAdmin(teamId, locals.currentUser.id),
+    userId,
+    isAdmin: isUserAdmin(teamId, userId),
     chatCount: await countTeamChats(teamId),
     userTeam: user?.userTeams.find((x) => x.teamId?.toString() === params.id),
   }
@@ -90,9 +92,9 @@ export const actions: Actions = {
 
   updateUser: async ({ request, params, locals }) => {
     const teamId = Number(params.id)
-    const currentUserId = locals.currentUser.id
+    const requestingUserId = locals.currentUser.id
 
-    if (!isUserAdmin(teamId, currentUserId)) {
+    if (!isUserAdmin(teamId, requestingUserId)) {
       return fail(401, {
         userSection: {
           error: 'You are no admin of this team.',
@@ -101,19 +103,53 @@ export const actions: Actions = {
     }
 
     const fields = Object.fromEntries(await request.formData())
+    const buttonAction = fields.submit
+    const userId = Number(fields.userId)
+    const userEmail = fields.userEmail
 
-    if (fields.remove) {
+    if (userId === requestingUserId) {
+      return fail(400, {
+        userSection: {
+          error: 'You cannot change your own role.',
+        },
+      })
+    }
+
+    if (!isUserInTeam(teamId, userId)) {
+      return fail(401, {
+        userSection: {
+          error: `User: ${userEmail} is not in the team`,
+        },
+      })
+    }
+
+    if (buttonAction == 'remove') {
       // remove user from team
-    } else if (fields.downgrade) {
-      // downgrade user to member
-    } else if (fields.upgrade) {
-      // upgrade user to admin
+      return {
+        userSection: {
+          success: `User ${userEmail} successfully removed from team.`,
+        },
+      }
+    } else if (buttonAction == 'downgrade') {
+      updateRole(userId, teamId, Role.MEMBER)
+      return {
+        userSection: {
+          success: `User ${userEmail} successfully downgraded to ${Role.MEMBER}.`,
+        },
+      }
+    } else if (buttonAction == 'upgrade') {
+      updateRole(userId, teamId, Role.ADMIN)
+      return {
+        userSection: {
+          success: `User ${userEmail} successfully upgraded to ${Role.ADMIN}.`,
+        },
+      }
     }
 
-    return {
+    return fail(422, {
       userSection: {
-        success: 'User removed successfully.',
+        error: 'No action selected.',
       },
-    }
+    })
   },
 }

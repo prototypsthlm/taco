@@ -74,6 +74,6 @@
     </form>
   </div>
   <div class="px-4 sm:px-6 lg:px-8 max-w-6xl">
-    <TeamMemberList form={form?.userSection} members={data.members} isAdmin={data.isAdmin} />
+    <TeamMemberList userId={data.userId} form={form?.userSection} members={data.members} isAdmin={data.isAdmin} />
   </div>
 </div>

@@ -25,6 +25,7 @@
 
   export let members: TeamMember[] | undefined
   export let isAdmin: boolean = false
+  export let userId: Number
   export let form: Record<string, string> = {}
 </script>
 
@@ -60,19 +61,27 @@
               userEmail={person.email}
             />
             <div class="min-w-0 flex-auto">
-              <p class="text-sm font-semibold leading-6 text-white">{person.name}</p>
+              <p class="text-sm font-semibold leading-6 text-white">
+                {person.name}
+                {#if person.id === userId}
+                  <span class="font-normal leading-5 text-gray-400">
+                    {' '}
+                    (you)
+                  </span>
+                {/if}
+              </p>
               <p class="mt-1 truncate text-xs leading-5 text-gray-400">{person.email}</p>
             </div>
           </div>
           <div class="flex flex-col sm:items-center">
             <p class="text-sm leading-6 text-white">{person.role}</p>
             <p class="mt-1 text-xs leading-5 text-gray-400">
-              Added to team <time datetime={person.addedAt.toISOString()}
+              Joined on <time datetime={person.addedAt.toISOString()}
                 >{formatDate(person.addedAt)}</time
               >
             </p>
           </div>
-          {#if isAdmin}
+          {#if isAdmin && person.id !== userId}
             <form
               class="md:place-self-end flex gap-2"
               method="post"
@@ -81,7 +90,8 @@
             >
               <button
                 type="submit"
-                name="remove"
+                name="submit"
+                value="remove"
                 class="flex gap-1 items-center rounded-md bg-red-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
               >
                 Remove
@@ -91,7 +101,8 @@
               {#if person.role === 'ADMIN'}
                 <button
                   type="submit"
-                  name="downgrade"
+                  name="submit"
+                  value="downgrade"
                   class="flex gap-1 items-center rounded-md bg-yellow-600 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-yellow-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                 >
                   Downgrade
@@ -100,7 +111,8 @@
               {:else}
                 <button
                   type="submit"
-                  name="upgrade"
+                  name="submit"
+                  value="upgrade"
                   class="flex gap-1 items-center rounded-md bg-green-600 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                 >
                   Upgrade
@@ -108,7 +120,8 @@
                 </button>
               {/if}
 
-              <input type="hidden" name="email" value={person.email} />
+              <input type="hidden" name="userEmail" value={person.email} />
+              <input type="hidden" name="userId" value={person.id} />
             </form>
           {/if}
         </li>
