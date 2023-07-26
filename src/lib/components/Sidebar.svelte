@@ -41,7 +41,7 @@
   {#if chats === null || selectTeamView}
     <div class="pt-2">
       <p class="text-white text-center font-bold text-lg">Select a Team</p>
-      <form method="post" action="app?/selectTeam" class="flex flex-col gap-4 py-2">
+      <form method="post" action="/app?/selectTeam" class="flex flex-col gap-4 py-2">
         {#each teams as team}
           <button
             type="submit"
