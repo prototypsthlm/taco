@@ -1,5 +1,5 @@
 import { countTeamChats, updateTeam } from '$lib/server/entities/team'
-import { Role, type Team } from '@prisma/client'
+import { Role } from '@prisma/client'
 import type { Actions, PageServerLoad } from './$types'
 import { z, ZodError } from 'zod'
 import { error, fail } from '@sveltejs/kit'
@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ params, parent, locals }) => {
 
   const teamId = Number(params.id)
   const team = await getTeamWithMembers(teamId)
-  if (!team) error(404, 'Team not found')
+  if (!team) throw error(404, 'Team not found')
 
   const userId = locals.currentUser.id
 
@@ -39,10 +39,13 @@ export const load: PageServerLoad = async ({ params, parent, locals }) => {
   if (!members?.some((member) => member.id === userId))
     throw error(404, 'You are not a member of this team.')
 
+  const isAdmin = await isUserAdmin(teamId, userId)
+  if (!isAdmin) team.openAiApiKey = '*'.repeat(64)
+
   return {
     members,
     userId,
-    isAdmin: await isUserAdmin(teamId, userId),
+    isAdmin,
     chatCount: await countTeamChats(teamId),
     team,
   }

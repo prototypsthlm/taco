@@ -120,7 +120,13 @@ export const findAllTeamsFromUser = async (userId: number) => {
     include: { userTeams: { include: { team: true } } },
   })
 
-  return user.userTeams.map((userTeam) => userTeam.team)
+  return user.userTeams.map((userTeam) => {
+    if (userTeam.role === Role.ADMIN) {
+      return userTeam.team
+    } else {
+      return { ...userTeam.team, openAiApiKey: '*'.repeat(64) }
+    }
+  })
 }
 
 export const changeActiveTeam = async (userId: number, teamId: number) => {
