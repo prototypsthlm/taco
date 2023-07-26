@@ -38,10 +38,11 @@ export const getUserTeamChats = (userId: number, teamId: number) => {
   })
 }
 
-export const createChat = (userTeamId: number) => {
+export const createChat = (userTeamId: number, role: string | undefined) => {
   return prisma.chat.create({
     data: {
       ownerId: userTeamId,
+      roleContent: role,
     },
     include: {
       owner: {

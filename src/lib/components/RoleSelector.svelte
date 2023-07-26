@@ -4,6 +4,9 @@
   import ChatBubbleBottomCenter from '@babeard/svelte-heroicons/solid/ChatBubbleBottomCenter'
   import CodeBracket from '@babeard/svelte-heroicons/solid/CodeBracket'
   import MusicalNote from '@babeard/svelte-heroicons/solid/MusicalNote'
+  import { createEventDispatcher } from 'svelte'
+
+
 
   type Role = {
     name: string
@@ -14,33 +17,36 @@
   let roles: Role[] = [
     {
       name: 'Developer',
-      prompt: 'Helping with all question around coding',
+      prompt: 'Helping with all question around coding.',
       icon: CodeBracket,
     },
     {
       name: 'Scientist',
-      prompt: 'Expert in question around science',
+      prompt: 'Expert in question around science.',
       icon: Beaker,
     },
     {
       name: 'Default',
-      prompt: 'Helping out with all questions',
+      prompt: 'You are a helpful assistant.',
       icon: ChatBubbleBottomCenter,
     },
     {
       name: 'Business',
-      prompt: 'Business help around strategy and marketing',
+      prompt: 'Business help around strategy and marketing.',
       icon: Briefcase,
     },
     {
       name: 'Musician',
-      prompt: 'Let you music be heard and improved',
+      prompt: 'Let you music be heard and improved.',
       icon: MusicalNote,
     },
   ]
 
+  let dispatcher = createEventDispatcher()
+
   function selectRole(role: Role) {
     selectedRole = role
+    dispatcher('roleChange', role)
   }
 
   let selectedRole: Role | null = roles[2]

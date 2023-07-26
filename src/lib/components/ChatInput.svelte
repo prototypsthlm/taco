@@ -4,6 +4,7 @@
 
   import { createEventDispatcher } from 'svelte'
 
+  export let role: string | null
   export let chatId: number | null
   let text: string = ''
   let isShiftPressed: boolean = false
@@ -82,6 +83,9 @@
     </div>
     <p class="text-accent text-opacity-50">Press <strong> Shift + Enter </strong> for a new line</p>
   </div>
+  {#if role}
+    <input type="hidden" name="role" value={role} />
+  {/if}
   {#if chatId}
     <input type="hidden" name="chatId" value={chatId} />
   {/if}
