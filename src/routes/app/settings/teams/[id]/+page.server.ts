@@ -36,7 +36,7 @@ export const load: PageServerLoad = async ({ params, parent, locals }) => {
   return {
     members,
     userId,
-    isAdmin: isUserAdmin(teamId, userId),
+    isAdmin: await isUserAdmin(teamId, userId),
     chatCount: await countTeamChats(teamId),
     userTeam: user?.userTeams.find((x) => x.teamId?.toString() === params.id),
   }
@@ -53,7 +53,7 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      if (!isUserAdmin(Number(params.id), locals.currentUser.id)) {
+      if (!(await isUserAdmin(Number(params.id), locals.currentUser.id))) {
         return fail(422, {
           teamSection: {
             fields,
@@ -94,7 +94,7 @@ export const actions: Actions = {
     const teamId = Number(params.id)
     const requestingUserId = locals.currentUser.id
 
-    if (!isUserAdmin(teamId, requestingUserId)) {
+    if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
         userSection: {
           error: 'You are no admin of this team.',
