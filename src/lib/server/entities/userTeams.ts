@@ -17,14 +17,14 @@ export const findUserTeam = async (userId: number, teamId: number) => {
 }
 
 export const updateRole = async (userId: number, teamId: number, role: Role) => {
-  const userTeam = findUserTeam(userId, teamId)
+  const userTeam = await findUserTeam(userId, teamId)
 
   if (!userTeam) {
     throw new Error('User is not in team.')
   }
 
   return prisma.userTeams.update({
-    where: { id: userTeam?.id },
+    where: { id: userTeam.id },
     data: {
       role,
     },

@@ -2,7 +2,7 @@ import { countTeamChats, updateTeam } from '$lib/server/entities/team'
 import { Role } from '@prisma/client'
 import type { Actions, PageServerLoad } from './$types'
 import { z, ZodError } from 'zod'
-import { fail } from '@sveltejs/kit'
+import { error, fail } from '@sveltejs/kit'
 
 import { getTeamWithMembers } from '$lib/server/entities/team'
 import { isUserAdmin, isUserInTeam } from '$lib/server/utils/database'
@@ -18,9 +18,12 @@ export type TeamMember = {
 
 export const load: PageServerLoad = async ({ params, parent, locals }) => {
   const { user } = await parent()
+  if (!user) throw error(404, 'User not found')
 
   const teamId = Number(params.id)
   const team = await getTeamWithMembers(teamId)
+  if (!team) throw error(404, 'Team not found')
+
   const userId = locals.currentUser.id
 
   const members = team?.userTeams.map((userTeam) => {
@@ -33,12 +36,18 @@ export const load: PageServerLoad = async ({ params, parent, locals }) => {
     } as TeamMember
   })
 
+  if (!members?.some((member) => member.id === userId))
+    throw error(404, 'You are not a member of this team.')
+
+  const isAdmin = await isUserAdmin(teamId, userId)
+  if (!isAdmin) team.openAiApiKey = '*'.repeat(64)
+
   return {
     members,
     userId,
-    isAdmin: isUserAdmin(teamId, userId),
+    isAdmin,
     chatCount: await countTeamChats(teamId),
-    userTeam: user?.userTeams.find((x) => x.teamId?.toString() === params.id),
+    team,
   }
 }
 
@@ -53,9 +62,9 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      if (!isUserAdmin(Number(params.id), locals.currentUser.id)) {
+      if (!(await isUserAdmin(Number(params.id), locals.currentUser.id))) {
         return fail(422, {
-          teamSection: {
+          keySection: {
             fields,
             error: 'User must be admin of the given team',
           },
@@ -65,7 +74,7 @@ export const actions: Actions = {
       await updateTeam(Number(params.id), schema.name, schema.openAiApiKey)
 
       return {
-        teamSection: {
+        keySection: {
           success: 'Team updated successfully.',
         },
       }
@@ -74,7 +83,7 @@ export const actions: Actions = {
         const errors = error.flatten().fieldErrors
 
         return fail(422, {
-          teamSection: {
+          keySection: {
             fields,
             errors,
           },
@@ -82,7 +91,7 @@ export const actions: Actions = {
       }
 
       return fail(500, {
-        teamSection: {
+        keySection: {
           fields,
           error: `${error}`,
         },
@@ -94,7 +103,7 @@ export const actions: Actions = {
     const teamId = Number(params.id)
     const requestingUserId = locals.currentUser.id
 
-    if (!isUserAdmin(teamId, requestingUserId)) {
+    if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
         userSection: {
           error: 'You are no admin of this team.',
