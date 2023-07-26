@@ -7,9 +7,11 @@ import {
   setChatName,
   storeAnswer,
 } from '$lib/server/entities/chat'
+import type { User } from '@prisma/client'
 import { z, ZodError } from 'zod'
+import { findUserTeam } from '../entities/userTeams'
 
-export async function sendMessage(formData: unknown, userId: number) {
+export async function sendMessage(formData: unknown, user: User) {
   try {
     const schema = z
       .object({
@@ -20,7 +22,10 @@ export async function sendMessage(formData: unknown, userId: number) {
 
     let chat: ChatWithRelations
     if (schema.chatId === undefined) {
-      chat = await createChat(userId)
+      if (!user.activeTeamId) throw new Error('User has no active team')
+      const userTeam = await findUserTeam(user.id, user.activeTeamId)
+      if (!userTeam) throw new Error('User active team does not exist')
+      chat = await createChat(userTeam.id)
     } else {
       const chatId = Number(schema.chatId)
       chat = await getChatWithRelationsById(chatId)

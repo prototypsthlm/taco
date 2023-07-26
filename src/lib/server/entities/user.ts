@@ -113,3 +113,19 @@ export const updatePassword = async (id: number, password: string) => {
 export const deleteUser = (id: number) => {
   return prisma.user.delete({ where: { id } })
 }
+
+export const findAllTeamsFromUser = async (userId: number) => {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    include: { userTeams: { include: { team: true } } },
+  })
+
+  return user.userTeams.map((userTeam) => userTeam.team)
+}
+
+export const changeActiveTeam = async (userId: number, teamId: number) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { activeTeamId: teamId },
+  })
+}

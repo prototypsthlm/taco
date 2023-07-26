@@ -23,6 +23,9 @@ model User {
 
   userTeams UserTeams[]
   message   Message[]
+
+  activeTeamId Int?
+  activeTeam   Team? @relation(fields: [activeTeamId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model Team {
@@ -35,6 +38,7 @@ model Team {
   updatedAt DateTime @updatedAt
 
   userTeams UserTeams[]
+  User      User[] // for active team reference
 }
 
 model UserTeams {
