@@ -1,10 +1,8 @@
 <script lang="ts">
-  import Alert from '$lib/components/Alert.svelte'
-  import Input from '$lib/components/Input.svelte'
   import type { PageData, ActionData } from './$types'
-  import { enhance } from '$app/forms'
   import TeamStats from '$lib/components/TeamStats.svelte'
   import TeamMemberList from '$lib/components/TeamMemberList.svelte'
+  import TeamKeys from '$lib/components/TeamKeys.svelte'
 
   export let data: PageData
   export let form: ActionData
@@ -13,7 +11,7 @@
 <header
   class="flex items-center justify-between border-b border-white/5 px-4 py-4 sm:px-6 sm:py-6 lg:px-8"
 >
-  <h1 class="text-lg font-semibold leading-7 text-white">Team {data.userTeam.team.name}</h1>
+  <h1 class="text-lg font-semibold leading-7 text-white">Team {data.team.name}</h1>
 </header>
 
 <div class="divide-y divide-white/5">
@@ -21,59 +19,19 @@
     estimatedCost={data.estimatedCost}
     numberChats={data.chatCount}
     numberMembers={data?.members?.length || 0}
-    createdAt={data.userTeam?.createdAt}
+    createdAt={data.team.createdAt}
   />
-  <div
-    class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8"
-  >
-    <div>
-      <h2 class="text-base font-semibold leading-7 text-white">Open AI API Key</h2>
-      <p class="mt-1 text-sm leading-6 text-gray-400">The key shared with the team</p>
-    </div>
-
-    <form
-      method="post"
-      action="?/updateTeamDetails"
-      class="md:col-span-2"
-      use:enhance={() => {
-        return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
-      }}
-    >
-      <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
-        <div class="col-span-full">
-          <Input
-            class="dark"
-            name="openAiApiKey"
-            value={form?.teamSection?.fields?.openAiApiKey ?? data.userTeam.team.openAiApiKey}
-            errors={form?.teamSection?.errors?.openAiApiKey}
-          />
-        </div>
-
-        <div class="col-span-full">
-          <Input
-            class="dark"
-            name="name"
-            value={form?.teamSection?.fields?.name ?? data.userTeam.team.name}
-            errors={form?.teamSection?.errors?.name}
-          />
-        </div>
-      </div>
-
-      <div class="mt-8 flex">
-        <button
-          type="submit"
-          class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-          >Save</button
-        >
-        <Alert
-          class="ml-4"
-          type={(form?.teamSection?.error && 'error') || (form?.teamSection?.success && 'success')}
-          message={form?.teamSection?.error || form?.teamSection?.success}
-        />
-      </div>
-    </form>
-  </div>
+  <TeamKeys
+    isAdmin={data.isAdmin}
+    form={form?.keySection}
+    team={data.team}
+  />
   <div class="px-4 sm:px-6 lg:px-8 max-w-6xl">
-    <TeamMemberList userId={data.userId} form={form?.userSection} members={data.members} isAdmin={data.isAdmin} />
+    <TeamMemberList
+      userId={data.userId}
+      form={form?.userSection}
+      members={data.members}
+      isAdmin={data.isAdmin}
+    />
   </div>
 </div>
