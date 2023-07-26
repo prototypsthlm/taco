@@ -17,6 +17,7 @@ export async function sendMessage(formData: unknown, user: User) {
       .object({
         message: z.string(),
         chatId: z.union([z.string(), z.undefined()]),
+        role: z.union([z.string(), z.undefined()]),
       })
       .parse(formData)
 
@@ -25,7 +26,7 @@ export async function sendMessage(formData: unknown, user: User) {
       if (!user.activeTeamId) throw new Error('User has no active team')
       const userTeam = await findUserTeam(user.id, user.activeTeamId)
       if (!userTeam) throw new Error('User active team does not exist')
-      chat = await createChat(userTeam.id)
+      chat = await createChat(userTeam.id, schema.role)
     } else {
       const chatId = Number(schema.chatId)
       chat = await getChatWithRelationsById(chatId)

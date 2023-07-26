@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { enhance } from '$app/forms'
   import Answer from '$lib/components/Answer.svelte'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import Question from '$lib/components/Question.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { fade } from 'svelte/transition'
+  import RoleSelector from './RoleSelector.svelte'
 
   export let chat: ChatWithRelations | null
   let messages: ChatWithRelations['messages'][number] = []
@@ -25,13 +25,17 @@
       },
     ]
   }
+
+  let selectedRolePrompt: string | null = 'You are a helpful assistant.'
 </script>
 
 <div class="flex flex-col justify-between items-center h-full w-full">
   {#if !messages.length}
-    <div class="flex flex-col justify-center items-center flex-grow h-full">
+    <div class="flex flex-col gap-4 justify-center items-center flex-grow h-full">
       <h1 class="text-accent text-5xl font-bold">New Chat!</h1>
       <p class="text-accent text-2xl">Choose your LLM personality</p>
+      <RoleSelector on:roleChange={(event) => (selectedRolePrompt = event.detail.prompt)} />
+      <p class="text-accent max-w-2xl text-center text-xl text-opacity-70">{selectedRolePrompt}</p>
     </div>
   {:else}
     <div class="flex flex-col w-full h-full overflow-scroll">
@@ -47,6 +51,6 @@
   {/if}
 
   <div class="self-end py-3 md:py-6 w-full bg-gray-900">
-    <ChatInput chatId={chat?.id} on:message={addPlaceholderMessage} />
+    <ChatInput chatId={chat?.id} role={selectedRolePrompt} on:message={addPlaceholderMessage} />
   </div>
 </div>
