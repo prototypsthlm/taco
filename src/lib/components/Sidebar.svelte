@@ -14,27 +14,29 @@
 </script>
 
 <aside class="w-full">
-  <button
-    on:click={() => (selectTeamView = !selectTeamView)}
-    class="flex justify-between items-center pb-6 w-full"
-  >
-    <div class="flex gap-2 items-center">
-      <img
-        class="w-8 h-8 rounded-lg"
-        src={`https://www.gravatar.com/avatar/${currentTeam.name}?d=identicon`}
-        alt=""
-      />
-      <div class="flex flex-col items-start leading-none">
-        <p class="text-gray-400 text-opacity-60 text-xs">Selected Team</p>
-        <p class="text-white">{currentTeam.name}</p>
+  {#if currentTeam}
+    <button
+      on:click={() => (selectTeamView = !selectTeamView)}
+      class="flex justify-between items-center pb-6 w-full"
+    >
+      <div class="flex gap-2 items-center">
+        <img
+          class="w-8 h-8 rounded-lg"
+          src={`https://www.gravatar.com/avatar/${currentTeam.name}?d=identicon`}
+          alt=""
+        />
+        <div class="flex flex-col items-start leading-none">
+          <p class="text-gray-400 text-opacity-60 text-xs">Selected Team</p>
+          <p class="text-white">{currentTeam.name}</p>
+        </div>
       </div>
-    </div>
-    {#if !selectTeamView}
-      <ChevronDownIcon class="h-4 w-4 text-white" />
-    {:else}
-      <ChevronUpIcon class="h-4 w-4 text-white" />
-    {/if}
-  </button>
+      {#if !selectTeamView}
+        <ChevronDownIcon class="h-4 w-4 text-white" />
+      {:else}
+        <ChevronUpIcon class="h-4 w-4 text-white" />
+      {/if}
+    </button>
+  {/if}
 
   {#if chats === null || selectTeamView}
     <div class="pt-2">
@@ -45,12 +47,12 @@
             type="submit"
             name="teamId"
             value={team.id}
-            disabled={team.id === currentTeam.id}
+            disabled={team.id === currentTeam?.id}
             class="text-left p-4 bg-slate-400 bg-opacity-10 hover:bg-opacity-20 rounded-lg"
           >
             <h4 class="text-white font-semibold text-sm">
               {team.name}
-              {#if team.id === currentTeam.id}
+              {#if team.id === currentTeam?.id}
                 <span class="text-xs text-gray-400 text-opacity-60"> (current)</span>
               {/if}
             </h4>
