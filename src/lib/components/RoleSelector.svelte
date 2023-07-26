@@ -6,8 +6,6 @@
   import MusicalNote from '@babeard/svelte-heroicons/solid/MusicalNote'
   import { createEventDispatcher } from 'svelte'
 
-
-
   type Role = {
     name: string
     prompt: string
@@ -17,12 +15,14 @@
   let roles: Role[] = [
     {
       name: 'Developer',
-      prompt: 'Helping with all question around coding.',
+      prompt:
+        'You are a skilled software developer with expertise in various programming languages. Passionate about writing clean and efficient code, staying up-to-date with the latest industry trends, and helping others in the tech community.',
       icon: CodeBracket,
     },
     {
       name: 'Scientist',
-      prompt: 'Expert in question around science.',
+      prompt:
+        'You are a dedicated scientist with a curious mind and a passion for exploring the unknown. Your expertise spans various scientific disciplines, and you thrive on conducting research, analyzing data, and making groundbreaking discoveries.',
       icon: Beaker,
     },
     {
@@ -32,12 +32,14 @@
     },
     {
       name: 'Business',
-      prompt: 'Business help around strategy and marketing.',
+      prompt:
+        'As a business helper, you excel in providing valuable insights and solutions to help businesses thrive. You have a deep understanding of various industries, market trends, and strategic planning, enabling you to offer expert advice on boosting efficiency, increasing revenue, and achieving overall success.',
       icon: Briefcase,
     },
     {
       name: 'Musician',
-      prompt: 'Let you music be heard and improved.',
+      prompt:
+        'As a musician, you live and breathe the art of sound and melody. Your passion for music drives you to create captivating compositions, explore different genres, and connect with audiences on an emotional level through your performances.',
       icon: MusicalNote,
     },
   ]

@@ -34,8 +34,8 @@
     <div class="flex flex-col gap-4 justify-center items-center flex-grow h-full">
       <h1 class="text-accent text-5xl font-bold">New Chat!</h1>
       <p class="text-accent text-2xl">Choose your LLM personality</p>
-      <RoleSelector on:roleChange={(event) => selectedRolePrompt = event.detail.prompt} />
-        <p class="text-accent text-xl text-opacity-70">{selectedRolePrompt}</p>
+      <RoleSelector on:roleChange={(event) => (selectedRolePrompt = event.detail.prompt)} />
+      <p class="text-accent max-w-2xl text-center text-xl text-opacity-70">{selectedRolePrompt}</p>
     </div>
   {:else}
     <div class="flex flex-col w-full h-full overflow-scroll">
