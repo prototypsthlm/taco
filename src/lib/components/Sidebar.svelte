@@ -6,7 +6,6 @@
   import type { Team } from '@prisma/client'
 
   export let chats: ChatWithRelations[] | null = []
-  export let currentChat: ChatWithRelations = null
   export let teams: Team[] = []
   export let currentTeam: Team = null
 
@@ -77,7 +76,6 @@
           name={chat.name || 'New Chat'}
           updatedAt={chat.updatedAt}
           roleContent={chat.roleContent}
-          isCurrentPage={chat.id === currentChat?.id}
         />
       {/each}
     </ul>
