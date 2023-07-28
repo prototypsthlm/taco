@@ -15,7 +15,7 @@
 
 <a {href} title={name}>
   <li
-    class="px-2 py-3 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl"
+    class="px-1 py-3 sm:px-4 lg:px-4 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl"
     class:bg-accent={activeChatId === chatId}
   >
     <div class="flex items-center gap-x-3">
