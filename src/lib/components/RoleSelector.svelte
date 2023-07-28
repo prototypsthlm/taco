@@ -58,8 +58,7 @@
   {#each roles as role}
     <button
       on:click={() => selectRole(role)}
-      class:bg-opacity-20={selectedRole === role}
-      class="flex flex-col rounded-lg md:min-w-[200px] gap-2 bg-white p-4 md:p-8 bg-opacity-5 hover:bg-opacity-20"
+      class="flex flex-col rounded-lg md:min-w-[200px] gap-2 bg-white p-4 md:p-8 {selectedRole === role ? 'bg-opacity-20' : 'bg-opacity-5'} hover:bg-opacity-20"
     >
       <svelte:component this={role.icon} class="w-6 h-6 md:w-12 md:h-12 mx-auto text-white" />
       <p class="text-md md:text-3xl font-semibold tracking-tight text-white">
