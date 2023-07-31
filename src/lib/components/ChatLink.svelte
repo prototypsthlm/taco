@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getTimeSince } from '$lib/client/utils/timeConverter'
+  import { getTimeSince } from '$lib/utils/timeConverter'
   import { ChatBubbleLeftIcon } from '@babeard/svelte-heroicons/solid'
   import { page } from '$app/stores'
 
