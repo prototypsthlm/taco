@@ -1,53 +1,36 @@
 import { countTeamChats, updateTeam } from '$lib/server/entities/team'
-import { Role } from '@prisma/client'
-import type { Actions, PageServerLoad } from './$types'
-import { z, ZodError } from 'zod'
-import { error, fail } from '@sveltejs/kit'
-
-import { getTeamWithMembers } from '$lib/server/entities/team'
+import { getUserWithTeamsAndTeamUsersById } from '$lib/server/entities/user'
+import { removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
+import { decrypt } from '$lib/server/utils/crypto'
 import { isUserAdmin, isUserInTeam } from '$lib/server/utils/database'
-import { removeUserFromTeam, updateRole } from '$lib/server/entities/userTeams'
+import { Role } from '@prisma/client'
+import { error, fail } from '@sveltejs/kit'
+import { z, ZodError } from 'zod'
+import type { Actions, PageServerLoad } from './$types'
 
-export type TeamMember = {
-  id: number
-  name: string
-  email: string
-  role: Role
-  addedAt: Date
-}
-
-export const load: PageServerLoad = async ({ params, parent, locals }) => {
-  const { user } = await parent()
-  if (!user) throw error(404, 'User not found')
-
+export const load: PageServerLoad = async ({ params, locals: { currentUser } }) => {
+  const user = await getUserWithTeamsAndTeamUsersById(currentUser.id)
   const teamId = Number(params.id)
-  const team = await getTeamWithMembers(teamId)
-  if (!team) throw error(404, 'Team not found')
 
-  const userId = locals.currentUser.id
+  const userTeam = user.userTeams.find((x) => x.teamId === teamId)
 
-  const members = team?.userTeams.map((userTeam) => {
-    return {
-      id: userTeam?.user?.id,
-      name: userTeam?.user?.name,
-      email: userTeam?.user?.email,
-      role: userTeam?.role,
-      addedAt: userTeam?.createdAt,
-    } as TeamMember
-  })
+  if (!userTeam) throw error(404, "Doesn't belong to this team or the team doesn't exist")
 
-  if (!members?.some((member) => member.id === userId))
-    throw error(404, 'You are not a member of this team.')
+  if (userTeam.team?.openAiApiKey) {
+    if (userTeam?.role === Role.ADMIN) {
+      if (!process.env.SECRET_KEY) {
+        throw new Error('You must have SECRET_KEY set in your env.')
+      }
 
-  const isAdmin = await isUserAdmin(teamId, userId)
-  if (!isAdmin) team.openAiApiKey = '*'.repeat(64)
+      userTeam.team.openAiApiKey = decrypt(userTeam.team.openAiApiKey, process.env.SECRET_KEY)
+    } else {
+      userTeam.team.openAiApiKey = '*'.repeat(64)
+    }
+  }
 
   return {
-    members,
-    userId,
-    isAdmin,
-    chatCount: await countTeamChats(teamId),
-    team,
+    userTeam,
+    chatCount: await countTeamChats(userTeam.teamId),
   }
 }
 
@@ -114,6 +97,7 @@ export const actions: Actions = {
     const fields = Object.fromEntries(await request.formData())
     const buttonAction = fields.submit
     const userId = Number(fields.userId)
+    const userTeamId = Number(fields.userTeamId)
     const userEmail = fields.userEmail
 
     if (userId === requestingUserId) {
@@ -124,7 +108,7 @@ export const actions: Actions = {
       })
     }
 
-    if (!isUserInTeam(teamId, userId)) {
+    if (!(await isUserInTeam(teamId, userId))) {
       return fail(401, {
         userSection: {
           error: `User: ${userEmail} is not in the team`,
@@ -132,22 +116,22 @@ export const actions: Actions = {
       })
     }
 
-    if (buttonAction == 'remove') {
-      removeUserFromTeam(userId, teamId)
+    if (buttonAction === 'remove') {
+      await removeUserTeam(userTeamId)
       return {
         userSection: {
           success: `User ${userEmail} successfully removed from the team.`,
         },
       }
-    } else if (buttonAction == 'downgrade') {
-      updateRole(userId, teamId, Role.MEMBER)
+    } else if (buttonAction === 'downgrade') {
+      await updateUserTeamRole(userTeamId, Role.MEMBER)
       return {
         userSection: {
           success: `User ${userEmail} successfully downgraded to ${Role.MEMBER}.`,
         },
       }
-    } else if (buttonAction == 'upgrade') {
-      updateRole(userId, teamId, Role.ADMIN)
+    } else if (buttonAction === 'upgrade') {
+      await updateUserTeamRole(userTeamId, Role.ADMIN)
       return {
         userSection: {
           success: `User ${userEmail} successfully upgraded to ${Role.ADMIN}.`,

@@ -2,11 +2,10 @@
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
   import { enhance } from '$app/forms'
-  import type { Team } from '@prisma/client'
+  import type { UserTeamWithTeamsAndTeamUsers } from '$lib/server/entities/user'
 
+  export let userTeam: UserTeamWithTeamsAndTeamUsers
   export let form: any
-  export let team: Team
-  export let isAdmin: boolean = false
 </script>
 
 <div class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
@@ -28,8 +27,8 @@
         <Input
           class="dark"
           name="openAiApiKey"
-          disabled={!isAdmin}
-          value={form?.fields?.openAiApiKey ?? team.openAiApiKey}
+          disabled={userTeam.role !== 'ADMIN'}
+          value={form?.fields?.openAiApiKey ?? userTeam.team.openAiApiKey}
           errors={form?.errors?.openAiApiKey}
         />
       </div>
@@ -38,8 +37,8 @@
         <Input
           class="dark"
           name="name"
-          disabled={!isAdmin}
-          value={form?.fields?.name ?? team.name}
+          disabled={userTeam.role !== 'ADMIN'}
+          value={form?.fields?.name ?? userTeam.team.name}
           errors={form?.errors?.name}
         />
       </div>
@@ -48,7 +47,7 @@
     <div class="mt-8 flex">
       <button
         type="submit"
-        disabled={!isAdmin}
+        disabled={userTeam.role !== 'ADMIN'}
         class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
         >Save</button
       >

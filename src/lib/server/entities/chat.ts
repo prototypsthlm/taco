@@ -16,28 +16,6 @@ export const getChatWithRelationsById = (id: number) => {
   })
 }
 
-export const getUserTeamChats = (userId: number, teamId: number) => {
-  return prisma.chat.findMany({
-    where: {
-      owner: {
-        userId,
-        teamId,
-      },
-    },
-    include: {
-      owner: {
-        include: {
-          user: true,
-          team: true,
-        },
-      },
-    },
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
-}
-
 export const createChat = (userTeamId: number, role: string | undefined) => {
   return prisma.chat.create({
     data: {
