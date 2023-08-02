@@ -1,5 +1,5 @@
 import { Role } from '@prisma/client'
-import { getUserWithRelationsById } from '../entities/user'
+import { getUserWithRelationsById } from '$lib/server/entities/user'
 
 export const isUserAdmin = async (teamId: number, userId: number) => {
   const user = await getUserWithRelationsById(userId)

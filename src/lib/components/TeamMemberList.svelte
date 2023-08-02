@@ -1,35 +1,29 @@
 <script lang="ts">
+  import { enhance } from '$app/forms'
+  import Alert from '$lib/components/Alert.svelte'
+  import UserProfileAvatar from '$lib/components/UserProfileAvatar.svelte'
+  import type { UserTeamWithTeamsAndTeamUsers } from '$lib/server/entities/user'
   import {
     ArrowDownIcon,
     ChevronUpIcon,
     PlusIcon,
     TrashIcon,
   } from '@babeard/svelte-heroicons/solid'
-  import type { TeamMember } from '../../routes/app/settings/teams/[id]/+page.server'
 
-  import UserProfileAvatar from './UserProfileAvatar.svelte'
-  import { enhance } from '$app/forms'
-  import Alert from './Alert.svelte'
-
-  function formatDate(date: Date) {
-    const options = {
+  const formatDate = (date: Date) =>
+    date.toLocaleString('sv-SE', {
       hour: '2-digit',
       minute: '2-digit',
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
-    }
+    })
 
-    return date.toLocaleString('sv-SE', options)
-  }
-
-  export let members: TeamMember[] | undefined
-  export let isAdmin: boolean = false
-  export let userId: Number
+  export let userTeam: UserTeamWithTeamsAndTeamUsers
   export let form: Record<string, string> = {}
 </script>
 
-{#if members}
+<div class="px-4 sm:px-6 lg:px-8 max-w-6xl">
   <div class="py-10 flex flex-col gap-4 md:gap-8">
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
@@ -53,35 +47,36 @@
       message={form?.error || form?.success}
     />
     <ul class="divide-y divide-gray-800">
-      {#each members as person}
+      {#each userTeam.team.teamUsers as teamUser}
         <li class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-6 py-5">
           <div class="flex gap-x-4">
             <UserProfileAvatar
               class="h-12 w-12 flex-none rounded-full bg-gray-800"
-              userEmail={person.email}
+              userEmail={teamUser.user.email}
             />
             <div class="min-w-0 flex-auto">
               <p class="text-sm font-semibold leading-6 text-white">
-                {person.name}
-                {#if person.id === userId}
+                {teamUser.user.name}
+                {#if teamUser.user?.id === userTeam.user?.id}
                   <span class="font-normal leading-5 text-gray-400">
                     {' '}
                     (you)
                   </span>
                 {/if}
               </p>
-              <p class="mt-1 truncate text-xs leading-5 text-gray-400">{person.email}</p>
+              <p class="mt-1 truncate text-xs leading-5 text-gray-400">{teamUser.user.email}</p>
             </div>
           </div>
           <div class="flex flex-col sm:items-center">
-            <p class="text-sm leading-6 text-white">{person.role}</p>
+            <p class="text-sm leading-6 text-white">{teamUser.role}</p>
             <p class="mt-1 text-xs leading-5 text-gray-400">
-              Joined on <time datetime={person.addedAt.toISOString()}
-                >{formatDate(person.addedAt)}</time
+              Joined on
+              <time datetime={teamUser.createdAt.toISOString()}
+                >{formatDate(teamUser.createdAt)}</time
               >
             </p>
           </div>
-          {#if isAdmin && person.id !== userId}
+          {#if userTeam.role === 'ADMIN' && userTeam.user?.id !== teamUser.user?.id}
             <form
               class="md:place-self-end flex gap-2"
               method="post"
@@ -90,7 +85,11 @@
             >
               <button
                 on:click={(event) => {
-                  if (!confirm(`Are you sure you want to remove ${person.email} from the team?`)) {
+                  if (
+                    !confirm(
+                      `Are you sure you want to remove ${teamUser.user.email} from the team?`
+                    )
+                  ) {
                     event.preventDefault()
                   }
                 }}
@@ -103,7 +102,7 @@
                 <TrashIcon class="h-4 w-4" />
               </button>
 
-              {#if person.role === 'ADMIN'}
+              {#if teamUser.role === 'ADMIN'}
                 <button
                   type="submit"
                   name="submit"
@@ -125,12 +124,13 @@
                 </button>
               {/if}
 
-              <input type="hidden" name="userEmail" value={person.email} />
-              <input type="hidden" name="userId" value={person.id} />
+              <input type="hidden" name="userEmail" value={teamUser.user.email} />
+              <input type="hidden" name="userId" value={teamUser.user?.id} />
+              <input type="hidden" name="userTeamId" value={teamUser?.id} />
             </form>
           {/if}
         </li>
       {/each}
     </ul>
   </div>
-{/if}
+</div>

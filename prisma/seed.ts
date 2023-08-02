@@ -46,7 +46,7 @@ async function seed() {
         createMany: {
           data: [
             {
-              question: 'OGOGAre you a helpful assistant?',
+              question: 'Are you a helpful assistant?',
               authorId: user.id,
             },
           ],
