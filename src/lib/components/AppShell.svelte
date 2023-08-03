@@ -117,7 +117,7 @@
     </a>
   </div>
 
-  <main class="lg:h-full lg:ml-72 h-[calc(100%-4rem)]">
+  <main class="lg:ml-72 grow overflow-scroll">
     <slot name="main" />
   </main>
 </div>
