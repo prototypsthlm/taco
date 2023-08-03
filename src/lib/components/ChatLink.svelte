@@ -27,21 +27,21 @@
       >
     </div>
     {#if isLinkActive}
-      <div class="flex justify-center items-center">
-        <p class="mt-2 truncate text-sm text-gray-500">
+      <div class="flex justify-between items-center gap-2 mt-1">
+        <p class="truncate text-sm text-gray-500">
           {roleContent}
         </p>
         <form method="post" action="/app/chat/{chatId}?/deleteChat" use:enhance>
           <button
             type="submit"
             on:click={(event) => {
-              if (!confirm(`Are you sure you want to remove the chat ${name}`)) {
+              if (!confirm(`Are you sure you want to delete the chat "${name}"`)) {
                 event.preventDefault()
               }
             }}
           >
             <TrashIcon
-              class="h-5 w-5 text-gray-500 hover:text-red-500 transition-colors duration-200"
+              class="h-5 w-5 text-gray-500 hover:text-red-500 duration-200"
             />
           </button>
           <input type="hidden" name="chatId" value={chatId} />
