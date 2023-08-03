@@ -1,8 +1,19 @@
 <script lang="ts">
   import ChatRoom from '$lib/components/ChatRoom.svelte'
+  import { resetToNewChat } from '../../stores/chat'
   import type { ActionData } from './$types'
 
   export let form: ActionData
+
+  let unique = {}
+
+  $: if ($resetToNewChat) {
+    $resetToNewChat = false
+    unique = {}
+    form = null
+  }
 </script>
 
-<ChatRoom chat={form?.chat || null} />
+{#key unique}
+  <ChatRoom chat={form?.chat || null} />
+{/key}
