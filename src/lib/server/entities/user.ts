@@ -1,10 +1,10 @@
 import { prisma } from '$lib/server/prisma'
-import { decrypt, generateSessionId } from '$lib/server/utils/crypto'
+import { generateSessionId } from '$lib/server/utils/crypto'
 import { Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
-export const getUserWithRelationsById = async (id: number) => {
-  const userWithRelations = await prisma.user.findUnique({
+export const getUserWithRelationsById = (id: number) =>
+  prisma.user.findUniqueOrThrow({
     where: { id },
     include: {
       userTeams: {
@@ -15,29 +15,15 @@ export const getUserWithRelationsById = async (id: number) => {
     },
   })
 
-  if (!userWithRelations?.userTeams) {
-    return userWithRelations
-  }
+export type UserBySessionId = Awaited<ReturnType<typeof getUserBySessionId>>
 
-  userWithRelations.userTeams = userWithRelations?.userTeams.map((userTeam) => {
-    if (!userTeam?.team?.openAiApiKey) {
-      return userTeam
-    }
-
-    if (!process.env.SECRET_KEY) {
-      throw new Error('You must have SECRET_KEY set in your env.')
-    }
-
-    userTeam.team.openAiApiKey = decrypt(userTeam.team.openAiApiKey, process.env.SECRET_KEY)
-    return userTeam
+export const getUserBySessionId = (sessionId: string) =>
+  prisma.user.findUniqueOrThrow({
+    where: { sessionId },
+    include: {
+      activeUserTeam: true,
+    },
   })
-
-  return userWithRelations
-}
-
-export const getUserBySessionId = async (sessionId: string) => {
-  return prisma.user.findUnique({ where: { sessionId } })
-}
 
 export const getUserIfCredentialsMatch = async (email: string, password: string) => {
   const user = await prisma.user.findUnique({ where: { email } })
@@ -91,47 +77,86 @@ export const createUser = async (
   })
 }
 
-export const updateUserPersonalData = (id: number, name: string, email: string) => {
-  return prisma.user.update({
+export const updateUserPersonalData = (id: number, name: string, email: string) =>
+  prisma.user.update({
     where: { id },
     data: {
       name,
       email,
     },
   })
-}
 
-export const updatePassword = async (id: number, password: string) => {
-  return prisma.user.update({
+export const updatePassword = async (id: number, password: string) =>
+  prisma.user.update({
     where: { id },
     data: {
       password: await bcrypt.hash(password, 10),
     },
   })
-}
 
-export const deleteUser = (id: number) => {
-  return prisma.user.delete({ where: { id } })
-}
+export const deleteUser = (id: number) => prisma.user.delete({ where: { id } })
 
-export const findAllTeamsFromUser = async (userId: number) => {
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id: userId },
+export const getUserWithUserTeamsById = async (id: number) =>
+  prisma.user.findUniqueOrThrow({
+    where: { id },
     include: { userTeams: { include: { team: true } } },
   })
 
-  return user.userTeams.map((userTeam) => {
-    if (userTeam.role === Role.ADMIN) {
-      return userTeam.team
-    } else {
-      return { ...userTeam.team, openAiApiKey: '*'.repeat(64) }
-    }
-  })
-}
-
-export const changeActiveTeam = async (userId: number, teamId: number) => {
-  return prisma.user.update({
+export const changeActiveUserTeam = (userId: number, userTeamId: number) =>
+  prisma.user.update({
     where: { id: userId },
-    data: { activeTeamId: teamId },
+    data: { activeUserTeamId: userTeamId },
   })
-}
+
+export type UserWithTeamsAndTeamUsers = Awaited<ReturnType<typeof getUserWithTeamsAndTeamUsersById>>
+export type UserTeamWithTeamsAndTeamUsers = UserWithTeamsAndTeamUsers['userTeams'][number]
+
+export const getUserWithTeamsAndTeamUsersById = (id: number) =>
+  prisma.user.findUniqueOrThrow({
+    where: { id },
+    include: {
+      userTeams: {
+        include: {
+          chats: true,
+          team: {
+            include: {
+              teamUsers: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
+export type UserWithUserTeamsActiveTeamAndChats = Awaited<
+  ReturnType<typeof getUserWithUserTeamsActiveTeamAndChatsById>
+>
+export const getUserWithUserTeamsActiveTeamAndChatsById = (id: number) =>
+  prisma.user.findUniqueOrThrow({
+    where: { id },
+    include: {
+      userTeams: {
+        include: {
+          team: true,
+        },
+      },
+      activeUserTeam: {
+        include: {
+          team: true,
+          chats: true,
+        },
+      },
+    },
+  })
+
+export const getUserWithActiveUserTeamById = (id: number) =>
+  prisma.user.findUniqueOrThrow({
+    where: { id },
+    include: {
+      activeUserTeam: true,
+    },
+  })

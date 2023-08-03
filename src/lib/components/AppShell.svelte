@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
-  import type { User } from '@prisma/client'
-  import { Dialog, TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
   import logo from '$lib/assets/logo.png'
+  import type { UserBySessionId } from '$lib/server/entities/user'
+  import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
+  import { Dialog, TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
   import UserProfileAvatar from './UserProfileAvatar.svelte'
 
-  export let user: User
+  export let user: UserBySessionId
 
   let sidebarOpen = false
 </script>

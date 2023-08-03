@@ -1,9 +1,6 @@
 <script lang="ts">
   import classNames from 'classnames'
-  import type { LayoutData } from './$types'
   import { page } from '$app/stores'
-
-  export let data: LayoutData
 </script>
 
 <div class="min-h-screen bg-gray-900">

@@ -8,7 +8,7 @@ const authRoutes = ['/signin', '/signup']
 export const handle: Handle = async ({ event, resolve }) => {
   // sign-out route
   if (event.url.pathname === '/signout') {
-    await event.cookies.delete('session_id', { path: '/' })
+    event.cookies.delete('session_id', { path: '/' })
     throw redirect(303, '/')
   }
 
@@ -32,7 +32,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     if (currentUser) {
       event.locals.currentUser = currentUser
     } else {
-      await event.cookies.delete('session_id', { path: '/' })
+      event.cookies.delete('session_id', { path: '/' })
       throw redirect(303, '/')
     }
   }

@@ -21,11 +21,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userTeams UserTeams[]
+  userTeams UserTeam[]
   message   Message[]
 
-  activeTeamId Int?
-  activeTeam   Team? @relation(fields: [activeTeamId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  activeUserTeamId Int?      @unique
+  activeUserTeam   UserTeam? @relation("ActiveUserTeam", fields: [activeUserTeamId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model Team {
@@ -37,22 +37,26 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userTeams UserTeams[]
-  User      User[] // for active team reference
+  teamUsers UserTeam[]
 }
 
-model UserTeams {
+model UserTeam {
   id Int @id @default(autoincrement())
+
+  role Role @default(MEMBER)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  role   Role   @default(MEMBER)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId Int
-  team   Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  teamId Int?
-  chats  Chat[]
+
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  teamId Int
+
+  chats Chat[]
+
+  userActivatedBy User? @relation("ActiveUserTeam")
 }
 
 model Chat {
@@ -69,7 +73,7 @@ model Chat {
 
   messages Message[]
 
-  owner   UserTeams @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  owner   UserTeam @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ownerId Int
 }
 
