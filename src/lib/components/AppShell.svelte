@@ -117,7 +117,7 @@
     </a>
   </div>
 
-  <main class="lg:ml-72 h-full">
+  <main class="lg:h-full lg:ml-72 h-[calc(100%-4rem)]">
     <slot name="main" />
   </main>
 </div>
