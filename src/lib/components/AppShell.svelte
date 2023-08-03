@@ -33,7 +33,7 @@
           leaveFrom="translate-x-0"
           leaveTo="-translate-x-full"
         >
-          <div class="relative mr-16 flex w-full max-w-xs flex-1">
+          <div class="relative mr-16 flex w-screen max-w-xs flex-1">
             <TransitionChild
               enter="ease-in-out duration-300"
               enterFrom="opacity-0"
@@ -51,15 +51,15 @@
             </TransitionChild>
             <!-- Sidebar component, swap this element with another sidebar if you like -->
             <div
-              class="min-h-screen flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10"
+              class="h-screen flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10"
             >
-              <div class="flex h-16 shrink-0 items-center">
+              <div class="flex h-16 items-center">
                 <a class="flex text-white items-center gap-4 text-2xl" href="/app">
                   <img class="h-8 w-auto" src={logo} alt="LLM Portal" /> LLM Portal
                 </a>
               </div>
-              <nav class="flex flex-1 flex-col">
-                <div class="flex flex-1 flex-col gap-y-7">
+              <nav class="flex flex-1 flex-col overflow-hidden">
+                <div class="flex flex-1 flex-col gap-y-7 overflow-hidden">
                   <slot name="sidebar" />
                 </div>
               </nav>
@@ -73,14 +73,14 @@
   <!-- Static sidebar for desktop -->
   <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
     <!-- Sidebar component, swap this element with another sidebar if you like -->
-    <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6">
-      <div class="flex h-16 shrink-0 items-center">
+    <div class="flex grow flex-col gap-y-5 bg-gray-900 px-6 h-screen">
+      <div class="flex h-16 items-center">
         <a class="flex text-white items-center gap-4 text-2xl" href="/app">
           <img class="h-8 w-auto" src={logo} alt="LLM Portal" /> LLM Portal
         </a>
       </div>
-      <nav class="flex flex-1 flex-col">
-        <div class="flex flex-1 flex-col gap-y-7">
+      <nav class="flex flex-col overflow-hidden h-full">
+        <div class="flex flex-col gap-y-7 overflow-hidden h-full">
           <slot name="sidebar" />
           <div class="-mx-6 mt-auto">
             <a
