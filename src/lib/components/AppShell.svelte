@@ -1,18 +1,23 @@
 <script lang="ts">
   import logo from '$lib/assets/logo.png'
   import type { UserBySessionId } from '$lib/server/entities/user'
+  import { isSidebarOpen } from '$lib/stores/general'
   import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
-  import { Dialog, TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
+  import { TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
   import UserProfileAvatar from './UserProfileAvatar.svelte'
 
   export let user: UserBySessionId
 
-  let sidebarOpen = false
+  let sidebarOpen: boolean
+
+  isSidebarOpen.subscribe((value) => {
+    sidebarOpen = value
+  })
 </script>
 
 <div class="flex flex-col justify-between h-screen bg-gray-900">
   <TransitionRoot show={sidebarOpen}>
-    <Dialog as="div" class="relative z-50 lg:hidden" on:close={() => (sidebarOpen = false)}>
+    <div class="relative z-50 lg:hidden">
       <TransitionChild
         enter="transition-opacity ease-linear duration-300"
         enterFrom="opacity-0"
@@ -43,7 +48,11 @@
               leaveTo="opacity-0"
             >
               <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
-                <button type="button" class="-m-2.5 p-2.5" on:click={() => (sidebarOpen = false)}>
+                <button
+                  type="button"
+                  class="-m-2.5 p-2.5"
+                  on:click={() => isSidebarOpen.set(false)}
+                >
                   <span class="sr-only">Close sidebar</span>
                   <XMarkIcon class="h-6 w-6 text-white" aria-hidden="true" />
                 </button>
@@ -67,7 +76,7 @@
           </div>
         </TransitionChild>
       </div>
-    </Dialog>
+    </div>
   </TransitionRoot>
 
   <!-- Static sidebar for desktop -->
@@ -103,7 +112,7 @@
     <button
       type="button"
       class="-m-2.5 p-2.5 text-gray-400 lg:hidden"
-      on:click={() => (sidebarOpen = true)}
+      on:click={() => isSidebarOpen.set(true)}
     >
       <span class="sr-only">Open sidebar</span>
       <Bars3Icon class="h-6 w-6" aria-hidden="true" />
