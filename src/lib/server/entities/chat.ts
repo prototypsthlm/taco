@@ -84,3 +84,11 @@ export const setChatName = (id: number, name: string) => {
     },
   })
 }
+
+export const deleteChat = (id: number) => {
+  return prisma.chat.delete({
+    where: {
+      id,
+    },
+  })
+}

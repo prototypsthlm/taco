@@ -117,7 +117,7 @@ export const getUserWithTeamsAndTeamUsersById = (id: number) =>
     include: {
       userTeams: {
         include: {
-          chats: true,
+          chats: { orderBy: { createdAt: 'asc' } },
           team: {
             include: {
               teamUsers: {
@@ -147,7 +147,19 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = (id: number) =>
       activeUserTeam: {
         include: {
           team: true,
-          chats: true,
+          chats: { orderBy: { createdAt: 'desc' } },
+        },
+      },
+    },
+  })
+
+export const getUserWithChatsById = (id: number) =>
+  prisma.user.findUniqueOrThrow({
+    where: { id },
+    include: {
+      activeUserTeam: {
+        include: {
+          chats: { orderBy: { createdAt: 'desc' } },
         },
       },
     },

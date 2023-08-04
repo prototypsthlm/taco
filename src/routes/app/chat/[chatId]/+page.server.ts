@@ -1,6 +1,7 @@
-import { getChatWithRelationsById } from '$lib/server/entities/chat'
+import { deleteChat, getChatWithRelationsById } from '$lib/server/entities/chat'
 import { sendMessage } from '$lib/server/utils/chatting'
-import { fail, type Actions } from '@sveltejs/kit'
+import { isUserOwningChat } from '$lib/server/utils/database'
+import { fail, redirect, type Actions } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ params, parent }) => {
@@ -30,5 +31,18 @@ export const actions: Actions = {
     }
 
     return res
+  },
+  deleteChat: async ({ locals, request }) => {
+    const data = Object.fromEntries(await request.formData())
+    const chatId = Number(data.chatId)
+    const currentUser = locals.currentUser
+
+    if (!isUserOwningChat(chatId, currentUser.id)) {
+      return fail(401, { message: `You don't own the chat ${chatId}` })
+    }
+
+    await deleteChat(chatId)
+
+    throw redirect(303, '/app')
   },
 }

@@ -1,7 +1,9 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
+  import { page } from '$app/stores'
   import ChatLink from '$lib/components/ChatLink.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
+  import { resetToNewChat } from '$lib/stores/chat'
   import { ChevronDownIcon, ChevronUpIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
@@ -63,8 +65,12 @@
       </form>
     </div>
   {:else}
+    {$page.route.id}
     <a
       href="/app"
+      on:click={() => {
+        if ($page.route.id === '/app') $resetToNewChat = true
+      }}
       class="mb-2 px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl border-2 border-white border-opacity-20"
     >
       <div class="flex items-center gap-x-3">
