@@ -3,8 +3,8 @@
   import { page } from '$app/stores'
   import ChatLink from '$lib/components/ChatLink.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
+  import { resetToNewChat } from '$lib/stores/chat'
   import { ChevronDownIcon, ChevronUpIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
-  import { resetToNewChat } from '../../stores/chat'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
 

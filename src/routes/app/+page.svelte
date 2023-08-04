@@ -1,6 +1,6 @@
 <script lang="ts">
   import ChatRoom from '$lib/components/ChatRoom.svelte'
-  import { resetToNewChat } from '../../stores/chat'
+  import { resetToNewChat } from '$lib/stores/chat'
   import type { ActionData } from './$types'
 
   export let form: ActionData
