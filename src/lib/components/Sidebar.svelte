@@ -1,9 +1,9 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
+  import { page } from '$app/stores'
   import ChatLink from '$lib/components/ChatLink.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { ChevronDownIcon, ChevronUpIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
-  import { page } from '$app/stores'
   import { resetToNewChat } from '../../stores/chat'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
@@ -11,7 +11,7 @@
   let selectTeamView = false
 </script>
 
-<aside class="w-full">
+<aside class="flex flex-col grow overflow-hidden">
   {#if user.activeUserTeam}
     <button
       on:click={() => (selectTeamView = !selectTeamView)}
@@ -39,7 +39,13 @@
   {#if !user?.activeUserTeam?.chats || selectTeamView}
     <div class="pt-2">
       <p class="text-white text-center font-bold text-lg">Select a Team</p>
-      <form method="post" use:enhance action="/app?/selectTeam" class="flex flex-col gap-4 py-2">
+      <form
+        method="post"
+        use:enhance
+        action="/app?/selectTeam"
+        class="flex flex-col gap-4 py-2"
+        on:submit={() => (selectTeamView = !selectTeamView)}
+      >
         {#each user.userTeams as userTeam}
           <button
             type="submit"
@@ -59,20 +65,20 @@
       </form>
     </div>
   {:else}
-    <ul class="flex flex-col gap-2 pt-4">
-      {$page.route.id}
-      <a
-        href="/app"
-        on:click={() => {
-          if ($page.route.id === '/app') $resetToNewChat = true
-        }}
-        class="mb-2 px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl border-2 border-white border-opacity-20"
-      >
-        <div class="flex items-center gap-x-3">
-          <PlusIcon class="h-6 w-6 text-white flex-none" />
-          <h3 class="flex-auto truncate text-md font-semibold leading-6 text-white">New Chat</h3>
-        </div>
-      </a>
+    {$page.route.id}
+    <a
+      href="/app"
+      on:click={() => {
+        if ($page.route.id === '/app') $resetToNewChat = true
+      }}
+      class="mb-2 px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl border-2 border-white border-opacity-20"
+    >
+      <div class="flex items-center gap-x-3">
+        <PlusIcon class="h-6 w-6 text-white flex-none" />
+        <h3 class="flex-auto truncate text-md font-semibold leading-6 text-white">New Chat</h3>
+      </div>
+    </a>
+    <ul class="overflow-scroll grow flex flex-col gap-2 pt-4">
       {#each user.activeUserTeam.chats as chat}
         <ChatLink
           chatId={chat.id}

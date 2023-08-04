@@ -1,18 +1,23 @@
 <script lang="ts">
   import logo from '$lib/assets/logo.png'
   import type { UserBySessionId } from '$lib/server/entities/user'
+  import { isSidebarOpen } from '$lib/stores/general'
   import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
-  import { Dialog, TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
+  import { TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
   import UserProfileAvatar from './UserProfileAvatar.svelte'
 
   export let user: UserBySessionId
 
-  let sidebarOpen = false
+  let sidebarOpen: boolean
+
+  isSidebarOpen.subscribe((value) => {
+    sidebarOpen = value
+  })
 </script>
 
 <div class="flex flex-col justify-between h-screen bg-gray-900">
   <TransitionRoot show={sidebarOpen}>
-    <Dialog as="div" class="relative z-50 lg:hidden" on:close={() => (sidebarOpen = false)}>
+    <div class="relative z-50 lg:hidden">
       <TransitionChild
         enter="transition-opacity ease-linear duration-300"
         enterFrom="opacity-0"
@@ -33,7 +38,7 @@
           leaveFrom="translate-x-0"
           leaveTo="-translate-x-full"
         >
-          <div class="relative mr-16 flex w-full max-w-xs flex-1">
+          <div class="relative mr-16 flex w-screen max-w-xs flex-1">
             <TransitionChild
               enter="ease-in-out duration-300"
               enterFrom="opacity-0"
@@ -43,7 +48,11 @@
               leaveTo="opacity-0"
             >
               <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
-                <button type="button" class="-m-2.5 p-2.5" on:click={() => (sidebarOpen = false)}>
+                <button
+                  type="button"
+                  class="-m-2.5 p-2.5"
+                  on:click={() => isSidebarOpen.set(false)}
+                >
                   <span class="sr-only">Close sidebar</span>
                   <XMarkIcon class="h-6 w-6 text-white" aria-hidden="true" />
                 </button>
@@ -51,15 +60,15 @@
             </TransitionChild>
             <!-- Sidebar component, swap this element with another sidebar if you like -->
             <div
-              class="min-h-screen flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10"
+              class="h-screen flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10"
             >
-              <div class="flex h-16 shrink-0 items-center">
+              <div class="flex h-16 items-center">
                 <a class="flex text-white items-center gap-4 text-2xl" href="/app">
                   <img class="h-8 w-auto" src={logo} alt="LLM Portal" /> LLM Portal
                 </a>
               </div>
-              <nav class="flex flex-1 flex-col">
-                <div class="flex flex-1 flex-col gap-y-7">
+              <nav class="flex flex-1 flex-col overflow-hidden">
+                <div class="flex flex-1 flex-col gap-y-7 overflow-hidden">
                   <slot name="sidebar" />
                 </div>
               </nav>
@@ -67,20 +76,20 @@
           </div>
         </TransitionChild>
       </div>
-    </Dialog>
+    </div>
   </TransitionRoot>
 
   <!-- Static sidebar for desktop -->
   <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
     <!-- Sidebar component, swap this element with another sidebar if you like -->
-    <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6">
-      <div class="flex h-16 shrink-0 items-center">
+    <div class="flex grow flex-col gap-y-5 bg-gray-900 px-6 h-screen">
+      <div class="flex h-16 items-center">
         <a class="flex text-white items-center gap-4 text-2xl" href="/app">
           <img class="h-8 w-auto" src={logo} alt="LLM Portal" /> LLM Portal
         </a>
       </div>
-      <nav class="flex flex-1 flex-col">
-        <div class="flex flex-1 flex-col gap-y-7">
+      <nav class="flex flex-col overflow-hidden h-full">
+        <div class="flex flex-col gap-y-7 overflow-hidden h-full">
           <slot name="sidebar" />
           <div class="-mx-6 mt-auto">
             <a
@@ -103,7 +112,7 @@
     <button
       type="button"
       class="-m-2.5 p-2.5 text-gray-400 lg:hidden"
-      on:click={() => (sidebarOpen = true)}
+      on:click={() => isSidebarOpen.set(true)}
     >
       <span class="sr-only">Open sidebar</span>
       <Bars3Icon class="h-6 w-6" aria-hidden="true" />
@@ -117,7 +126,7 @@
     </a>
   </div>
 
-  <main class="lg:ml-72 h-full">
+  <main class="lg:ml-72 grow overflow-scroll">
     <slot name="main" />
   </main>
 </div>

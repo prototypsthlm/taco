@@ -31,7 +31,7 @@
 
 <div class="flex flex-col justify-between items-center h-full w-full">
   {#if !messages.length}
-    <div class="flex flex-col gap-4 justify-center items-center flex-grow h-full">
+    <div class="flex flex-col gap-4 justify-center items-center grow h-full">
       <h1 class="text-accent text-5xl font-bold">New Chat!</h1>
       <p class="text-accent text-2xl">Choose your LLM personality</p>
       <RoleSelector on:roleChange={(event) => (selectedRolePrompt = event.detail.prompt)} />
