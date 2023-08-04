@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { isSidebarOpen } from '$lib/stores/general'
   import { getTimeSince } from '$lib/utils/timeConverter'
   import { ChatBubbleLeftIcon } from '@babeard/svelte-heroicons/solid'
   import { page } from '$app/stores'
@@ -13,7 +14,7 @@
   $: activeChatId = $page.data.chatId
 </script>
 
-<a {href} title={name}>
+<a {href} title={name} on:click={() => isSidebarOpen.set(false)}>
   <li
     class="px-1 py-3 sm:px-4 lg:px-4 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl"
     class:bg-accent={activeChatId === chatId}
