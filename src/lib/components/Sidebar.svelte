@@ -37,7 +37,13 @@
   {#if !user?.activeUserTeam?.chats || selectTeamView}
     <div class="pt-2">
       <p class="text-white text-center font-bold text-lg">Select a Team</p>
-      <form method="post" use:enhance action="/app?/selectTeam" class="flex flex-col gap-4 py-2">
+      <form
+        method="post"
+        use:enhance
+        action="/app?/selectTeam"
+        class="flex flex-col gap-4 py-2"
+        on:submit={() => (selectTeamView = !selectTeamView)}
+      >
         {#each user.userTeams as userTeam}
           <button
             type="submit"
