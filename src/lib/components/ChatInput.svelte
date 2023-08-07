@@ -1,16 +1,15 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
-
   import { createEventDispatcher } from 'svelte'
 
   export let role: string | null
   export let chatId: number | null
-  let text: string = ''
-  let isShiftPressed: boolean = false
-  let loading: boolean = false
-  let chatForm: HTMLFormElement
 
+  let text = ''
+  let isShiftPressed = false
+  let loading = false
+  let chatForm: HTMLFormElement
   const dispatch = createEventDispatcher()
 
   function dispatchMessage() {
@@ -32,7 +31,6 @@
 </script>
 
 <form
-  id="chat-input"
   method="POST"
   action="?/sendMessage"
   novalidate

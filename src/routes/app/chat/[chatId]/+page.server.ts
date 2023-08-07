@@ -4,14 +4,11 @@ import { isUserOwningChat } from '$lib/server/utils/database'
 import { fail, redirect, type Actions } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
-export const load: PageServerLoad = async ({ params, parent }) => {
-  const { chats, user } = await parent()
+export const load: PageServerLoad = async ({ params }) => {
   const chatId = Number(params.chatId)
   const chat = await getChatWithRelationsById(chatId)
 
   return {
-    user,
-    chats,
     chatId,
     chat,
   }
@@ -37,7 +34,7 @@ export const actions: Actions = {
     const chatId = Number(data.chatId)
     const currentUser = locals.currentUser
 
-    if (!isUserOwningChat(chatId, currentUser.id)) {
+    if (!(await isUserOwningChat(chatId, currentUser.id))) {
       return fail(401, { message: `You don't own the chat ${chatId}` })
     }
 

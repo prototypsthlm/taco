@@ -47,7 +47,7 @@ export const generateChatName = async (chat: ChatWithRelations) => {
   const client = getClient(chat)
 
   const res = await client.createChatCompletion(
-    transformChatToCompletion(chat, 'Summarize in no more than 5 words')
+    transformChatToCompletion(chat, 'Main topic of the conversation in no more than 5 words')
   )
 
   if (!res.data.choices[0].message?.content) {
