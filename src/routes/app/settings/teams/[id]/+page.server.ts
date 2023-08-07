@@ -1,4 +1,9 @@
-import { createInvitation, getInvitationsByTeamId } from '$lib/server/entities/invitation'
+import {
+  createInvitation,
+  deleteInvitationById,
+  getInvitationById,
+  getInvitationsByTeamId,
+} from '$lib/server/entities/invitation'
 import { countTeamChats, updateTeam } from '$lib/server/entities/team'
 import { getUserWithTeamsAndTeamUsersById } from '$lib/server/entities/user'
 import { removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
@@ -167,6 +172,44 @@ export const actions: Actions = {
     return {
       invitationSection: {
         success: `Created a inviation with uuid ${uuid}.`,
+      },
+    }
+  },
+  deleteInvitation: async ({ request, params, locals }) => {
+    const teamId = Number(params.id)
+    const requestingUserId = locals.currentUser.id
+
+    if (!(await isUserAdmin(teamId, requestingUserId))) {
+      return fail(401, {
+        userSection: {
+          error: 'You are no admin of this team.',
+        },
+      })
+    }
+
+    const fields = Object.fromEntries(await request.formData())
+    const invitationId = Number(fields.invitationId)
+
+    const invitation = await getInvitationById(invitationId)
+    if (!invitation) {
+      return fail(401, {
+        invitationSection: {
+          error: `Invitation with id ${invitationId} does not exist`,
+        },
+      })
+    } else if (invitation.teamId !== teamId) {
+      return fail(401, {
+        invitationSection: {
+          error: 'Invitation does not belong to this team.',
+        },
+      })
+    }
+
+    await deleteInvitationById(invitationId)
+
+    return {
+      invitationSection: {
+        success: `Invitation with id ${invitationId} successfully deleted.`,
       },
     }
   },

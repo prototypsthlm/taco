@@ -16,3 +16,19 @@ export const getInvitationsByTeamId = (teamId: number) => {
     },
   })
 }
+
+export const getInvitationById = (id: number) => {
+  return prisma.invitation.findFirst({
+    where: {
+      id,
+    },
+  })
+}
+
+export const deleteInvitationById = (id: number) => {
+  return prisma.invitation.delete({
+    where: {
+      id,
+    },
+  })
+}

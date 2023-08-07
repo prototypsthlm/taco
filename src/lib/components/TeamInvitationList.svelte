@@ -23,7 +23,7 @@
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
         <h1 class="text-base font-semibold leading-6 text-white">Invitations</h1>
-        <p class="mt-2 text-sm text-gray-300">A list of all invites send out to users.</p>
+        <p class="mt-2 text-sm text-gray-300">A list of all open invitations send out to users.</p>
       </div>
       <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
         <form
@@ -67,7 +67,7 @@
               <form
                 class="md:place-self-end flex gap-2"
                 method="post"
-                action="?/deleteInvite"
+                action="?/deleteInvitation"
                 use:enhance
               >
                 <button
@@ -81,7 +81,7 @@
                   value="remove"
                   class="flex gap-1 items-center rounded-md bg-red-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                 >
-                  Remove
+                  Delete
                   <TrashIcon class="h-4 w-4" />
                 </button>
 
