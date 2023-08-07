@@ -1,8 +1,10 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import Alert from '$lib/components/Alert.svelte'
-  import { PlusIcon, TrashIcon } from '@babeard/svelte-heroicons/solid'
+  import { CheckIcon, PlusIcon, TrashIcon } from '@babeard/svelte-heroicons/solid'
   import type { Invitation } from '@prisma/client'
+  import { page } from '$app/stores'
+  import ClipboardDocument from '@babeard/svelte-heroicons/solid/ClipboardDocument'
 
   const formatDate = (date: Date) =>
     date.toLocaleString('sv-SE', {
@@ -16,6 +18,15 @@
   export let invitations: Invitation[] = []
   export let isAdmin: boolean = false
   export let form: Record<string, string> = {}
+
+  let currentClipboardText: string = ''
+
+  function copyToClipboard(text: string) {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => (currentClipboardText = text))
+      .catch((err) => console.error('Unable to copy text to clipboard.', err))
+  }
 </script>
 
 <div class="px-4 sm:px-6 lg:px-8 max-w-6xl">
@@ -64,29 +75,38 @@
               </div>
             </div>
             {#if isAdmin}
-              <form
-                class="md:place-self-end flex gap-2"
-                method="post"
-                action="?/deleteInvitation"
-                use:enhance
-              >
+              <div class="md:place-self-end flex gap-2">
                 <button
-                  on:click={(event) => {
-                    if (!confirm(`Are you sure you want to delete the invite ${invite.hash}?`)) {
-                      event.preventDefault()
-                    }
-                  }}
-                  type="submit"
-                  name="submit"
-                  value="remove"
-                  class="flex gap-1 items-center rounded-md bg-red-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                  on:click={() =>
+                    copyToClipboard(window.location.origin + '/invitation/' + invite.hash)}
+                  class="flex gap-1 items-center rounded-md bg-green-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                 >
-                  Delete
-                  <TrashIcon class="h-4 w-4" />
+                  Copy
+                  {#if currentClipboardText === window.location.origin + '/invitation/' + invite.hash}
+                    <CheckIcon class="h-4 w-4" />
+                  {:else}
+                    <ClipboardDocument class="h-4 w-4" />
+                  {/if}
                 </button>
+                <form method="post" action="?/deleteInvitation" use:enhance>
+                  <button
+                    on:click={(event) => {
+                      if (!confirm(`Are you sure you want to delete the invite ${invite.hash}?`)) {
+                        event.preventDefault()
+                      }
+                    }}
+                    type="submit"
+                    name="submit"
+                    value="remove"
+                    class="flex gap-1 items-center rounded-md bg-red-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                  >
+                    Delete
+                    <TrashIcon class="h-4 w-4" />
+                  </button>
 
-                <input type="hidden" name="invitationId" value={invite.id} />
-              </form>
+                  <input type="hidden" name="invitationId" value={invite.id} />
+                </form>
+              </div>
             {/if}
           </li>
         {/each}
