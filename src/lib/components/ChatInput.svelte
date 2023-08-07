@@ -1,7 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
-  import { createEventDispatcher } from 'svelte'
+  import { createEventDispatcher, afterUpdate } from 'svelte'
   import autosize from 'svelte-autosize'
 
   export let role: string | null
@@ -21,6 +21,11 @@
       text = ''
     }
   }
+
+  let textareaRef: HTMLTextAreaElement
+  afterUpdate(() => {
+    textareaRef.focus()
+  })
 </script>
 
 <form
@@ -34,6 +39,7 @@
     return async ({ update }) => {
       await update()
       loading = false
+      textareaRef.focus()
     }
   }}
 >
@@ -42,6 +48,7 @@
       <div class="flex w-5/6 max-w-5xl shadow-xl">
         <div class="flex justify-centermin-h-[4rem] w-full bg-primary rounded-l-xl">
           <textarea
+            bind:this={textareaRef}
             rows="1"
             name="message"
             bind:value={text}
