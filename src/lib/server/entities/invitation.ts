@@ -14,6 +14,7 @@ export const getInvitationsByTeamId = (teamId: number) => {
     where: {
       teamId,
     },
+    orderBy: { createdAt: 'desc' },
   })
 }
 
@@ -21,6 +22,17 @@ export const getInvitationById = (id: number) => {
   return prisma.invitation.findFirst({
     where: {
       id,
+    },
+  })
+}
+
+export const getInvitationByHash = (hash: string) => {
+  return prisma.invitation.findFirst({
+    where: {
+      hash,
+    },
+    include: {
+      team: { include: { teamUsers: true } },
     },
   })
 }
