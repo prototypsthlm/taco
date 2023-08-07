@@ -2,6 +2,7 @@
   import { enhance } from '$app/forms'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
   import { createEventDispatcher } from 'svelte'
+  import autosize from 'svelte-autosize'
 
   export let role: string | null
   export let chatId: number | null
@@ -18,14 +19,6 @@
     if (text) {
       dispatch('message', text)
       text = ''
-    }
-  }
-
-  function handleTextAreaSize(eventTarget: EventTarget | null) {
-    const textarea = eventTarget as HTMLTextAreaElement
-    if (textarea.scrollHeight <= 500) {
-      textarea.style.height = 'auto'
-      textarea.style.height = textarea.scrollHeight + 'px'
     }
   }
 </script>
@@ -58,14 +51,15 @@
                   dispatchMessage()
                   chatForm.requestSubmit()
                   e.preventDefault()
-                } else handleTextAreaSize(e.target)
+                }
               } else if (e.key === 'Shift') isShiftPressed = true
             }}
             on:keyup={(e) => {
               if (e.key === 'Shift') isShiftPressed = false
             }}
             placeholder="Type your message"
-            class="no-border w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white"
+            class="no-border w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white max-h-96"
+            use:autosize
           />
         </div>
         <button disabled={loading} class="p-3 pr-14 w-12 rounded-r-xl bg-primary group">
