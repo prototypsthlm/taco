@@ -62,7 +62,7 @@
         <div in:fade={{ duration: 400 }}>
           <Question
             text={message.question}
-            author={message.author?.name || chat?.owner.user.name}
+            authorEmail={message.author?.email || chat?.owner.user.email}
           />
         </div>
         <div in:fade={{ delay: 400, duration: 400 }}>

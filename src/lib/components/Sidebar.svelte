@@ -65,7 +65,6 @@
       </form>
     </div>
   {:else}
-    {$page.route.id}
     <a
       href="/app"
       on:click={() => {
