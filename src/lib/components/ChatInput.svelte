@@ -65,7 +65,7 @@
               if (e.key === 'Shift') isShiftPressed = false
             }}
             placeholder="Type your message"
-            class="no-border w-full items-center my-auto resize-none m-2 text-xl placeholder-white placeholder-opacity-50 bg-primary text-white"
+            class="no-border w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white"
           />
         </div>
         <button disabled={loading} class="p-3 pr-14 w-12 rounded-r-xl bg-primary group">

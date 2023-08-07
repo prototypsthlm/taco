@@ -11,7 +11,7 @@
   <div class="text-2xl h-12 w-12 text-center p-2 text-accent bg-blue-600 rounded-xl">
     {authorShorthand}
   </div>
-  <div class="max-w-5xl text-xl text-accent prose prose-invert">
+  <div class="max-w-5xl text-accent prose prose-invert">
     {#await markdownToHtml(text) then parsedText}
       {@html parsedText}
     {/await}
