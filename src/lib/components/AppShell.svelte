@@ -4,7 +4,7 @@
   import { isSidebarOpen } from '$lib/stores/general'
   import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
   import { TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
-  import UserProfileAvatar from './UserProfileAvatar.svelte'
+  import Gravatar from './Gravatar.svelte'
 
   export let user: UserBySessionId
 
@@ -96,7 +96,7 @@
               href="/app/settings"
               class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
             >
-              <UserProfileAvatar class="h-8 w-8 rounded-full bg-gray-800" userEmail={user.email} />
+              <Gravatar class="h-8 w-8 rounded-full bg-gray-800" value={user.email} />
               <span class="sr-only">Your profile</span>
               <span aria-hidden="true">{user.name}</span>
             </a>
@@ -122,7 +122,7 @@
     </div>
     <a href="/app/settings">
       <span class="sr-only">Your profile</span>
-      <UserProfileAvatar class="h-8 w-8 rounded-full bg-gray-800" userEmail={user.email} />
+      <Gravatar class="h-8 w-8 rounded-full bg-gray-800" value={user.email} />
     </a>
   </div>
 

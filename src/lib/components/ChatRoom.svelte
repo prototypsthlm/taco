@@ -2,18 +2,20 @@
   import Answer from '$lib/components/Answer.svelte'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import Question from '$lib/components/Question.svelte'
+  import RoleSelector from '$lib/components/RoleSelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
+  import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
-  import RoleSelector from './RoleSelector.svelte'
 
-  export let chat: ChatWithRelations | null
-  let messages: ChatWithRelations['messages'][number] = []
+  export let chat: ChatWithRelations
+  let messages: ChatWithRelations['messages'] = []
 
   $: if (chat) {
     messages = chat?.messages
+    scrollToBottom(element)
   }
 
-  function addPlaceholderMessage(event) {
+  function addPlaceholderMessage(event: CustomEvent<string>) {
     const message = event.detail
 
     messages = [
@@ -22,11 +24,24 @@
         question: message,
         createdAt: new Date(),
         updatedAt: new Date(),
-      },
+      } as ChatWithRelations['messages'][number],
     ]
+
+    scrollToBottom(element)
   }
 
   let selectedRolePrompt: string | null = 'You are a helpful assistant.'
+  let element: HTMLElement
+
+  onMount(() => {
+    scrollToBottom(element)
+  })
+
+  const scrollToBottom = (node: HTMLElement) => {
+    setTimeout(() => {
+      node?.scroll({ top: node.scrollHeight, behavior: 'smooth' })
+    }, 100)
+  }
 </script>
 
 <div class="flex flex-col justify-between items-center h-full w-full">
@@ -38,10 +53,13 @@
       <p class="text-accent max-w-2xl text-center text-xl text-opacity-70">{selectedRolePrompt}</p>
     </div>
   {:else}
-    <div class="flex flex-col w-full h-full overflow-scroll">
+    <div bind:this={element} class="flex flex-col w-full h-full overflow-scroll">
       {#each messages as message}
         <div in:fade={{ duration: 400 }}>
-          <Question text={message.question} author={message.author} />
+          <Question
+            text={message.question}
+            authorEmail={message.author?.email || chat?.owner.user.email}
+          />
         </div>
         <div in:fade={{ delay: 400, duration: 400 }}>
           <Answer text={message.answer} />

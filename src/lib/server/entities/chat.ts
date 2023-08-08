@@ -1,4 +1,5 @@
 import { prisma } from '$lib/server/prisma'
+
 export type ChatWithRelations = Awaited<ReturnType<typeof getChatWithRelationsById>>
 
 export const getChatWithRelationsById = (id: number) => {
@@ -11,7 +12,12 @@ export const getChatWithRelationsById = (id: number) => {
           team: true,
         },
       },
-      messages: true,
+      messages: {
+        include: {
+          author: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      },
     },
   })
 }
@@ -29,7 +35,12 @@ export const createChat = (userTeamId: number, role: string | undefined) => {
           team: true,
         },
       },
-      messages: true,
+      messages: {
+        include: {
+          author: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      },
     },
   })
 }
@@ -53,7 +64,12 @@ export const addMessageToChat = (chat: ChatWithRelations, question: string) => {
           team: true,
         },
       },
-      messages: true,
+      messages: {
+        include: {
+          author: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      },
     },
   })
 }
@@ -80,7 +96,12 @@ export const setChatName = (id: number, name: string) => {
           team: true,
         },
       },
-      messages: true,
+      messages: {
+        include: {
+          author: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      },
     },
   })
 }

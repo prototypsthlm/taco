@@ -1,16 +1,16 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
-
-  import { createEventDispatcher } from 'svelte'
+  import { createEventDispatcher, afterUpdate } from 'svelte'
+  import autosize from 'svelte-autosize'
 
   export let role: string | null
   export let chatId: number | null
-  let text: string = ''
-  let isShiftPressed: boolean = false
-  let loading: boolean = false
-  let chatForm: HTMLFormElement
 
+  let text = ''
+  let isShiftPressed = false
+  let loading = false
+  let chatForm: HTMLFormElement
   const dispatch = createEventDispatcher()
 
   function dispatchMessage() {
@@ -22,17 +22,13 @@
     }
   }
 
-  function handleTextAreaSize(eventTarget: EventTarget | null) {
-    const textarea = eventTarget as HTMLTextAreaElement
-    if (textarea.scrollHeight <= 500) {
-      textarea.style.height = 'auto'
-      textarea.style.height = textarea.scrollHeight + 'px'
-    }
-  }
+  let textareaRef: HTMLTextAreaElement
+  afterUpdate(() => {
+    textareaRef.focus()
+  })
 </script>
 
 <form
-  id="chat-input"
   method="POST"
   action="?/sendMessage"
   novalidate
@@ -43,6 +39,7 @@
     return async ({ update }) => {
       await update()
       loading = false
+      textareaRef.focus()
     }
   }}
 >
@@ -51,6 +48,7 @@
       <div class="flex w-5/6 max-w-5xl shadow-xl">
         <div class="flex justify-centermin-h-[4rem] w-full bg-primary rounded-l-xl">
           <textarea
+            bind:this={textareaRef}
             rows="1"
             name="message"
             bind:value={text}
@@ -60,14 +58,15 @@
                   dispatchMessage()
                   chatForm.requestSubmit()
                   e.preventDefault()
-                } else handleTextAreaSize(e.target)
+                }
               } else if (e.key === 'Shift') isShiftPressed = true
             }}
             on:keyup={(e) => {
               if (e.key === 'Shift') isShiftPressed = false
             }}
             placeholder="Type your message"
-            class="no-border w-full items-center my-auto resize-none m-2 text-xl placeholder-white placeholder-opacity-50 bg-primary text-white"
+            class="no-border w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white max-h-96"
+            use:autosize
           />
         </div>
         <button disabled={loading} class="p-3 pr-14 w-12 rounded-r-xl bg-primary group">
