@@ -1,7 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import Alert from '$lib/components/Alert.svelte'
-  import UserProfileAvatar from '$lib/components/UserProfileAvatar.svelte'
+  import Gravatar from '$lib/components/Gravatar.svelte'
   import type { UserTeamWithTeamsAndTeamUsers } from '$lib/server/entities/user'
   import {
     ArrowDownIcon,
@@ -50,9 +50,9 @@
       {#each userTeam.team.teamUsers as teamUser}
         <li class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-6 py-5">
           <div class="flex gap-x-4">
-            <UserProfileAvatar
+            <Gravatar
               class="h-12 w-12 flex-none rounded-full bg-gray-800"
-              userEmail={teamUser.user.email}
+              value={teamUser.user.email}
             />
             <div class="min-w-0 flex-auto">
               <p class="text-sm font-semibold leading-6 text-white">
