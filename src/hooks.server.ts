@@ -14,8 +14,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   const sessionId = event.cookies.get('session_id')
 
-  // no cookie
   if (!sessionId) {
+    // no cookie
     // trying to access protected route
     if (protectedRoutes.some((x) => x === event.url.pathname)) {
       throw redirect(303, '/')
@@ -31,6 +31,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     if (currentUser) {
       event.locals.currentUser = currentUser
+
+      if (!currentUser.activeUserTeamId && !event.url.pathname.includes('/app/settings')) {
+        // no active team -> force team selection
+        throw redirect(303, '/app/settings/teams')
+      }
     } else {
       event.cookies.delete('session_id', { path: '/' })
       throw redirect(303, '/')
