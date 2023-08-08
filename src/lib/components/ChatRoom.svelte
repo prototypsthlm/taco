@@ -12,9 +12,7 @@
 
   $: if (chat) {
     messages = chat?.messages
-    setTimeout(() => {
-      scrollToBottom(element)
-    }, 100)
+    scrollToBottom(element)
   }
 
   function addPlaceholderMessage(event: CustomEvent<string>) {
@@ -29,22 +27,20 @@
       } as ChatWithRelations['messages'][number],
     ]
 
-    setTimeout(() => {
-      scrollToBottom(element)
-    }, 100)
+    scrollToBottom(element)
   }
 
   let selectedRolePrompt: string | null = 'You are a helpful assistant.'
   let element: HTMLElement
 
   onMount(() => {
-    setTimeout(() => {
-      scrollToBottom(element)
-    }, 100)
+    scrollToBottom(element)
   })
 
   const scrollToBottom = (node: HTMLElement) => {
-    node?.scroll({ top: node.scrollHeight, behavior: 'smooth' })
+    setTimeout(() => {
+      node?.scroll({ top: node.scrollHeight, behavior: 'smooth' })
+    }, 100)
   }
 </script>
 
