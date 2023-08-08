@@ -4,12 +4,11 @@
   import TeamMemberList from '$lib/components/TeamMemberList.svelte'
   import TeamKeys from '$lib/components/TeamKeys.svelte'
   import TeamInvitationList from '$lib/components/TeamInvitationList.svelte'
-  import { Role } from '@prisma/client'
 
   export let data: PageData
   export let form: ActionData
 
-  $: isAdmin = data.userTeam.role === Role.ADMIN
+  $: isAdmin = data.userTeam.role === "ADMIN"
 </script>
 
 <header

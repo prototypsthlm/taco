@@ -22,7 +22,7 @@
   </form>
 </header>
 <!-- Deployment list -->
-{#if data?.user?.userTeams && data?.user?.userTeams.length > 0}
+{#if data?.user?.userTeams && data?.user?.userTeams.length}
   <div class="flex flex-col lg:flex-row justify-between divide-x divide-white/5">
     <ul class="divide-y divide-white/5 grow">
       {#each data?.user?.userTeams as userTeam}

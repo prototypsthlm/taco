@@ -8,7 +8,6 @@
     ChevronUpIcon,
     TrashIcon,
   } from '@babeard/svelte-heroicons/solid'
-  import { Role } from '@prisma/client'
 
   const formatDate = (date: Date) =>
     date.toLocaleString('sv-SE', {
@@ -67,7 +66,7 @@
               >
             </p>
           </div>
-          {#if userTeam.role === Role.ADMIN && userTeam.user?.id !== teamUser.user?.id}
+          {#if userTeam.role === 'ADMIN' && userTeam.user?.id !== teamUser.user?.id}
             <form
               class="md:place-self-end flex gap-2"
               method="post"
@@ -93,7 +92,7 @@
                 <TrashIcon class="h-4 w-4" />
               </button>
 
-              {#if teamUser.role === Role.ADMIN}
+              {#if teamUser.role === 'ADMIN'}
                 <button
                   type="submit"
                   name="submit"
