@@ -1,6 +1,11 @@
-import { getInvitationByHash } from '$lib/server/entities/invitation'
-import { sendMessage } from '$lib/server/utils/chatting'
-import { error, fail, type Actions } from '@sveltejs/kit'
+import {
+  deleteInvitationById,
+  getInvitationByHash,
+  getInvitationById,
+} from '$lib/server/entities/invitation'
+import { changeActiveUserTeam } from '$lib/server/entities/user'
+import { createUserTeam } from '$lib/server/entities/userTeams'
+import { error, fail, redirect, type Actions } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ params, locals }) => {
@@ -9,7 +14,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   if (!currentUser) {
     return {
       error: {
-        header: 'Logged in user required',
+        header: 'Loggin is required',
         description:
           'You need to login or create an account before you can accept this invitation.',
         showLoginButton: true,
@@ -44,9 +49,17 @@ export const actions: Actions = {
   acceptInvitation: async ({ request, locals }) => {
     const fields = Object.fromEntries(await request.formData())
     const invitationId = Number(fields.invitationId)
+    const invitation = await getInvitationById(invitationId)
+    const currentUser = locals.currentUser
 
-    return {
-      success: true,
+    if (!invitation) {
+      return fail(404, { message: 'Invitation not found' })
     }
+
+    await createUserTeam(currentUser.id, invitation.teamId)
+    await deleteInvitationById(invitationId)
+    await changeActiveUserTeam(currentUser.id, invitation.teamId)
+
+    throw redirect(303, `/app`)
   },
 }

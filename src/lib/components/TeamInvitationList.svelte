@@ -27,6 +27,10 @@
       .then(() => (currentClipboardText = text))
       .catch((err) => console.error('Unable to copy text to clipboard.', err))
   }
+
+  function createInvitationUrl(hash: string) {
+    return `${window.location.origin}/invitation/${hash}`
+  }
 </script>
 
 <div class="px-4 sm:px-6 lg:px-8 max-w-6xl">
@@ -78,11 +82,11 @@
               <div class="md:place-self-end flex gap-2">
                 <button
                   on:click={() =>
-                    copyToClipboard(window.location.origin + '/invitation/' + invite.hash)}
+                    copyToClipboard(createInvitationUrl(invite.hash))}
                   class="flex gap-1 items-center rounded-md bg-green-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                 >
                   Copy
-                  {#if currentClipboardText === window.location.origin + '/invitation/' + invite.hash}
+                  {#if currentClipboardText === createInvitationUrl(invite.hash)}
                     <CheckIcon class="h-4 w-4" />
                   {:else}
                     <ClipboardDocument class="h-4 w-4" />
