@@ -117,7 +117,7 @@ export const getUserWithTeamsAndTeamUsersById = (id: number) =>
     include: {
       userTeams: {
         include: {
-          chats: { orderBy: { createdAt: 'asc' } },
+          chats: { orderBy: { updatedAt: 'desc' } },
           team: {
             include: {
               teamUsers: {
@@ -127,6 +127,7 @@ export const getUserWithTeamsAndTeamUsersById = (id: number) =>
               },
             },
           },
+          user: true,
         },
       },
     },
@@ -147,7 +148,7 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = (id: number) =>
       activeUserTeam: {
         include: {
           team: true,
-          chats: { orderBy: { createdAt: 'desc' } },
+          chats: { orderBy: { updatedAt: 'desc' } },
         },
       },
     },
@@ -159,7 +160,7 @@ export const getUserWithChatsById = (id: number) =>
     include: {
       activeUserTeam: {
         include: {
-          chats: { orderBy: { createdAt: 'desc' } },
+          chats: { orderBy: { updatedAt: 'desc' } },
         },
       },
     },

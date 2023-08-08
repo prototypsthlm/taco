@@ -2,6 +2,7 @@
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
   import ChatLink from '$lib/components/ChatLink.svelte'
+  import Gravatar from '$lib/components/Gravatar.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { resetToNewChat } from '$lib/stores/chat'
   import { ChevronDownIcon, ChevronUpIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
@@ -18,11 +19,7 @@
       class="flex justify-between items-center pb-6 w-full"
     >
       <div class="flex gap-2 items-center">
-        <img
-          class="w-8 h-8 rounded-lg"
-          src={`https://www.gravatar.com/avatar/${user.activeUserTeam.team?.name}?d=identicon`}
-          alt=""
-        />
+        <Gravatar class="w-8 h-8 rounded-lg" value={user.activeUserTeam.team?.name} />
         <div class="flex flex-col items-start leading-none">
           <p class="text-gray-400 text-opacity-60 text-xs">Selected Team</p>
           <p class="text-white">{user.activeUserTeam.team?.name}</p>
@@ -65,7 +62,6 @@
       </form>
     </div>
   {:else}
-    {$page.route.id}
     <a
       href="/app"
       on:click={() => {
