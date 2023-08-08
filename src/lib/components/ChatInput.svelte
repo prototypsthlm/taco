@@ -5,7 +5,7 @@
   import autosize from 'svelte-autosize'
 
   export let role: string | null
-  export let chatId: number | null
+  export let chatId: number | undefined
 
   let text = ''
   let isShiftPressed = false
