@@ -127,6 +127,7 @@ export const getUserWithTeamsAndTeamUsersById = (id: number) =>
               },
             },
           },
+          user: true,
         },
       },
     },
