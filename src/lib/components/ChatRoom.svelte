@@ -1,17 +1,15 @@
 <script lang="ts">
-  import Answer from '$lib/components/Answer.svelte'
   import ChatInput from '$lib/components/ChatInput.svelte'
-  import Question from '$lib/components/Question.svelte'
+  import ChatMessage from '$lib/components/ChatMessage.svelte'
   import RoleSelector from '$lib/components/RoleSelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { onMount } from 'svelte'
-  import { fade } from 'svelte/transition'
 
-  export let chat: ChatWithRelations
+  export let chat: ChatWithRelations | undefined
   let messages: ChatWithRelations['messages'] = []
 
-  $: if (chat) {
-    messages = chat?.messages
+  $: {
+    messages = chat?.messages || []
     scrollToBottom(element)
   }
 
@@ -55,15 +53,7 @@
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-scroll">
       {#each messages as message}
-        <div in:fade={{ duration: 400 }}>
-          <Question
-            text={message.question}
-            authorEmail={message.author?.email || chat?.owner.user.email}
-          />
-        </div>
-        <div in:fade={{ delay: 400, duration: 400 }}>
-          <Answer text={message.answer} />
-        </div>
+        <ChatMessage {chat} {message} />
       {/each}
     </div>
   {/if}
