@@ -6,7 +6,6 @@
   import {
     ArrowDownIcon,
     ChevronUpIcon,
-    PlusIcon,
     TrashIcon,
   } from '@babeard/svelte-heroicons/solid'
 
@@ -31,15 +30,6 @@
         <p class="mt-2 text-sm text-gray-300">
           A list of all the users in this team and their roles.
         </p>
-      </div>
-      <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-        <button
-          type="button"
-          class="flex gap-1 items-center rounded-md bg-indigo-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-        >
-          Add User
-          <PlusIcon class="h-4 w-4" />
-        </button>
       </div>
     </div>
     <Alert

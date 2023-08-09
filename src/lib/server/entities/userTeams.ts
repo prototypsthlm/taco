@@ -13,3 +13,11 @@ export const removeUserTeam = async (id: number) =>
   prisma.userTeam.delete({
     where: { id },
   })
+
+export const createUserTeam = async (userId: number, teamId: number) =>
+  prisma.userTeam.create({
+    data: {
+      userId,
+      teamId,
+    },
+  })
