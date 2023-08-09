@@ -3,7 +3,6 @@
   import Alert from '$lib/components/Alert.svelte'
   import { CheckIcon, PlusIcon, TrashIcon } from '@babeard/svelte-heroicons/solid'
   import type { Invitation } from '@prisma/client'
-  import { page } from '$app/stores'
   import ClipboardDocument from '@babeard/svelte-heroicons/solid/ClipboardDocument'
 
   const formatDate = (date: Date) =>
@@ -29,7 +28,10 @@
   }
 
   function createInvitationUrl(hash: string) {
-    return `${window.location.origin}/invitation/${hash}`
+    if (process.browser) {
+      return `${window.location.origin}/invitation/${hash}`
+    } 
+    return ''
   }
 </script>
 
@@ -71,27 +73,26 @@
                   {invite.hash}
                 </p>
                 <p class="mt-1 truncate text-xs leading-5 text-gray-400">
-                  Invited on
+                  Invitation created on
                   <time datetime={invite.createdAt.toISOString()}
                     >{formatDate(invite.createdAt)}</time
                   >
                 </p>
               </div>
             </div>
-            {#if isAdmin}
-              <div class="md:place-self-end flex gap-2">
-                <button
-                  on:click={() =>
-                    copyToClipboard(createInvitationUrl(invite.hash))}
-                  class="flex gap-1 items-center rounded-md bg-green-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                >
-                  Copy
-                  {#if currentClipboardText === createInvitationUrl(invite.hash)}
-                    <CheckIcon class="h-4 w-4" />
-                  {:else}
-                    <ClipboardDocument class="h-4 w-4" />
-                  {/if}
-                </button>
+            <div class="md:place-self-end flex gap-2">
+              <button
+                on:click={() => copyToClipboard(createInvitationUrl(invite.hash))}
+                class="flex gap-1 items-center rounded-md bg-green-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+              >
+                Copy
+                {#if currentClipboardText === createInvitationUrl(invite.hash)}
+                  <CheckIcon class="h-4 w-4" />
+                {:else}
+                  <ClipboardDocument class="h-4 w-4" />
+                {/if}
+              </button>
+              {#if isAdmin}
                 <form method="post" action="?/deleteInvitation" use:enhance>
                   <button
                     on:click={(event) => {
@@ -110,8 +111,8 @@
 
                   <input type="hidden" name="invitationId" value={invite.id} />
                 </form>
-              </div>
-            {/if}
+              {/if}
+            </div>
           </li>
         {/each}
       </ul>

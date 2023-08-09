@@ -1,9 +1,9 @@
 import { prisma } from '$lib/server/prisma'
 
-export const createInvitation = (uuid: string, teamId: number) => {
+export const createInvitation = (hash: string, teamId: number) => {
   return prisma.invitation.create({
     data: {
-      hash: uuid,
+      hash,
       teamId,
     },
   })

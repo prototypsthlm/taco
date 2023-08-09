@@ -188,7 +188,7 @@ export const actions: Actions = {
 
     return {
       invitationSection: {
-        success: `Created a inviation with uuid ${uuid}.`,
+        success: `Created a inviation with hash ${uuid}.`,
       },
     }
   },
