@@ -1,4 +1,4 @@
-import { deleteChat, getChatWithRelationsById } from '$lib/server/entities/chat'
+import { deleteChat, forkChat, getChatWithRelationsById } from '$lib/server/entities/chat'
 import { sendMessage } from '$lib/server/utils/chatting'
 import { isUserOwningChat } from '$lib/server/utils/database'
 import { fail, redirect, type Actions } from '@sveltejs/kit'
@@ -40,5 +40,14 @@ export const actions: Actions = {
     await deleteChat(chatId)
 
     throw redirect(303, '/app')
+  },
+  forkChat: async ({ locals, request }) => {
+    const data = Object.fromEntries(await request.formData())
+    const chatId = Number(data.chatId)
+    const currentUser = locals.currentUser
+
+    const newChat = await forkChat(chatId, currentUser.id)
+
+    throw redirect(303, `/app/chat/${newChat.id}`)
   },
 }

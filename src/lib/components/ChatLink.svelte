@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { enhance } from '$app/forms'
+  import { page } from '$app/stores'
+  import ForkIcon from '$lib/components/icons/ForkIcon.svelte'
   import { isSidebarOpen } from '$lib/stores/general'
   import { getTimeSince } from '$lib/utils/timeConverter'
   import { ChatBubbleLeftIcon, TrashIcon } from '@babeard/svelte-heroicons/solid'
-  import { page } from '$app/stores'
-  import { enhance } from '$app/forms'
 
   export let chatId: number
   export let name: string
@@ -32,8 +33,15 @@
         <p class="truncate text-sm text-gray-500">
           {roleContent}
         </p>
+        <form method="post" action="/app/chat/{chatId}?/forkChat" use:enhance>
+          <button title="Fork it!" type="submit">
+            <ForkIcon class="h-5 w-5 text-gray-500 hover:text-red-500 duration-200" />
+          </button>
+          <input type="hidden" name="chatId" value={chatId} />
+        </form>
         <form method="post" action="/app/chat/{chatId}?/deleteChat" use:enhance>
           <button
+            title="Delete it!"
             type="submit"
             on:click={(event) => {
               if (!confirm(`Are you sure you want to delete the chat "${name}"`)) {
@@ -41,9 +49,7 @@
               }
             }}
           >
-            <TrashIcon
-              class="h-5 w-5 text-gray-500 hover:text-red-500 duration-200"
-            />
+            <TrashIcon class="h-5 w-5 text-gray-500 hover:text-red-500 duration-200" />
           </button>
           <input type="hidden" name="chatId" value={chatId} />
         </form>
