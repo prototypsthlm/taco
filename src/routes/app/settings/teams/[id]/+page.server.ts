@@ -4,7 +4,7 @@ import {
   getInvitationById,
   getInvitationsByTeamId,
 } from '$lib/server/entities/invitation'
-import { countTeamChats, updateTeam } from '$lib/server/entities/team'
+import { countTeamChats, getTeamByName, updateTeam } from '$lib/server/entities/team'
 import { getUserWithTeamsAndTeamUsersById } from '$lib/server/entities/user'
 import { getUserTeamById, removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
 import { decrypt } from '$lib/server/utils/crypto'
@@ -49,8 +49,8 @@ export const actions: Actions = {
     try {
       const schema = z
         .object({
-          openAiApiKey: z.string().min(1),
           name: z.string().min(1),
+          openAiApiKey: z.union([z.string(), z.undefined()]),
         })
         .parse(fields)
 
@@ -63,7 +63,17 @@ export const actions: Actions = {
         })
       }
 
-      await updateTeam(Number(params.id), schema.name, schema.openAiApiKey)
+      const team = await getTeamByName(schema.name)
+      if (team) {
+        return fail(409, {
+          keySection: {
+            fields,
+            error: 'Team name already exists.',
+          },
+        })
+      }
+
+      await updateTeam(Number(params.id), schema.name, schema.openAiApiKey ?? null)
 
       return {
         keySection: {
