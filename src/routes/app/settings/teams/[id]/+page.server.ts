@@ -6,7 +6,7 @@ import {
 } from '$lib/server/entities/invitation'
 import { countTeamChats, updateTeam } from '$lib/server/entities/team'
 import { getUserWithTeamsAndTeamUsersById } from '$lib/server/entities/user'
-import { removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
+import { getUserTeamById, removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
 import { decrypt } from '$lib/server/utils/crypto'
 import { isUserAdmin, isUserInTeam } from '$lib/server/utils/database'
 import { Role } from '@prisma/client'
@@ -94,7 +94,6 @@ export const actions: Actions = {
   updateUser: async ({ request, params, locals }) => {
     const teamId = Number(params.id)
     const requestingUserId = locals.currentUser.id
-
     if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
         userSection: {
@@ -104,11 +103,7 @@ export const actions: Actions = {
     }
 
     const fields = Object.fromEntries(await request.formData())
-    const buttonAction = fields.submit
     const userId = Number(fields.userId)
-    const userTeamId = Number(fields.userTeamId)
-    const userEmail = fields.userEmail
-
     if (userId === requestingUserId) {
       return fail(400, {
         userSection: {
@@ -117,6 +112,17 @@ export const actions: Actions = {
       })
     }
 
+    const userTeamId = Number(fields.userTeamId)
+    const userTeam = await getUserTeamById(userTeamId)
+    if (userTeam?.role === Role.OWNER) {
+      return fail(400, {
+        userSection: {
+          error: 'You cannot change the role of the owner.',
+        },
+      })
+    }
+
+    const userEmail = fields.userEmail
     if (!(await isUserInTeam(teamId, userId))) {
       return fail(401, {
         userSection: {
@@ -125,6 +131,7 @@ export const actions: Actions = {
       })
     }
 
+    const buttonAction = fields.submit
     if (buttonAction === 'remove') {
       await removeUserTeam(userTeamId)
       return {

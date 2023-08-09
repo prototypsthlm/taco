@@ -24,3 +24,26 @@ export const countTeamChats = async (id: number) => {
     },
   })
 }
+
+export const getTeamByName = async (name: string) => {
+  return prisma.team.findUnique({
+    where: {
+      name,
+    },
+  })
+}
+
+export const createTeam = async (name: string, openAiApiKey: string | null) => {
+  if (!process.env.SECRET_KEY) {
+    throw new Error('You must have SECRET_KEY set in your env.')
+  }
+
+  const apiKey = openAiApiKey ? encrypt(openAiApiKey, process.env.SECRET_KEY) : null
+
+  return prisma.team.create({
+    data: {
+      name,
+      openAiApiKey: apiKey,
+    },
+  })
+}
