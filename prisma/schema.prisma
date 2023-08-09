@@ -110,4 +110,5 @@ model Invitation {
 enum Role {
   MEMBER
   ADMIN
+  OWNER
 }

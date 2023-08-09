@@ -8,7 +8,7 @@
   export let data: PageData
   export let form: ActionData
 
-  $: isAdmin = data.userTeam.role === "ADMIN"
+  $: isAdmin = data.userTeam.role !== "MEMBER"
 </script>
 
 <header

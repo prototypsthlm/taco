@@ -102,7 +102,7 @@
                   Downgrade
                   <ArrowDownIcon class="h-4 w-4" />
                 </button>
-              {:else}
+              {:else if teamUser.role === 'MEMBER'}
                 <button
                   type="submit"
                   name="submit"
