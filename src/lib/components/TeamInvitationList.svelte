@@ -4,6 +4,7 @@
   import { CheckIcon, PlusIcon, TrashIcon } from '@babeard/svelte-heroicons/solid'
   import type { Invitation } from '@prisma/client'
   import ClipboardDocument from '@babeard/svelte-heroicons/solid/ClipboardDocument'
+  import { page } from '$app/stores'
 
   const formatDate = (date: Date) =>
     date.toLocaleString('sv-SE', {
@@ -28,10 +29,7 @@
   }
 
   function createInvitationUrl(hash: string) {
-    if (process.browser) {
-      return `${window.location.origin}/invitation/${hash}`
-    } 
-    return ''
+    return `${$page.url.origin}/invitation/${hash}`
   }
 </script>
 

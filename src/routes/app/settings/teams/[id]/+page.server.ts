@@ -177,7 +177,7 @@ export const actions: Actions = {
 
     if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
-        userSection: {
+        invitationSection: {
           error: 'You are no admin of this team.',
         },
       })
