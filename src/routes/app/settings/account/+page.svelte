@@ -5,11 +5,11 @@
   import ModalCancelConfirm from '$lib/components/ModalCancelConfirm.svelte'
   import type { ActionData, PageData } from './$types'
 
-  let isModalOpen = false
-
   export let data: PageData
   export let form: ActionData
-  let deleteForm
+
+  let isModalOpen = false
+  let deleteForm: HTMLFormElement
 </script>
 
 <!-- Settings forms -->
