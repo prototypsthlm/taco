@@ -25,14 +25,14 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
   if (!userTeam) throw error(404, "Doesn't belong to this team or the team doesn't exist")
 
   if (userTeam.team?.openAiApiKey) {
-    if (userTeam?.role === Role.ADMIN) {
+    if (userTeam?.role === Role.MEMBER) {
+      userTeam.team.openAiApiKey = '*'.repeat(64)
+    } else {
       if (!process.env.SECRET_KEY) {
         throw new Error('You must have SECRET_KEY set in your env.')
       }
 
       userTeam.team.openAiApiKey = decrypt(userTeam.team.openAiApiKey, process.env.SECRET_KEY)
-    } else {
-      userTeam.team.openAiApiKey = '*'.repeat(64)
     }
   }
 

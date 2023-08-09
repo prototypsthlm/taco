@@ -27,7 +27,8 @@
         <Input
           class="dark"
           name="openAiApiKey"
-          disabled={userTeam.role !== 'ADMIN'}
+          placeholder="OpenAI API Key"
+          disabled={userTeam.role === 'MEMBER'}
           value={form?.fields?.openAiApiKey ?? userTeam.team.openAiApiKey}
           errors={form?.errors?.openAiApiKey}
         />
@@ -37,7 +38,8 @@
         <Input
           class="dark"
           name="name"
-          disabled={userTeam.role !== 'ADMIN'}
+          placeholder="Name"
+          disabled={userTeam.role === 'MEMBER'}
           value={form?.fields?.name ?? userTeam.team.name}
           errors={form?.errors?.name}
         />
@@ -47,7 +49,7 @@
     <div class="mt-8 flex">
       <button
         type="submit"
-        disabled={userTeam.role !== 'ADMIN'}
+        disabled={userTeam.role === 'MEMBER'}
         class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
         >Save</button
       >
