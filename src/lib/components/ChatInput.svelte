@@ -54,7 +54,7 @@
             bind:value={text}
             on:keydown={(e) => {
               if (e.key === 'Enter') {
-                if (!isShiftPressed) {
+                if (!isShiftPressed && text.trim()) {
                   dispatchMessage()
                   chatForm.requestSubmit()
                   e.preventDefault()

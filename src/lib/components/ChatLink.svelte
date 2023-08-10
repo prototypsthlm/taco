@@ -18,6 +18,7 @@
 
   let deleteForm: HTMLFormElement
   let forkForm: HTMLFormElement
+  let forkInput: HTMLElement
 </script>
 
 <a href={isLinkActive ? null : href} title={name} on:click={() => isSidebarOpen.set(false)}>
@@ -41,7 +42,7 @@
         <p class="truncate text-sm text-gray-500">
           {roleContent}
         </p>
-        <ModalConfirm on:confirm={() => forkForm.requestSubmit()}>
+        <ModalConfirm initialFocus={forkInput} on:confirm={() => forkForm.requestSubmit()}>
           <button type="button" slot="trigger">
             <ForkIcon class="h-5 w-5 text-gray-500 hover:text-green-500 duration-200" />
           </button>
@@ -52,6 +53,7 @@
               action="/app/chat/{chatId}?/forkChat"
               bind:this={forkForm}
               use:enhance
+              class="w-full"
             >
               <div class="mt-2 max-w-xl text-sm text-gray-500">
                 <p>Choose a name for the new forked chat.</p>
@@ -60,10 +62,11 @@
                 <div class="w-full sm:max-w-xl flex">
                   <label class="sr-only" for="newName">New Name</label>
                   <input
+                    bind:this={forkInput}
                     type="text"
                     name="newName"
                     id="newName"
-                    class="block w-96 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     placeholder="A new name for the forked chat."
                     value={`Forked: ${name}`}
                   />
