@@ -2,6 +2,7 @@ import { deleteChat, forkChat, getChatWithRelationsById } from '$lib/server/enti
 import { sendMessage } from '$lib/server/utils/chatting'
 import { isUserOwningChat } from '$lib/server/utils/database'
 import { fail, redirect, type Actions } from '@sveltejs/kit'
+import { z } from 'zod'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -41,13 +42,41 @@ export const actions: Actions = {
 
     throw redirect(303, '/app')
   },
-  forkChat: async ({ locals, request }) => {
-    const data = Object.fromEntries(await request.formData())
-    const chatId = Number(data.chatId)
-    const currentUser = locals.currentUser
+  forkChat: async ({ locals: { currentUser }, request }) => {
+    const fields = Object.fromEntries(await request.formData())
 
-    const newChat = await forkChat(chatId, currentUser.id)
+    const schema = z
+      .object({
+        chatId: z.preprocess(Number, z.number()),
+        newName: z.string(),
+      })
+      .safeParse(fields)
 
-    throw redirect(303, `/app/chat/${newChat.id}`)
+    if (!currentUser.activeUserTeamId) {
+      return fail(422, {
+        error: `User needs an active team`,
+      })
+    }
+
+    if (schema.success) {
+      const newChat = await forkChat(
+        schema.data.chatId,
+        currentUser.activeUserTeamId,
+        schema.data.newName
+      )
+      throw redirect(303, `/app/chat/${newChat.id}`)
+    }
+
+    if (schema.error.errors.length) {
+      return fail(422, {
+        fields,
+        errors: schema.error.flatten().fieldErrors,
+      })
+    }
+
+    return fail(500, {
+      fields,
+      error: `${schema.error}`,
+    })
   },
 }

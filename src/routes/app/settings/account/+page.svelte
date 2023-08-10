@@ -8,7 +8,6 @@
   export let data: PageData
   export let form: ActionData
 
-  let isModalOpen = false
   let deleteForm: HTMLFormElement
 </script>
 
@@ -165,23 +164,21 @@
       class="flex items-start md:col-span-2"
       bind:this={deleteForm}
     >
-      <button
-        class="rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400"
-        on:click={(e) => {
-          e.preventDefault()
-          isModalOpen = true
-        }}
-        >Yes, delete my account
-      </button>
-      <ModalConfirm bind:open={isModalOpen} on:confirm={() => deleteForm.requestSubmit()}>
+      <ModalConfirm type="warning" on:confirm={() => deleteForm.requestSubmit()}>
+        <button
+          type="button"
+          slot="trigger"
+          class="rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400"
+          >Yes, delete my account
+        </button>
         <svelte:fragment slot="title">Are you sure you want to delete your account?</svelte:fragment
         >
         <p slot="body" class="text-sm text-gray-500">
           All of your data will be permanently removed from our servers forever. This action cannot
           be undone.
         </p>
-        <svelte:fragment slot="cancel-button">I changed my mind</svelte:fragment>
-        <svelte:fragment slot="confirm-button">Yes, delete it all!</svelte:fragment>
+        <svelte:fragment slot="cancel">I changed my mind</svelte:fragment>
+        <svelte:fragment slot="confirm">Yes, delete it all!</svelte:fragment>
       </ModalConfirm>
     </form>
   </div>
