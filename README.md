@@ -80,7 +80,7 @@ We use Tailwind UI to style the app. Tailwind UI relies on Headless UI in some p
 a svelte implementation of that library: @rgossiaux/svelte-headlessui. TWUI also relies on
 Heroicons, there is also a svelte port of that icon collection @babeard/svelte-heroicons.
 
-You can see all that in action in `src/lib/components/ModalCancelConfirm.svelte`.
+You can see all that in action in `src/lib/components/ModalConfirm.svelte`.
 
 ## Dark Mode
 

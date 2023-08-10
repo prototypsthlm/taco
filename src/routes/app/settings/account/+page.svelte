@@ -2,7 +2,7 @@
   import { enhance } from '$app/forms'
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
-  import ModalCancelConfirm from '$lib/components/ModalCancelConfirm.svelte'
+  import ModalConfirm from '$lib/components/ModalConfirm.svelte'
   import type { ActionData, PageData } from './$types'
 
   export let data: PageData
@@ -173,7 +173,7 @@
         }}
         >Yes, delete my account
       </button>
-      <ModalCancelConfirm bind:open={isModalOpen} on:confirm={() => deleteForm.requestSubmit()}>
+      <ModalConfirm bind:open={isModalOpen} on:confirm={() => deleteForm.requestSubmit()}>
         <svelte:fragment slot="title">Are you sure you want to delete your account?</svelte:fragment
         >
         <p slot="body" class="text-sm text-gray-500">
@@ -182,7 +182,7 @@
         </p>
         <svelte:fragment slot="cancel-button">I changed my mind</svelte:fragment>
         <svelte:fragment slot="confirm-button">Yes, delete it all!</svelte:fragment>
-      </ModalCancelConfirm>
+      </ModalConfirm>
     </form>
   </div>
 </div>
