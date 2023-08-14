@@ -16,7 +16,7 @@
   class="min-h-screen bg-gray-50 dark:bg-gray-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
 >
   <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <img class="mx-auto h-10 w-auto" src={logo} alt="LLM Portal" />
+    <img class="mx-auto h-10 w-auto" src={logo} alt="TACO" />
     <h2
       class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-gray-100"
     >

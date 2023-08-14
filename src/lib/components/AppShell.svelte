@@ -64,7 +64,7 @@
             >
               <div class="flex h-16 items-center">
                 <a class="flex text-white items-center gap-4 text-2xl" href="/app">
-                  <img class="h-8 w-auto" src={logo} alt="LLM Portal" /> LLM Portal
+                  <img class="h-8 w-auto" src={logo} alt="TACO" /> TACO
                 </a>
               </div>
               <nav class="flex flex-1 flex-col overflow-hidden">
@@ -85,7 +85,7 @@
     <div class="flex grow flex-col gap-y-5 bg-gray-900 px-6 h-screen">
       <div class="flex h-16 items-center">
         <a class="flex text-white items-center gap-4 text-2xl" href="/app">
-          <img class="h-8 w-auto" src={logo} alt="LLM Portal" /> LLM Portal
+          <img class="h-8 w-auto" src={logo} alt="TACO" /> TACO
         </a>
       </div>
       <nav class="flex flex-col overflow-hidden h-full">
