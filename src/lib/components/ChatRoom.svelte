@@ -65,7 +65,7 @@
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-scroll">
       {#each messages as message (message.id)}
-        <div out:slide animate:flip={{ duration: (d) => d * 0.6 }}>
+        <div out:slide animate:flip={{ duration: (d) => d * 1.2 }}>
           <ChatMessage
             {chat}
             {message}
