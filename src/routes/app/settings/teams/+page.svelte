@@ -36,7 +36,7 @@
             </div>
           </div>
           {#if data?.user.activeUserTeamId !== userTeam?.id}
-            <form method="post" action="/app?/selectTeam" use:enhance>
+            <form method="post" action="?/selectTeam" use:enhance>
               <button
                 type="submit"
                 class="rounded-md bg-yellow-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
