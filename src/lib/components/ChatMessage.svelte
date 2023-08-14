@@ -6,8 +6,6 @@
   import { TrashIcon } from '@babeard/svelte-heroicons/outline'
   import { ArrowPathIcon } from '@babeard/svelte-heroicons/solid'
   import { createEventDispatcher } from 'svelte'
-  import { quadInOut } from 'svelte/easing'
-  import type { TransitionConfig } from 'svelte/transition'
 
   export let chat: ChatWithRelations | undefined
   export let message: ChatWithRelations['messages'][number]
@@ -24,71 +22,41 @@
       console.log(json?.error)
     }
   }
-
-  type ExolapseParams = { duration?: number; callback?: () => void }
-  type Exolapse = (node: Element, params?: ExolapseParams) => TransitionConfig
-
-  const exolapse: Exolapse = (node, { duration = 300, callback } = {}) => {
-    const height = parseFloat(getComputedStyle(node).height)
-    const standardHeight = 500
-    const adjustedDuration = duration
-    // const adjustedDuration = duration * (height / standardHeight)
-
-    if (callback) {
-      setTimeout(callback, adjustedDuration)
-    }
-
-    return {
-      duration: adjustedDuration,
-      easing: quadInOut,
-      css: (to: number) => {
-        const adjustedOpacity = Math.min(1, Math.pow(to, 2))
-        return `
-          min-height: ${height * to}px;
-          height: ${height * to}px;
-          overflow: hidden;
-          opacity: ${adjustedOpacity};
-        `
-      },
-    }
-  }
 </script>
 
-<div transition:exolapse={{ duration: 300 }}>
-  <div class="p-4 md:p-8 flex justify-center">
-    <div class="max-w-screen-md w-full flex gap-4 md:gap-8">
-      <div class="flex-shrink-0 h-10 w-10 text-accent bg-blue-600 rounded-xl overflow-hidden flex">
-        <Gravatar value={message.author?.email || chat?.owner.user.email} />
-      </div>
-      <div class="text-accent prose prose-invert prose-pre:overflow-x-scroll">
-        {#await markdownToHtml(message.question) then parsedText}
+<div class="p-4 md:p-8 flex justify-center">
+  <div class="max-w-screen-md w-full flex gap-4 md:gap-8">
+    <div class="flex-shrink-0 h-10 w-10 text-accent bg-blue-600 rounded-xl overflow-hidden flex">
+      <Gravatar value={message.author?.email || chat?.owner.user.email} />
+    </div>
+    <div class="text-accent prose prose-invert prose-pre:overflow-x-scroll">
+      {#await markdownToHtml(message.question) then parsedText}
+        {@html parsedText}
+      {/await}
+    </div>
+    <button class="flex-shrink-0 text-white self-start ml-auto" on:click={deleteMessage}>
+      <TrashIcon class="w-5" />
+    </button>
+  </div>
+</div>
+<div class="p-4 md:p-8 bg-accent bg-opacity-10 flex justify-center">
+  <div class="max-w-screen-md w-full flex gap-4 md:gap-8">
+    <div
+      class="flex-shrink-0 h-10 w-10 text-accent bg-[#19c37c] rounded-xl flex items-center justify-center"
+    >
+      <ChatGptIcon />
+    </div>
+    {#if message?.answer}
+      <!-- We need to force prose-invert, which is the dark mode for the prose class due to not having a non dark option -->
+      <div class="text-accent prose prose-invert overflow-x-hidden prose-pre:overflow-x-scroll">
+        {#await markdownToHtml(message.answer) then parsedText}
           {@html parsedText}
         {/await}
       </div>
-      <button class="flex-shrink-0 text-white self-start ml-auto" on:click={deleteMessage}>
-        <TrashIcon class="w-5" />
-      </button>
-    </div>
-  </div>
-  <div class="p-4 md:p-8 bg-accent bg-opacity-10 flex justify-center">
-    <div class="max-w-screen-md w-full flex gap-4 md:gap-8">
-      <div
-        class="flex-shrink-0 h-10 w-10 text-accent bg-[#19c37c] rounded-xl flex items-center justify-center"
-      >
-        <ChatGptIcon />
+    {:else}
+      <div class="flex items-center justify-center space-x-2">
+        <ArrowPathIcon class="h-6 w-6 text-white animate-spin" />
       </div>
-      {#if message?.answer}
-        <!-- We need to force prose-invert, which is the dark mode for the prose class due to not having a non dark option -->
-        <div class="text-accent prose prose-invert overflow-x-hidden prose-pre:overflow-x-scroll">
-          {#await markdownToHtml(message.answer) then parsedText}
-            {@html parsedText}
-          {/await}
-        </div>
-      {:else}
-        <div class="flex items-center justify-center space-x-2">
-          <ArrowPathIcon class="h-6 w-6 text-white animate-spin" />
-        </div>
-      {/if}
-    </div>
+    {/if}
   </div>
 </div>

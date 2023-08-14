@@ -4,6 +4,9 @@
   import RoleSelector from '$lib/components/RoleSelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { onMount } from 'svelte'
+  import { flip } from 'svelte/animate'
+  import { quintOut } from 'svelte/easing'
+  import { crossfade } from 'svelte/transition'
 
   export let chat: ChatWithRelations | undefined
   let messages: ChatWithRelations['messages'] = []
@@ -40,6 +43,29 @@
       node?.scroll({ top: node.scrollHeight, behavior: 'smooth' })
     }, 500)
   }
+
+  const [send, receive] = crossfade({
+    duration: (d) => Math.sqrt(d * 200),
+
+    fallback(node, params) {
+      const style = getComputedStyle(node)
+      const height = parseFloat(style.height)
+
+      return {
+        duration: 600,
+        easing: quintOut,
+        css: (to: number) => {
+          const adjustedOpacity = Math.min(1, Math.pow(to, 2))
+          return `
+          min-height: ${height * to}px;
+          height: ${height * to}px;
+          overflow: hidden;
+          opacity: ${adjustedOpacity};
+        `
+        },
+      }
+    },
+  })
 </script>
 
 <div class="flex flex-col justify-between items-center h-full w-full">
@@ -52,16 +78,16 @@
     </div>
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-scroll">
-      {#each messages as message}
-        <ChatMessage
-          {chat}
-          {message}
-          on:delete={(e) => {
-            if (chat?.messages) {
-              chat.messages = chat.messages.filter((x) => x.id !== e.detail.messageId)
-            }
-          }}
-        />
+      {#each messages as message (message.id)}
+        <div out:send={{ key: message.id }} animate:flip={{ duration: (d) => d * 0.5 }}>
+          <ChatMessage
+            {chat}
+            {message}
+            on:delete={(e) => {
+              messages = messages.filter((x) => x.id !== e.detail.messageId)
+            }}
+          />
+        </div>
       {/each}
     </div>
   {/if}
