@@ -17,7 +17,7 @@
 
     const json = await res.json()
     if (json?.success && chat) {
-      dispatch('delete', { messageId: message.id })
+      dispatch('delete')
     } else {
       console.log(json?.error)
     }
@@ -34,7 +34,7 @@
         {@html parsedText}
       {/await}
     </div>
-    <button class="flex-shrink-0 text-white self-start ml-auto" on:click={deleteMessage}>
+    <button class="flex-shrink-0 text-white self-start ml-auto" on:click={() => dispatch('delete')}>
       <TrashIcon class="w-5" />
     </button>
   </div>

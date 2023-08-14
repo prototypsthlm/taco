@@ -5,15 +5,13 @@
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { onMount } from 'svelte'
   import { flip } from 'svelte/animate'
-  import { quintOut } from 'svelte/easing'
-  import { crossfade } from 'svelte/transition'
+  import { slide } from 'svelte/transition'
 
   export let chat: ChatWithRelations | undefined
   let messages: ChatWithRelations['messages'] = []
 
   $: {
     messages = chat?.messages || []
-    scrollToBottom(element)
   }
 
   function addPlaceholderMessage(event: CustomEvent<string>) {
@@ -44,28 +42,16 @@
     }, 500)
   }
 
-  const [send, receive] = crossfade({
-    duration: (d) => Math.sqrt(d * 200),
+  async function deleteMessage(id: number) {
+    const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' })
 
-    fallback(node, params) {
-      const style = getComputedStyle(node)
-      const height = parseFloat(style.height)
-
-      return {
-        duration: 600,
-        easing: quintOut,
-        css: (to: number) => {
-          const adjustedOpacity = Math.min(1, Math.pow(to, 2))
-          return `
-          min-height: ${height * to}px;
-          height: ${height * to}px;
-          overflow: hidden;
-          opacity: ${adjustedOpacity};
-        `
-        },
-      }
-    },
-  })
+    const json = await res.json()
+    if (json?.success && chat) {
+      chat.messages = chat.messages.filter((x) => x.id !== id)
+    } else {
+      console.log(json?.error)
+    }
+  }
 </script>
 
 <div class="flex flex-col justify-between items-center h-full w-full">
@@ -79,12 +65,12 @@
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-scroll">
       {#each messages as message (message.id)}
-        <div out:send={{ key: message.id }} animate:flip={{ duration: (d) => d * 0.5 }}>
+        <div out:slide animate:flip={{ duration: (d) => d * 0.6 }}>
           <ChatMessage
             {chat}
             {message}
-            on:delete={(e) => {
-              messages = messages.filter((x) => x.id !== e.detail.messageId)
+            on:delete={() => {
+              deleteMessage(message.id)
             }}
           />
         </div>
