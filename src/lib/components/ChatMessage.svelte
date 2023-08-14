@@ -11,17 +11,6 @@
   export let message: ChatWithRelations['messages'][number]
 
   const dispatch = createEventDispatcher()
-
-  async function deleteMessage() {
-    const res = await fetch(`/api/messages/${message.id}`, { method: 'DELETE' })
-
-    const json = await res.json()
-    if (json?.success && chat) {
-      dispatch('delete')
-    } else {
-      console.log(json?.error)
-    }
-  }
 </script>
 
 <div class="p-4 md:p-8 flex justify-center">
