@@ -38,7 +38,7 @@
   const scrollToBottom = (node: HTMLElement) => {
     setTimeout(() => {
       node?.scroll({ top: node.scrollHeight, behavior: 'smooth' })
-    }, 100)
+    }, 500)
   }
 </script>
 
@@ -53,7 +53,15 @@
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-scroll">
       {#each messages as message}
-        <ChatMessage {chat} {message} />
+        <ChatMessage
+          {chat}
+          {message}
+          on:delete={(e) => {
+            if (chat?.messages) {
+              chat.messages = chat.messages.filter((x) => x.id !== e.detail.messageId)
+            }
+          }}
+        />
       {/each}
     </div>
   {/if}
