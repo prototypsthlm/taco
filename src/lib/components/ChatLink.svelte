@@ -43,7 +43,7 @@
           {roleContent}
         </p>
         <ModalConfirm initialFocus={forkInput} on:confirm={() => forkForm.requestSubmit()}>
-          <button type="button" slot="trigger">
+          <button type="button" title="Fork it" slot="trigger">
             <ForkIcon class="h-5 w-5 text-gray-500 hover:text-green-500 duration-200" />
           </button>
           <svelte:fragment slot="title">Do you want to fork the chat?</svelte:fragment>
@@ -84,7 +84,7 @@
           use:enhance
         >
           <ModalConfirm type="warning" on:confirm={() => deleteForm.requestSubmit()}>
-            <button type="button" title="Delete it!" slot="trigger">
+            <button type="button" title="Delete it" slot="trigger">
               <TrashIcon class="h-5 w-5 text-gray-500 hover:text-red-500 duration-200" />
             </button>
             <svelte:fragment slot="body">
