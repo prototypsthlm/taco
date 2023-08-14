@@ -6,24 +6,26 @@ const protectedRoutes = ['/app']
 const authRoutes = ['/signin', '/signup']
 
 export const handle: Handle = async ({ event, resolve }) => {
+  const targetRoute = event.url.pathname
+
   // sign-out route
-  if (event.url.pathname === '/signout') {
+  if (targetRoute === '/signout') {
     event.cookies.delete('session_id', { path: '/' })
     throw redirect(303, '/')
   }
 
   const sessionId = event.cookies.get('session_id')
 
-  // no cookie
   if (!sessionId) {
+    // no cookie
     // trying to access protected route
-    if (protectedRoutes.some((x) => x === event.url.pathname)) {
+    if (protectedRoutes.some((x) => x === targetRoute)) {
       throw redirect(303, '/')
     }
   } else {
     // cookie
     // trying to access auth route while already logged in
-    if (authRoutes.some((x) => x === event.url.pathname)) {
+    if (authRoutes.some((x) => x === targetRoute)) {
       throw redirect(303, '/app')
     }
 
@@ -31,6 +33,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     if (currentUser) {
       event.locals.currentUser = currentUser
+
+      if (
+        !currentUser.activeUserTeamId &&
+        !(targetRoute.includes('/app/settings') || targetRoute.includes('/invitation'))
+      ) {
+        // no active team -> force team selection
+        throw redirect(303, '/app/settings/teams')
+      }
     } else {
       event.cookies.delete('session_id', { path: '/' })
       throw redirect(303, '/')

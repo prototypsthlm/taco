@@ -1,36 +1,45 @@
-import { countTeamChats, updateTeam } from '$lib/server/entities/team'
+import {
+  createInvitation,
+  deleteInvitationById,
+  getInvitationById,
+  getInvitationsByTeamId,
+} from '$lib/server/entities/invitation'
+import { countTeamChats, getTeamByName, updateTeam } from '$lib/server/entities/team'
 import { getUserWithTeamsAndTeamUsersById } from '$lib/server/entities/user'
-import { removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
+import { getUserTeamById, removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
 import { decrypt } from '$lib/server/utils/crypto'
 import { isUserAdmin, isUserInTeam } from '$lib/server/utils/database'
 import { Role } from '@prisma/client'
 import { error, fail } from '@sveltejs/kit'
+import { randomUUID } from 'crypto'
 import { z, ZodError } from 'zod'
 import type { Actions, PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ params, locals: { currentUser } }) => {
   const user = await getUserWithTeamsAndTeamUsersById(currentUser.id)
   const teamId = Number(params.id)
+  const invitations = getInvitationsByTeamId(teamId)
 
   const userTeam = user.userTeams.find((x) => x.teamId === teamId)
 
   if (!userTeam) throw error(404, "Doesn't belong to this team or the team doesn't exist")
 
   if (userTeam.team?.openAiApiKey) {
-    if (userTeam?.role === Role.ADMIN) {
+    if (userTeam?.role === Role.MEMBER) {
+      userTeam.team.openAiApiKey = '*'.repeat(64)
+    } else {
       if (!process.env.SECRET_KEY) {
         throw new Error('You must have SECRET_KEY set in your env.')
       }
 
       userTeam.team.openAiApiKey = decrypt(userTeam.team.openAiApiKey, process.env.SECRET_KEY)
-    } else {
-      userTeam.team.openAiApiKey = '*'.repeat(64)
     }
   }
 
   return {
     userTeam,
     chatCount: await countTeamChats(userTeam.teamId),
+    invitations,
   }
 }
 
@@ -40,8 +49,8 @@ export const actions: Actions = {
     try {
       const schema = z
         .object({
-          openAiApiKey: z.string().min(1),
           name: z.string().min(1),
+          openAiApiKey: z.union([z.string(), z.undefined()]),
         })
         .parse(fields)
 
@@ -54,7 +63,17 @@ export const actions: Actions = {
         })
       }
 
-      await updateTeam(Number(params.id), schema.name, schema.openAiApiKey)
+      const team = await getTeamByName(schema.name)
+      if (team) {
+        return fail(409, {
+          keySection: {
+            fields,
+            error: 'Team name already exists.',
+          },
+        })
+      }
+
+      await updateTeam(Number(params.id), schema.name, schema.openAiApiKey ?? null)
 
       return {
         keySection: {
@@ -85,7 +104,6 @@ export const actions: Actions = {
   updateUser: async ({ request, params, locals }) => {
     const teamId = Number(params.id)
     const requestingUserId = locals.currentUser.id
-
     if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
         userSection: {
@@ -95,11 +113,7 @@ export const actions: Actions = {
     }
 
     const fields = Object.fromEntries(await request.formData())
-    const buttonAction = fields.submit
     const userId = Number(fields.userId)
-    const userTeamId = Number(fields.userTeamId)
-    const userEmail = fields.userEmail
-
     if (userId === requestingUserId) {
       return fail(400, {
         userSection: {
@@ -108,6 +122,17 @@ export const actions: Actions = {
       })
     }
 
+    const userTeamId = Number(fields.userTeamId)
+    const userTeam = await getUserTeamById(userTeamId)
+    if (userTeam?.role === Role.OWNER) {
+      return fail(400, {
+        userSection: {
+          error: 'You cannot change the role of the owner.',
+        },
+      })
+    }
+
+    const userEmail = fields.userEmail
     if (!(await isUserInTeam(teamId, userId))) {
       return fail(401, {
         userSection: {
@@ -116,6 +141,7 @@ export const actions: Actions = {
       })
     }
 
+    const buttonAction = fields.submit
     if (buttonAction === 'remove') {
       await removeUserTeam(userTeamId)
       return {
@@ -144,5 +170,64 @@ export const actions: Actions = {
         error: 'No action selected.',
       },
     })
+  },
+  createInvitation: async ({ params, locals }) => {
+    const teamId = Number(params.id)
+    const requestingUserId = locals.currentUser.id
+
+    if (!(await isUserAdmin(teamId, requestingUserId))) {
+      return fail(401, {
+        invitationSection: {
+          error: 'You are no admin of this team.',
+        },
+      })
+    }
+
+    const uuid = randomUUID()
+    await createInvitation(uuid, teamId)
+
+    return {
+      invitationSection: {
+        success: `Created a inviation with hash ${uuid}.`,
+      },
+    }
+  },
+  deleteInvitation: async ({ request, params, locals }) => {
+    const teamId = Number(params.id)
+    const requestingUserId = locals.currentUser.id
+
+    if (!(await isUserAdmin(teamId, requestingUserId))) {
+      return fail(401, {
+        userSection: {
+          error: 'You are no admin of this team.',
+        },
+      })
+    }
+
+    const fields = Object.fromEntries(await request.formData())
+    const invitationId = Number(fields.invitationId)
+
+    const invitation = await getInvitationById(invitationId)
+    if (!invitation) {
+      return fail(401, {
+        invitationSection: {
+          error: `Invitation with id ${invitationId} does not exist`,
+        },
+      })
+    } else if (invitation.teamId !== teamId) {
+      return fail(401, {
+        invitationSection: {
+          error: 'Invitation does not belong to this team.',
+        },
+      })
+    }
+
+    await deleteInvitationById(invitationId)
+
+    return {
+      invitationSection: {
+        success: `Invitation with id ${invitationId} successfully deleted.`,
+      },
+    }
   },
 }

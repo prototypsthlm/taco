@@ -3,7 +3,11 @@ import { getUserWithChatsById, getUserWithRelationsById } from '$lib/server/enti
 
 export const isUserAdmin = async (teamId: number, userId: number) => {
   const user = await getUserWithRelationsById(userId)
-  return user?.userTeams.some((x) => x.teamId === teamId && x.role === Role.ADMIN) || false
+  return (
+    user?.userTeams.some(
+      (x) => x.teamId === teamId && (x.role === Role.ADMIN || x.role === Role.OWNER)
+    ) || false
+  )
 }
 
 export const isUserInTeam = async (teamId: number, userId: number) => {

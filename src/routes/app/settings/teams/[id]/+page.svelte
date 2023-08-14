@@ -3,9 +3,12 @@
   import TeamStats from '$lib/components/TeamStats.svelte'
   import TeamMemberList from '$lib/components/TeamMemberList.svelte'
   import TeamKeys from '$lib/components/TeamKeys.svelte'
+  import TeamInvitationList from '$lib/components/TeamInvitationList.svelte'
 
   export let data: PageData
   export let form: ActionData
+
+  $: isAdmin = data.userTeam.role !== "MEMBER"
 </script>
 
 <header
@@ -17,5 +20,6 @@
 <div class="divide-y divide-white/5">
   <TeamStats userTeam={data.userTeam} numberChats={data.chatCount} />
   <TeamKeys userTeam={data.userTeam} form={form?.keySection} />
+  <TeamInvitationList invitations={data.invitations} isAdmin={isAdmin} form={form?.invitationSection} />
   <TeamMemberList userTeam={data.userTeam} form={form?.userSection} />
 </div>
