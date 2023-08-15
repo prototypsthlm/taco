@@ -134,3 +134,13 @@ export const forkChat = async (chatId: number, ownerId: number, name: string) =>
     },
   })
 }
+
+export const countTeamChats = async (id: number) => {
+  return prisma.chat.count({
+    where: {
+      owner: {
+        teamId: id,
+      },
+    },
+  })
+}

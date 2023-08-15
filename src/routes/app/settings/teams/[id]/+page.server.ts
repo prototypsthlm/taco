@@ -1,10 +1,11 @@
+import { countTeamChats } from '$lib/server/entities/chat'
 import {
   createInvitation,
   deleteInvitationById,
   getInvitationById,
   getInvitationsByTeamId,
 } from '$lib/server/entities/invitation'
-import { countTeamChats, getTeamByName, updateTeam } from '$lib/server/entities/team'
+import { getTeamByName, updateTeam } from '$lib/server/entities/team'
 import { getUserWithTeamsAndTeamUsersById } from '$lib/server/entities/user'
 import { getUserTeamById, removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
 import { decrypt } from '$lib/server/utils/crypto'
@@ -230,9 +231,12 @@ export const actions: Actions = {
       },
     }
   },
-  loadingCost: async ({ request, params, locals }) => {
+  estimateCost: async ({ request, params, locals }) => {
+    console.log('estimateCost')
     return {
-      estimatedCost: 200,
+      statsSection: {
+        estimatedCost: 200,
+      },
     }
   },
 }
