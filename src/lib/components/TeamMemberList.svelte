@@ -66,7 +66,7 @@
               >
             </p>
           </div>
-          {#if userTeam.role === 'ADMIN' && userTeam.user?.id !== teamUser.user?.id}
+          {#if userTeam.role !== 'MEMBER' && userTeam.user?.id !== teamUser.user?.id}
             <form
               class="md:place-self-end flex gap-2"
               method="post"
