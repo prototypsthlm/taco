@@ -230,4 +230,9 @@ export const actions: Actions = {
       },
     }
   },
+  loadingCost: async ({ request, params, locals }) => {
+    return {
+      estimatedCost: 200,
+    }
+  },
 }

@@ -1,8 +1,12 @@
 <script lang="ts">
+  import { enhance } from '$app/forms'
   import type { UserTeamWithTeamsAndTeamUsers } from '$lib/server/entities/user'
 
   export let userTeam: UserTeamWithTeamsAndTeamUsers
   export let numberChats: number
+  export let estimatedCost: number | null
+
+  let loadingCost = false
 </script>
 
 <div class="bg-gray-900">
@@ -18,10 +22,31 @@
       </div>
       <div class="bg-gray-900 px-4 py-6 sm:px-6 lg:px-8">
         <p class="text-sm font-medium leading-6 text-gray-400">Estimated cost</p>
-        <p class="mt-2 flex items-baseline gap-x-2">
-          <span class="text-4xl font-semibold tracking-tight text-white">?</span>
-          <span class="text-sm text-gray-400">$</span>
-        </p>
+        {#if !estimatedCost}
+          {#if !loadingCost}
+            <form
+              method="post"
+              action="?/estimateCost"
+              use:enhance={() => {
+                loadingCost = true
+              }}
+              class="pt-3"
+            >
+              <input type="hidden" name="teamId" value={userTeam.team.id} />
+              <button
+                type="submit"
+                class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-md font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Calculate
+              </button>
+            </form>
+          {/if}
+        {:else}
+          <p class="mt-2 flex items-baseline gap-x-2">
+            <span class="text-4xl font-semibold tracking-tight text-white">{estimatedCost}</span>
+            <span class="text-sm text-gray-400">$</span>
+          </p>
+        {/if}
       </div>
       <div class="bg-gray-900 px-4 py-6 sm:px-6 lg:px-8">
         <p class="text-sm font-medium leading-6 text-gray-400">Number of chats</p>
