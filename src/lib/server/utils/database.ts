@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client'
+import { Role, type User } from '@prisma/client'
 import { getUserWithChatsById, getUserWithRelationsById } from '$lib/server/entities/user'
 
 export const isUserAdmin = async (teamId: number, userId: number) => {
@@ -18,4 +18,9 @@ export const isUserInTeam = async (teamId: number, userId: number) => {
 export const isUserOwningChat = async (chatId: number, userId: number) => {
   const user = await getUserWithChatsById(userId)
   return user?.activeUserTeam?.chats?.some((x) => x.id === chatId)
+}
+
+export const escapeUserSecrets = (user: User) => {
+  user.password = null
+  user.sessionId = null
 }

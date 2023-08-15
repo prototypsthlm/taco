@@ -4,8 +4,13 @@ import {
   getInvitationById,
   getInvitationsByTeamId,
 } from '$lib/server/entities/invitation'
-import { countTeamChats, getTeamByName, updateTeam } from '$lib/server/entities/team'
-import { getUserWithTeamsAndTeamUsersById } from '$lib/server/entities/user'
+import {
+  countTeamChats,
+  getTeamByIdWithMembers,
+  getTeamByName,
+  updateTeam,
+} from '$lib/server/entities/team'
+import { getUserWithUserTeamsById } from '$lib/server/entities/user'
 import { getUserTeamById, removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
 import { decrypt } from '$lib/server/utils/crypto'
 import { isUserAdmin, isUserInTeam } from '$lib/server/utils/database'
@@ -16,7 +21,7 @@ import { z, ZodError } from 'zod'
 import type { Actions, PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ params, locals: { currentUser } }) => {
-  const user = await getUserWithTeamsAndTeamUsersById(currentUser.id)
+  const user = await getUserWithUserTeamsById(currentUser.id)
   const teamId = Number(params.id)
   const invitations = getInvitationsByTeamId(teamId)
 
@@ -24,20 +29,35 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
 
   if (!userTeam) throw error(404, "Doesn't belong to this team or the team doesn't exist")
 
-  if (userTeam.team?.openAiApiKey) {
+  const team = await getTeamByIdWithMembers(teamId)
+
+  if (team?.openAiApiKey) {
     if (userTeam?.role === Role.MEMBER) {
-      userTeam.team.openAiApiKey = '*'.repeat(64)
+      team.openAiApiKey = '*'.repeat(64)
     } else {
       if (!process.env.SECRET_KEY) {
         throw new Error('You must have SECRET_KEY set in your env.')
       }
 
-      userTeam.team.openAiApiKey = decrypt(userTeam.team.openAiApiKey, process.env.SECRET_KEY)
+      team.openAiApiKey = decrypt(team.openAiApiKey, process.env.SECRET_KEY)
     }
   }
+  console.log(
+    JSON.stringify(
+      {
+        userTeam,
+        team,
+        chatCount: await countTeamChats(userTeam.teamId),
+        invitations,
+      },
+      null,
+      2
+    )
+  )
 
   return {
     userTeam,
+    team,
     chatCount: await countTeamChats(userTeam.teamId),
     invitations,
   }
