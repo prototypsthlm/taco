@@ -113,3 +113,24 @@ export const deleteChat = (id: number) => {
     },
   })
 }
+
+export const forkChat = async (chatId: number, ownerId: number, name: string) => {
+  const chat = await getChatWithRelationsById(chatId)
+
+  return prisma.chat.create({
+    data: {
+      name,
+      shared: chat.shared,
+      model: chat.model,
+      temperature: chat.temperature,
+      roleContent: chat.roleContent,
+      messages: {
+        create: chat.messages.map((x) => ({
+          question: x.question,
+          answer: x.answer,
+        })),
+      },
+      ownerId,
+    },
+  })
+}

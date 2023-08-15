@@ -15,5 +15,5 @@
 </script>
 
 {#key unique}
-  <ChatRoom chat={form?.chat || null} />
+  <ChatRoom chat={form?.chat} />
 {/key}

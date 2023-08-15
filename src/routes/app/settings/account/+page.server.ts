@@ -2,13 +2,7 @@ import { deleteUser, updatePassword, updateUserPersonalData } from '$lib/server/
 import { fail, redirect } from '@sveltejs/kit'
 import bcrypt from 'bcryptjs'
 import { z, ZodError } from 'zod'
-import type { Actions, PageServerLoad } from './$types'
-
-export const load: PageServerLoad = ({ locals }) => {
-  return {
-    user: locals.currentUser,
-  }
-}
+import type { Actions } from './$types'
 
 export const actions: Actions = {
   personal: async ({ request, locals }) => {
@@ -107,7 +101,7 @@ export const actions: Actions = {
       await deleteUser(locals.currentUser.id)
 
       // delete cookie
-      await cookies.delete('session_id', { path: '/' })
+      cookies.delete('session_id', { path: '/' })
     } catch (error) {
       return fail(500, {
         password: {

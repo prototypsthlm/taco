@@ -5,7 +5,7 @@
   import autosize from 'svelte-autosize'
 
   export let role: string | null
-  export let chatId: number | null
+  export let chatId: number | undefined
 
   let text = ''
   let isShiftPressed = false
@@ -54,7 +54,7 @@
             bind:value={text}
             on:keydown={(e) => {
               if (e.key === 'Enter') {
-                if (!isShiftPressed) {
+                if (!isShiftPressed && text.trim()) {
                   dispatchMessage()
                   chatForm.requestSubmit()
                   e.preventDefault()

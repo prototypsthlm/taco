@@ -1,18 +1,17 @@
 <script lang="ts">
-  import Answer from '$lib/components/Answer.svelte'
   import ChatInput from '$lib/components/ChatInput.svelte'
-  import Question from '$lib/components/Question.svelte'
+  import ChatMessage from '$lib/components/ChatMessage.svelte'
   import RoleSelector from '$lib/components/RoleSelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { onMount } from 'svelte'
-  import { fade } from 'svelte/transition'
+  import { flip } from 'svelte/animate'
+  import { slide } from 'svelte/transition'
 
-  export let chat: ChatWithRelations
+  export let chat: ChatWithRelations | undefined
   let messages: ChatWithRelations['messages'] = []
 
-  $: if (chat) {
-    messages = chat?.messages
-    scrollToBottom(element)
+  $: {
+    messages = chat?.messages || []
   }
 
   function addPlaceholderMessage(event: CustomEvent<string>) {
@@ -40,7 +39,18 @@
   const scrollToBottom = (node: HTMLElement) => {
     setTimeout(() => {
       node?.scroll({ top: node.scrollHeight, behavior: 'smooth' })
-    }, 100)
+    }, 500)
+  }
+
+  async function deleteMessage(id: number) {
+    const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' })
+
+    const json = await res.json()
+    if (json?.success && chat) {
+      chat.messages = chat.messages.filter((x) => x.id !== id)
+    } else {
+      console.log(json?.error)
+    }
   }
 </script>
 
@@ -54,15 +64,15 @@
     </div>
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-scroll">
-      {#each messages as message}
-        <div in:fade={{ duration: 400 }}>
-          <Question
-            text={message.question}
-            authorEmail={message.author?.email || chat?.owner.user.email}
+      {#each messages as message (message.id)}
+        <div out:slide animate:flip={{ duration: (d) => d * 1.2 }}>
+          <ChatMessage
+            {chat}
+            {message}
+            on:delete={() => {
+              deleteMessage(message.id)
+            }}
           />
-        </div>
-        <div in:fade={{ delay: 400, duration: 400 }}>
-          <Answer text={message.answer} />
         </div>
       {/each}
     </div>

@@ -7,4 +7,4 @@
   export let form: ActionData
 </script>
 
-<ChatRoom chat={form?.chat || data?.chat || null} />
+<ChatRoom chat={form?.chat || data?.chat} />

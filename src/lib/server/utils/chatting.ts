@@ -9,6 +9,7 @@ import {
 } from '$lib/server/entities/chat'
 import type { UserBySessionId } from '$lib/server/entities/user'
 import { getUserWithActiveUserTeamById } from '$lib/server/entities/user'
+import { trim } from '$lib/utils/string'
 import { z, ZodError } from 'zod'
 
 export async function sendMessage(formData: unknown, user: UserBySessionId) {
@@ -33,7 +34,10 @@ export async function sendMessage(formData: unknown, user: UserBySessionId) {
 
     try {
       if (!chat.name && chat.messages.some((x) => x.answer)) {
-        const name = await generateChatName(chat)
+        let name = await generateChatName(chat)
+        name = trim(name, '"').trim()
+        name = trim(name, '.').trim()
+        name = trim(name, 'Topic:').trim()
         chat = await setChatName(chat.id, name)
       }
     } catch (e) {
