@@ -22,7 +22,7 @@
       </div>
       <ChevronRight class="h-4 w-4 text-white" />
     </a>
-    {#if !user?.activeUserTeam?.chats?.length}
+    {#if user?.activeUserTeam?.chats?.length}
       <a
         href="/app"
         on:click={() => {
