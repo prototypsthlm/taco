@@ -6,8 +6,6 @@ import type { Actions } from './$types'
 
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
-    console.log(url.searchParams.get('redirect'));
-    
     const fields = Object.fromEntries(await request.formData())
     try {
       const schema = z
