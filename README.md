@@ -1,4 +1,4 @@
-# LLM Portal 🌀
+# TACO (Team AI Chat pOrtal) 🌀
 
 ## Developing
 

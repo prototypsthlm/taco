@@ -13,7 +13,7 @@
 >
   <div class="font-bold text-accent text-center px-4">
     <h3 class="text-5xl md:text-6xl">Prototyps</h3>
-    <h1 class="text-6xl md:text-7xl">LLM Portal 🌀</h1>
+    <h1 class="text-6xl md:text-7xl">TACO 🌀</h1>
     <p class="text-accent text-xl md:text-2xl mt-8">
       Use the large language model to increase your poductivity
     </p>

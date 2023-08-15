@@ -15,7 +15,7 @@
 </script>
 
 <svelte:head>
-  <title>LLM Portal</title>
+  <title>TACO</title>
 </svelte:head>
 
 <slot />
