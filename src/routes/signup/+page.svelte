@@ -1,6 +1,5 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import logo from '$lib/assets/logo.png'
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
   import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
