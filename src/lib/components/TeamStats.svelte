@@ -1,10 +1,12 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import type { UserTeamWithTeamsAndTeamUsers } from '$lib/server/entities/user'
+  import { ArrowPathIcon } from '@babeard/svelte-heroicons/solid'
 
   export let userTeam: UserTeamWithTeamsAndTeamUsers
   export let numberChats: number
   export let estimatedCost: number | null
+  export let form: any | null
 
   let loadingCost = false
 </script>
@@ -22,7 +24,7 @@
       </div>
       <div class="bg-gray-900 px-4 py-6 sm:px-6 lg:px-8">
         <p class="text-sm font-medium leading-6 text-gray-400">Estimated cost</p>
-        {#if !estimatedCost}
+        {#if !form?.estimatedCost}
           {#if !loadingCost}
             <form
               method="post"
@@ -40,10 +42,12 @@
                 Calculate
               </button>
             </form>
+            {:else}
+            <ArrowPathIcon class="animate-spin mt-4 h-8 w-8 text-white" />
           {/if}
         {:else}
           <p class="mt-2 flex items-baseline gap-x-2">
-            <span class="text-4xl font-semibold tracking-tight text-white">{estimatedCost}</span>
+            <span class="text-4xl font-semibold tracking-tight text-white">{form?.estimatedCost}</span>
             <span class="text-sm text-gray-400">$</span>
           </p>
         {/if}

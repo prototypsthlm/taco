@@ -144,3 +144,16 @@ export const countTeamChats = async (id: number) => {
     },
   })
 }
+
+export const getAllTeamChats = async (id: number) => {
+  return prisma.chat.findMany({
+    where: {
+      owner: {
+        teamId: id,
+      },
+    },
+    include: {
+      messages: true,
+    },
+  })
+}

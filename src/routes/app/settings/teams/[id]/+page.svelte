@@ -18,7 +18,7 @@
 </header>
 
 <div class="divide-y divide-white/5">
-  <TeamStats userTeam={data.userTeam} numberChats={data.chatCount} estimatedCost={null} />
+  <TeamStats userTeam={data.userTeam} form={form?.statsSection} numberChats={data.chatCount} estimatedCost={null} />
   <TeamKeys userTeam={data.userTeam} form={form?.keySection} />
   <TeamInvitationList invitations={data.invitations} isAdmin={isAdmin} form={form?.invitationSection} />
   <TeamMemberList userTeam={data.userTeam} form={form?.userSection} />

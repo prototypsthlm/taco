@@ -1,4 +1,4 @@
-export const estimateTokenCount = (text: string): number => {
+export const calcTokenCount = (text: string): number => {
   // Define a regular expression pattern to match tokens
   const tokenPattern = /\w+|[^\w\s]+/g
 
