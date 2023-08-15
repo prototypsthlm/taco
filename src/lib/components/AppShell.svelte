@@ -1,10 +1,10 @@
 <script lang="ts">
-  import logo from '$lib/assets/logo.png'
   import type { UserBySessionId } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
   import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
   import { TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
   import Gravatar from './Gravatar.svelte'
+  import TacoIcon from './icons/TacoIcon.svelte'
 
   export let user: UserBySessionId
 
@@ -63,8 +63,8 @@
               class="h-screen flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10"
             >
               <div class="flex h-16 items-center">
-                <a class="flex text-white items-center gap-4 text-2xl" href="/app">
-                  <img class="h-8 w-auto" src={logo} alt="TACO" /> TACO
+                <a class="text-white text-2xl" href="/app">
+                  <TacoIcon class="h-10 w-auto" />
                 </a>
               </div>
               <nav class="flex flex-1 flex-col overflow-hidden">
@@ -84,8 +84,8 @@
     <!-- Sidebar component, swap this element with another sidebar if you like -->
     <div class="flex grow flex-col gap-y-5 bg-gray-900 px-6 h-screen">
       <div class="flex h-16 items-center">
-        <a class="flex text-white items-center gap-4 text-2xl" href="/app">
-          <img class="h-8 w-auto" src={logo} alt="TACO" /> TACO
+        <a class="text-white text-2xl" href="/app">
+          <TacoIcon class="h-12 w-auto" />
         </a>
       </div>
       <nav class="flex flex-col overflow-hidden h-full">

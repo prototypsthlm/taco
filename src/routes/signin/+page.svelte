@@ -1,8 +1,8 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import logo from '$lib/assets/logo.png'
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
+  import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
   import type { ActionData } from './$types'
 
   export let form: ActionData
@@ -15,8 +15,10 @@
 <div
   class="min-h-screen bg-gray-50 dark:bg-gray-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
 >
-  <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <img class="mx-auto h-10 w-auto" src={logo} alt="TACO" />
+  <div class="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center gap-4">
+    <div class="text-3xl md:text-5xl">
+      <TacoIcon class="h-16 md:h-24 w-auto" dark />
+    </div>
     <h2
       class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-gray-100"
     >
