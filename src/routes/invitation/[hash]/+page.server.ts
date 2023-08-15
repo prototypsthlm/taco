@@ -56,9 +56,9 @@ export const actions: Actions = {
       return fail(404, { message: 'Invitation not found' })
     }
 
-    await createUserTeam(currentUser.id, invitation.teamId)
+    const userTeam = await createUserTeam(currentUser.id, invitation.teamId)
     await deleteInvitationById(invitationId)
-    await changeActiveUserTeam(currentUser.id, invitation.teamId)
+    await changeActiveUserTeam(currentUser.id, userTeam.id)
 
     throw redirect(303, `/app`)
   },
