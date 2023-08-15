@@ -5,7 +5,7 @@ import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
 
 export const actions: Actions = {
-  default: async ({ request, cookies }) => {
+  default: async ({ request, cookies, url }) => {
     const fields = Object.fromEntries(await request.formData())
     try {
       const schema = z
@@ -49,6 +49,8 @@ export const actions: Actions = {
         error: `${error}`,
       })
     }
-    throw redirect(303, '/app')
+
+    const redirectUrl = url.searchParams.get('redirect') || '/app'
+    throw redirect(303, redirectUrl)
   },
 }

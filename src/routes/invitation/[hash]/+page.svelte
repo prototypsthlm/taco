@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PageData } from './$types'
+  import { page } from '$app/stores'
 
   export let data: PageData
 </script>
@@ -40,11 +41,11 @@
         <div class="mt-10 flex items-center justify-center gap-x-6">
           {#if data.error.showLoginButton}
             <a
-              href="/signin"
+              href="/signin?redirect={$page.url}"
               class="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >Signin
             </a>
-            <a href="/signup" class="text-sm font-semibold leading-6 text-white"
+            <a href="/signup?redirect={$page.url}" class="text-sm font-semibold leading-6 text-white"
               >Register <span aria-hidden="true">→</span></a
             >
           {:else}
