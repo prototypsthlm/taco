@@ -42,18 +42,6 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
       team.openAiApiKey = decrypt(team.openAiApiKey, process.env.SECRET_KEY)
     }
   }
-  console.log(
-    JSON.stringify(
-      {
-        userTeam,
-        team,
-        chatCount: await countTeamChats(userTeam.teamId),
-        invitations,
-      },
-      null,
-      2
-    )
-  )
 
   return {
     userTeam,
