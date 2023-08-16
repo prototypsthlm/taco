@@ -18,10 +18,8 @@ export const getUserWithRelationsById = async (id: number) => {
   return user
 }
 
-export type UserBySessionId = Awaited<ReturnType<typeof getUserBySessionId>>
-
 export const getUserBySessionId = (sessionId: string) =>
-  prisma.user.findUniqueOrThrow({
+  prisma.user.findUnique({
     where: { sessionId },
     include: {
       activeUserTeam: true,
