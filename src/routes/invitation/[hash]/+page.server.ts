@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   const invitation = await getInvitationByHash(params.hash)
 
   if (!invitation) {
-    throw error(404, { message: 'Invitation not found' })
+    throw error(404, 'Invitation not found')
   }
 
   if (invitation.team.teamUsers.some((x) => x.userId === currentUser.id)) {

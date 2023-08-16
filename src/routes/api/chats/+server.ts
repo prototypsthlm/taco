@@ -1,13 +1,12 @@
 import { transformChatToCompletionRequest } from '$lib/server/api/openai'
-import { createChat, getChatWithRelationsById } from '$lib/server/entities/chat'
 import type { ChatWithRelations } from '$lib/server/entities/chat'
+import { createChat, getChatWithRelationsById } from '$lib/server/entities/chat'
 import { decrypt } from '$lib/server/utils/crypto'
-import { error, json } from '@sveltejs/kit'
-import { PassThrough } from 'stream'
+import { error } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { RequestHandler } from './$types'
 
-export const POST: RequestHandler = async ({ params, request, fetch, locals: { currentUser } }) => {
+export const POST: RequestHandler = async ({ request, fetch, locals: { currentUser } }) => {
   const requestData = await request.json()
 
   const schema = z
@@ -19,7 +18,7 @@ export const POST: RequestHandler = async ({ params, request, fetch, locals: { c
     .safeParse(requestData)
 
   if (!schema.success) {
-    throw error(422, json({ errors: schema.error.flatten().fieldErrors }))
+    throw error(422, JSON.stringify({ errors: schema.error.flatten().fieldErrors }))
   }
 
   let chat: ChatWithRelations
@@ -28,11 +27,11 @@ export const POST: RequestHandler = async ({ params, request, fetch, locals: { c
     try {
       chat = await getChatWithRelationsById(schema.data.id)
     } catch (e) {
-      throw error(500, json({ error: `Error getting user ${e}` }))
+      throw error(500, JSON.stringify({ error: `Error getting user ${e}` }))
     }
   } else {
     if (!currentUser.activeUserTeamId) {
-      throw error(500, json({ error: `User has no active team` }))
+      throw error(500, JSON.stringify({ error: `User has no active team` }))
     }
     chat = await createChat(currentUser.activeUserTeamId, schema.data.role)
   }
@@ -40,11 +39,11 @@ export const POST: RequestHandler = async ({ params, request, fetch, locals: { c
   const chatRequest = transformChatToCompletionRequest(chat, schema.data.question, true)
 
   if (!chat?.owner?.team?.openAiApiKey) {
-    throw error(500, json({ error: `Open AI API key is not set!` }))
+    throw error(500, JSON.stringify({ error: `Open AI API key is not set!` }))
   }
 
   if (!process.env.SECRET_KEY) {
-    throw error(500, json({ error: `You must have SECRET_KEY set in your env.` }))
+    throw error(500, JSON.stringify({ error: `You must have SECRET_KEY set in your env.` }))
   }
 
   const apiKey = decrypt(chat.owner.team.openAiApiKey, process.env.SECRET_KEY)
@@ -60,7 +59,7 @@ export const POST: RequestHandler = async ({ params, request, fetch, locals: { c
 
   if (!chatResponse.ok) {
     const err = await chatResponse.json()
-    throw error(500, json({ error: `OpenAI API Error: ${err.error.message}` }))
+    throw error(500, JSON.stringify({ error: `OpenAI API Error: ${err.error.message}` }))
   }
 
   console.log(chatResponse)
