@@ -1,9 +1,10 @@
 import { prisma } from '$lib/server/prisma'
 import { generateSessionId } from '$lib/server/utils/crypto'
 import bcrypt from 'bcryptjs'
+import { escapeUserSecrets } from '../utils/database'
 
-export const getUserWithRelationsById = (id: number) =>
-  prisma.user.findUniqueOrThrow({
+export const getUserWithRelationsById = async (id: number) => {
+  const user = await prisma.user.findUniqueOrThrow({
     where: { id },
     include: {
       userTeams: {
@@ -13,11 +14,12 @@ export const getUserWithRelationsById = (id: number) =>
       },
     },
   })
-
-export type UserBySessionId = Awaited<ReturnType<typeof getUserBySessionId>>
+  escapeUserSecrets(user)
+  return user
+}
 
 export const getUserBySessionId = (sessionId: string) =>
-  prisma.user.findUniqueOrThrow({
+  prisma.user.findUnique({
     where: { sessionId },
     include: {
       activeUserTeam: true,
@@ -37,6 +39,7 @@ export const getUserIfCredentialsMatch = async (email: string, password: string)
     return null
   }
 
+  escapeUserSecrets(user)
   return user
 }
 
@@ -45,7 +48,7 @@ export const setSessionId = (id: number) => {
 }
 
 export const createUser = async (name: string, email: string, password: string) => {
-  return prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       email,
       name,
@@ -53,6 +56,8 @@ export const createUser = async (name: string, email: string, password: string) 
       password: await bcrypt.hash(password, 10),
     },
   })
+  escapeUserSecrets(user)
+  return user
 }
 
 export const updateUserPersonalData = (id: number, name: string, email: string) =>
@@ -74,11 +79,14 @@ export const updatePassword = async (id: number, password: string) =>
 
 export const deleteUser = (id: number) => prisma.user.delete({ where: { id } })
 
-export const getUserWithUserTeamsById = async (id: number) =>
-  prisma.user.findUniqueOrThrow({
+export const getUserWithUserTeamsById = async (id: number) => {
+  const user = await prisma.user.findUniqueOrThrow({
     where: { id },
-    include: { userTeams: { include: { team: true } } },
+    include: { userTeams: true },
   })
+  escapeUserSecrets(user)
+  return user
+}
 
 export const changeActiveUserTeam = (userId: number, userTeamId: number) =>
   prisma.user.update({
@@ -86,36 +94,11 @@ export const changeActiveUserTeam = (userId: number, userTeamId: number) =>
     data: { activeUserTeamId: userTeamId },
   })
 
-export type UserWithTeamsAndTeamUsers = Awaited<ReturnType<typeof getUserWithTeamsAndTeamUsersById>>
-export type UserTeamWithTeamsAndTeamUsers = UserWithTeamsAndTeamUsers['userTeams'][number]
-
-export const getUserWithTeamsAndTeamUsersById = (id: number) =>
-  prisma.user.findUniqueOrThrow({
-    where: { id },
-    include: {
-      userTeams: {
-        include: {
-          chats: { orderBy: { updatedAt: 'desc' } },
-          team: {
-            include: {
-              teamUsers: {
-                include: {
-                  user: true,
-                },
-              },
-            },
-          },
-          user: true,
-        },
-      },
-    },
-  })
-
 export type UserWithUserTeamsActiveTeamAndChats = Awaited<
   ReturnType<typeof getUserWithUserTeamsActiveTeamAndChatsById>
 >
-export const getUserWithUserTeamsActiveTeamAndChatsById = (id: number) =>
-  prisma.user.findUniqueOrThrow({
+export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => {
+  const user = prisma.user.findUniqueOrThrow({
     where: { id },
     include: {
       userTeams: {
@@ -131,9 +114,12 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = (id: number) =>
       },
     },
   })
+  escapeUserSecrets(user)
+  return user
+}
 
-export const getUserWithChatsById = (id: number) =>
-  prisma.user.findUniqueOrThrow({
+export const getUserWithChatsById = async (id: number) => {
+  const user = prisma.user.findUniqueOrThrow({
     where: { id },
     include: {
       activeUserTeam: {
@@ -143,11 +129,17 @@ export const getUserWithChatsById = (id: number) =>
       },
     },
   })
+  escapeUserSecrets(user)
+  return user
+}
 
-export const getUserWithActiveUserTeamById = (id: number) =>
-  prisma.user.findUniqueOrThrow({
+export const getUserWithActiveUserTeamById = async (id: number) => {
+  const user = prisma.user.findUniqueOrThrow({
     where: { id },
     include: {
       activeUserTeam: true,
     },
   })
+  escapeUserSecrets(user)
+  return user
+}

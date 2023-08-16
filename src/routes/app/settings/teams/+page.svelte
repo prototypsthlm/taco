@@ -1,8 +1,10 @@
 <script lang="ts">
   import UserGroup from '@babeard/svelte-heroicons/solid/UserGroup'
   import type { PageServerData } from './$types'
-  import { ChevronRightIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
+  import { PlusIcon } from '@babeard/svelte-heroicons/solid'
   import Envelope from '@babeard/svelte-heroicons/solid/Envelope'
+  import { enhance } from '$app/forms'
+  import Gravatar from '$lib/components/Gravatar.svelte'
 
   export let data: PageServerData
 </script>
@@ -24,18 +26,35 @@
   <div class="flex flex-col lg:flex-row justify-between divide-x divide-white/5">
     <ul class="divide-y divide-white/5 grow">
       {#each data?.user?.userTeams as userTeam}
-        <a href="/app/settings/teams/{userTeam?.team?.id}">
-          <li class="relative flex items-center space-x-4 px-4 py-4 sm:px-6 lg:px-8">
-            <div class="min-w-0 flex-auto">
-              <div class="flex items-center gap-x-3">
-                <h2 class="min-w-0 text-sm font-semibold leading-6 text-white">
-                  <span class="truncate">{userTeam?.team?.name}</span>
-                </h2>
-              </div>
+        <li class="relative flex items-center space-x-4 px-4 py-4 sm:px-6 lg:px-8">
+          <Gravatar class="w-8 h-8 rounded-lg" value={userTeam.team.name} />
+          <div class="min-w-0 flex-auto">
+            <div class="flex items-center gap-x-3">
+              <h2 class="min-w-0 text-sm font-semibold leading-6 text-white">
+                <span class="truncate">{userTeam?.team?.name}</span>
+              </h2>
             </div>
-            <ChevronRightIcon class="w-4 flex-none text-gray-400" />
-          </li>
-        </a>
+          </div>
+          {#if data?.user.activeUserTeamId !== userTeam?.id}
+            <form method="post" action="?/selectTeam" use:enhance>
+              <button
+                type="submit"
+                class="rounded-md bg-yellow-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >Switch</button
+              >
+              <input type="hidden" name="userTeamId" value={userTeam.id} />
+            </form>
+          {:else}
+            <span class="text-white opacity-60 text-sm"> (Active team)</span> 
+          {/if}
+          <a href="/app/settings/teams/{userTeam?.team?.id}">
+            <button
+              type="button"
+              class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >Settings</button
+            >
+          </a>
+        </li>
       {/each}
     </ul>
     <slot />

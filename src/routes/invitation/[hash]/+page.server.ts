@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   if (!currentUser) {
     return {
       error: {
-        header: 'Loggin is required',
+        header: 'Login is required',
         description:
           'You need to login or create an account before you can accept this invitation.',
         showLoginButton: true,
@@ -56,9 +56,9 @@ export const actions: Actions = {
       return fail(404, { message: 'Invitation not found' })
     }
 
-    await createUserTeam(currentUser.id, invitation.teamId)
+    const userTeam = await createUserTeam(currentUser.id, invitation.teamId)
     await deleteInvitationById(invitationId)
-    await changeActiveUserTeam(currentUser.id, invitation.teamId)
+    await changeActiveUserTeam(currentUser.id, userTeam.id)
 
     throw redirect(303, `/app`)
   },

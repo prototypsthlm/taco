@@ -134,3 +134,26 @@ export const forkChat = async (chatId: number, ownerId: number, name: string) =>
     },
   })
 }
+
+export const countTeamChats = async (id: number) => {
+  return prisma.chat.count({
+    where: {
+      owner: {
+        teamId: id,
+      },
+    },
+  })
+}
+
+export const getAllTeamChats = async (id: number) => {
+  return prisma.chat.findMany({
+    where: {
+      owner: {
+        teamId: id,
+      },
+    },
+    include: {
+      messages: true,
+    },
+  })
+}

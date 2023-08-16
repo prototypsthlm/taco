@@ -1,10 +1,10 @@
 <script lang="ts">
-  import logo from '$lib/assets/logo.png'
   import type { UserBySessionId } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
   import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
   import { TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
   import Gravatar from './Gravatar.svelte'
+  import TacoIcon from './icons/TacoIcon.svelte'
 
   export let user: UserBySessionId
 
@@ -63,8 +63,8 @@
               class="h-screen flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10"
             >
               <div class="flex h-16 items-center">
-                <a class="flex text-white items-center gap-4 text-2xl" href="/app">
-                  <img class="h-8 w-auto" src={logo} alt="LLM Portal" /> LLM Portal
+                <a class="text-white text-2xl" href="/app">
+                  <TacoIcon class="h-10 w-auto" />
                 </a>
               </div>
               <nav class="flex flex-1 flex-col overflow-hidden">
@@ -80,18 +80,20 @@
   </TransitionRoot>
 
   <!-- Static sidebar for desktop -->
-  <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+  <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r-2 border-gray-800">
     <!-- Sidebar component, swap this element with another sidebar if you like -->
-    <div class="flex grow flex-col gap-y-5 bg-gray-900 px-6 h-screen">
-      <div class="flex h-16 items-center">
-        <a class="flex text-white items-center gap-4 text-2xl" href="/app">
-          <img class="h-8 w-auto" src={logo} alt="LLM Portal" /> LLM Portal
+    <div class="flex grow flex-col gap-y-5 bg-gray-900 h-screen">
+      <div class="flex h-20 items-center pl-6">
+        <a class="text-white text-2xl" href="/app">
+          <TacoIcon class="h-12 w-auto" />
         </a>
       </div>
       <nav class="flex flex-col overflow-hidden h-full">
         <div class="flex flex-col gap-y-7 overflow-hidden h-full">
-          <slot name="sidebar" />
-          <div class="-mx-6 mt-auto">
+          <div class="px-4">
+            <slot name="sidebar" />
+          </div>
+          <div class="mt-auto">
             <a
               href="/app/settings"
               class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"

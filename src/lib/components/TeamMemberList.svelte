@@ -2,7 +2,6 @@
   import { enhance } from '$app/forms'
   import Alert from '$lib/components/Alert.svelte'
   import Gravatar from '$lib/components/Gravatar.svelte'
-  import type { UserTeamWithTeamsAndTeamUsers } from '$lib/server/entities/user'
   import {
     ArrowDownIcon,
     ChevronUpIcon,
@@ -18,7 +17,8 @@
       year: 'numeric',
     })
 
-  export let userTeam: UserTeamWithTeamsAndTeamUsers
+  export let userTeam: any
+  export let team: any
   export let form: Record<string, string> = {}
 </script>
 
@@ -37,7 +37,7 @@
       message={form?.error || form?.success}
     />
     <ul class="divide-y divide-gray-800">
-      {#each userTeam.team.teamUsers as teamUser}
+      {#each team.teamUsers as teamUser}
         <li class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-6 py-5">
           <div class="flex gap-x-4">
             <Gravatar
@@ -66,7 +66,7 @@
               >
             </p>
           </div>
-          {#if userTeam.role === 'ADMIN' && userTeam.user?.id !== teamUser.user?.id}
+          {#if userTeam.role !== 'MEMBER' && userTeam.user?.id !== teamUser.user?.id}
             <form
               class="md:place-self-end flex gap-2"
               method="post"

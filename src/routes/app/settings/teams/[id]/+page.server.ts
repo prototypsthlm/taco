@@ -1,14 +1,16 @@
+import { countTeamChats, getAllTeamChats } from '$lib/server/entities/chat'
 import {
   createInvitation,
   deleteInvitationById,
   getInvitationById,
   getInvitationsByTeamId,
 } from '$lib/server/entities/invitation'
-import { countTeamChats, getTeamByName, updateTeam } from '$lib/server/entities/team'
-import { getUserWithTeamsAndTeamUsersById } from '$lib/server/entities/user'
+import { getTeamByIdWithMembers, getTeamByName, updateTeam } from '$lib/server/entities/team'
+import { getUserWithUserTeamsById } from '$lib/server/entities/user'
 import { getUserTeamById, removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
 import { decrypt } from '$lib/server/utils/crypto'
 import { isUserAdmin, isUserInTeam } from '$lib/server/utils/database'
+import { calcTokenCount } from '$lib/server/utils/tokens'
 import { Role } from '@prisma/client'
 import { error, fail } from '@sveltejs/kit'
 import { randomUUID } from 'crypto'
@@ -16,7 +18,7 @@ import { z, ZodError } from 'zod'
 import type { Actions, PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ params, locals: { currentUser } }) => {
-  const user = await getUserWithTeamsAndTeamUsersById(currentUser.id)
+  const user = await getUserWithUserTeamsById(currentUser.id)
   const teamId = Number(params.id)
   const invitations = getInvitationsByTeamId(teamId)
 
@@ -24,20 +26,23 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
 
   if (!userTeam) throw error(404, "Doesn't belong to this team or the team doesn't exist")
 
-  if (userTeam.team?.openAiApiKey) {
+  const team = await getTeamByIdWithMembers(teamId)
+
+  if (team?.openAiApiKey) {
     if (userTeam?.role === Role.MEMBER) {
-      userTeam.team.openAiApiKey = '*'.repeat(64)
+      team.openAiApiKey = '*'.repeat(64)
     } else {
       if (!process.env.SECRET_KEY) {
         throw new Error('You must have SECRET_KEY set in your env.')
       }
 
-      userTeam.team.openAiApiKey = decrypt(userTeam.team.openAiApiKey, process.env.SECRET_KEY)
+      team.openAiApiKey = decrypt(team.openAiApiKey, process.env.SECRET_KEY)
     }
   }
 
   return {
     userTeam,
+    team,
     chatCount: await countTeamChats(userTeam.teamId),
     invitations,
   }
@@ -227,6 +232,37 @@ export const actions: Actions = {
     return {
       invitationSection: {
         success: `Invitation with id ${invitationId} successfully deleted.`,
+      },
+    }
+  },
+  estimateCost: async ({ params }) => {
+    const teamId = Number(params.id)
+    const chats = await getAllTeamChats(teamId)
+
+    let totalInputTokenCount = 0
+    let totalOutputTokenCount = 0
+
+    chats.forEach((chat) => {
+      totalInputTokenCount += calcTokenCount(chat.roleContent)
+
+      chat.messages.forEach((message) => {
+        totalInputTokenCount += calcTokenCount(message.question)
+        totalOutputTokenCount += calcTokenCount(message.answer || '')
+      })
+    })
+
+    const input1kCost = 0.0015
+    const output1kCost = 0.002
+
+    const totalInputCost = (totalInputTokenCount / 1000) * input1kCost
+    const totalOutputCost = (totalOutputTokenCount / 1000) * output1kCost
+    const totalCost = totalInputCost + totalOutputCost
+
+    return {
+      statsSection: {
+        estimatedCost: String(totalCost).slice(0, 10),
+        inputTokens: totalInputTokenCount,
+        outputTokens: totalOutputTokenCount,
       },
     }
   },
