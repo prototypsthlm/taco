@@ -2,9 +2,9 @@
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
   import { enhance } from '$app/forms'
-  import type { UserTeamWithTeamsAndTeamUsers } from '$lib/server/entities/user'
 
-  export let userTeam: UserTeamWithTeamsAndTeamUsers
+  export let userTeam: any
+  export let team: any
   export let form: any
 </script>
 
@@ -29,7 +29,7 @@
           name="openAiApiKey"
           placeholder="OpenAI API Key"
           disabled={userTeam.role === 'MEMBER'}
-          value={form?.fields?.openAiApiKey ?? userTeam.team.openAiApiKey}
+          value={form?.fields?.openAiApiKey ?? team.openAiApiKey}
           errors={form?.errors?.openAiApiKey}
         />
       </div>
@@ -40,7 +40,7 @@
           name="name"
           placeholder="Name"
           disabled={userTeam.role === 'MEMBER'}
-          value={form?.fields?.name ?? userTeam.team.name}
+          value={form?.fields?.name ?? team.name}
           errors={form?.errors?.name}
         />
       </div>

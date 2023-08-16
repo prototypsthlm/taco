@@ -1,5 +1,6 @@
 import { prisma } from '$lib/server/prisma'
 import { encrypt } from '$lib/server/utils/crypto'
+import { escapeUserSecrets } from '../utils/database'
 
 export const updateTeam = async (id: number, name: string, openAiApiKey: string | null) => {
   if (!process.env.SECRET_KEY) {
@@ -23,6 +24,24 @@ export const getTeamByName = async (name: string) => {
       name,
     },
   })
+}
+
+export const getTeamByIdWithMembers = async (id: number) => {
+  const team = await prisma.team.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      teamUsers: {
+        include: {
+          user: true,
+        },
+      },
+    },
+  })
+
+  if (team) team.teamUsers.forEach((teamUser) => escapeUserSecrets(teamUser.user))
+  return team
 }
 
 export const createTeam = async (name: string, openAiApiKey: string | null) => {

@@ -1,11 +1,10 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import type { UserTeamWithTeamsAndTeamUsers } from '$lib/server/entities/user'
   import { ArrowPathIcon } from '@babeard/svelte-heroicons/solid'
 
-  export let userTeam: UserTeamWithTeamsAndTeamUsers
+  export let userTeam: any
+  export let team: any
   export let numberChats: number
-  export let estimatedCost: number | null
   export let form: any | null
 
   let loadingCost = false
@@ -18,7 +17,7 @@
         <p class="text-sm font-medium leading-6 text-gray-400">Number of team users</p>
         <p class="mt-2 flex items-baseline gap-x-2">
           <span class="text-4xl font-semibold tracking-tight text-white"
-            >{userTeam.team?.teamUsers.length}</span
+            >{team?.teamUsers?.length}</span
           >
         </p>
       </div>
@@ -62,9 +61,9 @@
         <p class="text-sm font-medium leading-6 text-gray-400">Team Created At</p>
         <p class="mt-2 flex items-baseline gap-x-2">
           <time
-            datetime={userTeam.team.createdAt?.toISOString()}
+            datetime={team.createdAt?.toISOString()}
             class="text-4xl font-semibold tracking-tight text-white"
-            >{userTeam.team.createdAt?.toLocaleDateString()}</time
+            >{team.createdAt?.toLocaleDateString()}</time
           >
         </p>
       </div>
