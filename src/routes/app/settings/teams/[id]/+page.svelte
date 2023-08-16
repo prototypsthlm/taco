@@ -8,7 +8,7 @@
   export let data: PageData
   export let form: ActionData
 
-  $: isAdmin = data.userTeam.role !== "MEMBER"
+  $: isAdmin = data.userTeam.role !== 'MEMBER'
 </script>
 
 <header
@@ -18,8 +18,13 @@
 </header>
 
 <div class="divide-y divide-white/5">
-  <TeamStats team={data.team} numberChats={data.chatCount} />
+  <TeamStats
+    userTeam={data.userTeam}
+    team={data.team}
+    form={form?.statsSection}
+    numberChats={data.chatCount}
+  />
   <TeamKeys userTeam={data.userTeam} team={data.team} form={form?.keySection} />
-  <TeamInvitationList invitations={data.invitations} isAdmin={isAdmin} form={form?.invitationSection} />
+  <TeamInvitationList invitations={data.invitations} {isAdmin} form={form?.invitationSection} />
   <TeamMemberList team={data.team} userTeam={data.userTeam} form={form?.userSection} />
 </div>

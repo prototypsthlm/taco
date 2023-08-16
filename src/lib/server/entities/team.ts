@@ -18,16 +18,6 @@ export const updateTeam = async (id: number, name: string, openAiApiKey: string 
   })
 }
 
-export const countTeamChats = async (id: number) => {
-  return prisma.chat.count({
-    where: {
-      owner: {
-        teamId: id,
-      },
-    },
-  })
-}
-
 export const getTeamByName = async (name: string) => {
   return prisma.team.findUnique({
     where: {

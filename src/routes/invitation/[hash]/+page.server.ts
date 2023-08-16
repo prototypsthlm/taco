@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   if (!currentUser) {
     return {
       error: {
-        header: 'Loggin is required',
+        header: 'Login is required',
         description:
           'You need to login or create an account before you can accept this invitation.',
         showLoginButton: true,
