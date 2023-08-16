@@ -1,3 +1,4 @@
+import type { UserBySessionId } from '$lib/server/entities/user'
 import { getUserBySessionId } from '$lib/server/entities/user'
 import type { Handle } from '@sveltejs/kit'
 import { redirect } from '@sveltejs/kit'
@@ -28,22 +29,24 @@ export const handle: Handle = async ({ event, resolve }) => {
     if (authRoutes.some((x) => x === targetRoute)) {
       throw redirect(303, '/app')
     }
+    let currentUser: UserBySessionId
 
-    const currentUser = await getUserBySessionId(sessionId)
-
-    if (currentUser) {
+    try {
+      currentUser = await getUserBySessionId(sessionId)
       event.locals.currentUser = currentUser
-
-      if (
-        !currentUser.activeUserTeamId &&
-        !(targetRoute.includes('/app/settings') || targetRoute.includes('/invitation'))
-      ) {
-        // no active team -> force team selection
-        throw redirect(303, '/app/settings/teams')
-      }
-    } else {
+    } catch (e) {
       event.cookies.delete('session_id', { path: '/' })
       throw redirect(303, '/')
+    }
+
+    event.locals.currentUser = currentUser
+
+    if (
+      !currentUser.activeUserTeamId &&
+      !(targetRoute.includes('/app/settings') || targetRoute.includes('/invitation'))
+    ) {
+      // no active team -> force team selection
+      throw redirect(303, '/app/settings/teams')
     }
   }
 

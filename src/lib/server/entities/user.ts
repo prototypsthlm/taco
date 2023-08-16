@@ -18,8 +18,10 @@ export const getUserWithRelationsById = async (id: number) => {
   return user
 }
 
+export type UserBySessionId = Awaited<ReturnType<typeof getUserBySessionId>>
+
 export const getUserBySessionId = (sessionId: string) =>
-  prisma.user.findUnique({
+  prisma.user.findUniqueOrThrow({
     where: { sessionId },
     include: {
       activeUserTeam: true,
@@ -98,7 +100,7 @@ export type UserWithUserTeamsActiveTeamAndChats = Awaited<
   ReturnType<typeof getUserWithUserTeamsActiveTeamAndChatsById>
 >
 export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => {
-  const user = prisma.user.findUniqueOrThrow({
+  const user = await prisma.user.findUniqueOrThrow({
     where: { id },
     include: {
       userTeams: {
@@ -119,7 +121,7 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => 
 }
 
 export const getUserWithChatsById = async (id: number) => {
-  const user = prisma.user.findUniqueOrThrow({
+  const user = await prisma.user.findUniqueOrThrow({
     where: { id },
     include: {
       activeUserTeam: {
@@ -134,7 +136,7 @@ export const getUserWithChatsById = async (id: number) => {
 }
 
 export const getUserWithActiveUserTeamById = async (id: number) => {
-  const user = prisma.user.findUniqueOrThrow({
+  const user = await prisma.user.findUniqueOrThrow({
     where: { id },
     include: {
       activeUserTeam: true,

@@ -4,7 +4,7 @@ import type { ChatCompletionRequestMessage, CreateChatCompletionRequest } from '
 import { Configuration, OpenAIApi } from 'openai'
 import { ChatCompletionRequestMessageRoleEnum } from 'openai/api'
 
-const getClient = (chat: ChatWithRelations) => {
+export const getClient = (chat: ChatWithRelations) => {
   if (!chat?.owner?.team?.openAiApiKey) {
     throw new Error('Open AI API key is not set!')
   }
@@ -24,7 +24,7 @@ export const ask = async (chat: ChatWithRelations) => {
   const client = getClient(chat)
 
   try {
-    const res = await client.createChatCompletion(transformChatToCompletion(chat))
+    const res = await client.createChatCompletion(transformChatToCompletionRequest(chat))
 
     if (!res.data.choices[0].message?.content) {
       throw new Error('Error getting an answer from API. Message has no content.')
@@ -47,7 +47,7 @@ export const generateChatName = async (chat: ChatWithRelations) => {
   const client = getClient(chat)
 
   const res = await client.createChatCompletion(
-    transformChatToCompletion(chat, 'Main topic of the conversation in no more than 5 words')
+    transformChatToCompletionRequest(chat, 'Main topic of the conversation in no more than 5 words')
   )
 
   if (!res.data.choices[0].message?.content) {
@@ -57,9 +57,10 @@ export const generateChatName = async (chat: ChatWithRelations) => {
   return res.data.choices[0].message.content
 }
 
-const transformChatToCompletion = (
+export const transformChatToCompletionRequest = (
   chat: ChatWithRelations,
-  newMessage?: string
+  newMessage?: string,
+  stream = false
 ): CreateChatCompletionRequest => {
   const messages: ChatCompletionRequestMessage[] = chat.messages.flatMap((message) => {
     const question = [
@@ -88,5 +89,6 @@ const transformChatToCompletion = (
       ...newMessageAsArray,
     ],
     temperature: Number(chat.temperature),
+    stream,
   }
 }
