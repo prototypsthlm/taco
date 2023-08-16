@@ -16,9 +16,8 @@ export const DELETE: RequestHandler = async ({ params }) => {
 
   try {
     await deleteMessage(schema.data.id)
+    return json({ success: true })
   } catch (e) {
     throw error(500, json({ error: `${e}` }))
   }
-
-  return json({ success: true })
 }
