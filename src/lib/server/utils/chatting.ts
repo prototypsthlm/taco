@@ -1,7 +1,7 @@
 import { ask, generateChatName } from '$lib/server/api/openai'
 import type { ChatWithRelations } from '$lib/server/entities/chat'
 import {
-  addMessageToChat,
+  addQuestionToChat,
   createChat,
   getChatWithRelationsById,
   setChatName,
@@ -44,7 +44,7 @@ export async function sendMessage(formData: unknown, user: UserBySessionId) {
       console.error(`something went south ${e}`)
     }
 
-    chat = await addMessageToChat(chat, schema.message)
+    chat = await addQuestionToChat(chat.id, schema.message)
     const llmResponse = await ask(chat)
 
     const lastMessage = chat.messages[chat.messages.length - 1]

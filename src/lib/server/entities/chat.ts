@@ -45,11 +45,9 @@ export const createChat = (userTeamId: number, role: string | undefined) => {
   })
 }
 
-export const addMessageToChat = (chat: ChatWithRelations, question: string) => {
+export const addQuestionToChat = (id: number, question: string) => {
   return prisma.chat.update({
-    where: {
-      id: chat.id,
-    },
+    where: { id },
     data: {
       messages: {
         create: {
