@@ -57,14 +57,28 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     body: JSON.stringify(chatRequest),
   })
 
-  if (!chatResponse.ok) {
+  if (!chatResponse.ok || !chatResponse.body) {
     const err = await chatResponse.json()
     throw error(500, JSON.stringify({ error: `OpenAI API Error: ${err.error.message}` }))
   }
 
-  console.log(chatResponse)
+  const { readable, writable } = new TransformStream({
+    async transform(chunk, controller) {
+      const chunkString = new TextDecoder().decode(chunk)
 
-  return new Response(chatResponse.body, {
+      if (chunkString.includes('[DONE]')) {
+        console.log('Detected [DONE]')
+        // Execute your server-side logic here
+      }
+
+      // Forward the chunk to the frontend immediately
+      controller.enqueue(chunk)
+    },
+  })
+
+  chatResponse.body.pipeThrough({ writable, readable })
+
+  return new Response(readable, {
     headers: {
       'Content-Type': 'text/event-stream',
     },
