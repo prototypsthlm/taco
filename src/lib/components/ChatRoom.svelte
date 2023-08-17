@@ -16,9 +16,7 @@
   let selectedRolePrompt: string | null = 'You are a helpful assistant.'
   let element: HTMLElement
 
-  $: {
-    messages = chat?.messages || []
-  }
+  $: messages = chat?.messages || []
 
   onMount(() => {
     scrollToBottom()
