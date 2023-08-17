@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { invalidateAll } from '$app/navigation'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import RoleSelector from '$lib/components/RoleSelector.svelte'
@@ -12,36 +13,20 @@
   let messages: ChatWithRelations['messages'] = []
   let loading = false
   let answer = ''
+  let selectedRolePrompt: string | null = 'You are a helpful assistant.'
+  let element: HTMLElement
 
   $: {
     messages = chat?.messages || []
   }
 
-  let selectedRolePrompt: string | null = 'You are a helpful assistant.'
-  let element: HTMLElement
-
   onMount(() => {
-    scrollToBottom(element)
+    scrollToBottom()
   })
 
-  function sendMessage(event: CustomEvent<{ question: string }>) {
-    const { question } = event.detail
-
-    messages = [
-      ...messages,
-      {
-        question,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as ChatWithRelations['messages'][number],
-    ]
-
-    scrollToBottom(element)
-  }
-
-  const scrollToBottom = (node: HTMLElement) => {
+  const scrollToBottom = () => {
     setTimeout(() => {
-      node?.scroll({ top: node.scrollHeight, behavior: 'smooth' })
+      element?.scroll({ top: element.scrollHeight, behavior: 'smooth' })
     }, 500)
   }
 
@@ -60,6 +45,17 @@
     const { question } = event.detail
     loading = true
 
+    messages = [
+      ...(chat?.messages || []),
+      {
+        question,
+        answer,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as ChatWithRelations['messages'][number],
+    ]
+    scrollToBottom()
+
     const eventSource = new SSE('/api/chats', {
       headers: {
         'Content-Type': 'application/json',
@@ -74,11 +70,13 @@
     eventSource.addEventListener('error', handleError)
 
     eventSource.addEventListener('message', (e) => {
-      scrollToBottom(element)
+      scrollToBottom()
       try {
         if (e.data === '[DONE]') {
           loading = false
+          answer = ''
           console.log(e.data)
+          invalidateAll()
           return
         }
 
@@ -86,14 +84,24 @@
         const [{ delta }] = completionResponse.choices
 
         if (delta.content) {
-          answer = (answer ?? '') + delta.content
+          answer += delta.content
+
+          messages = [
+            ...(chat?.messages || []),
+            {
+              question,
+              answer,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            } as ChatWithRelations['messages'][number],
+          ]
         }
       } catch (err) {
         handleError(err)
       }
     })
     eventSource.stream()
-    scrollToBottom(element)
+    scrollToBottom()
   }
 
   function handleError<T>(err: T) {
@@ -103,12 +111,6 @@
 </script>
 
 <div class="flex flex-col justify-between items-center h-full w-full">
-  <div class="text-white">
-    {#if loading}
-      <h1>LOADDDDDDDDDDDDDDDDDDDDDINNNNNNNNNNNNNG</h1>
-    {/if}
-    ANSWER: {answer}
-  </div>
   {#if !messages.length}
     <div class="flex flex-col gap-4 justify-center items-center grow h-full">
       <h1 class="text-accent text-5xl font-bold">New Chat!</h1>

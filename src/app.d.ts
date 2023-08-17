@@ -1,12 +1,12 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
-import type { User } from '@prisma/client'
+import type { UserBySessionId } from '$lib/server/entities/user'
 
 declare global {
   namespace App {
     // interface Error {}
     interface Locals {
-      currentUser: User
+      currentUser: UserBySessionId
     }
     // interface PageData {}
     // interface Platform {}

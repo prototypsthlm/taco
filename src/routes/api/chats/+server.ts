@@ -1,6 +1,6 @@
 import { transformChatToCompletionRequest } from '$lib/server/api/openai'
 import type { ChatWithRelations } from '$lib/server/entities/chat'
-import { createChat, getChatWithRelationsById } from '$lib/server/entities/chat'
+import { createChat, getChatWithRelationsById, createMessage } from '$lib/server/entities/chat'
 import { decrypt } from '$lib/server/utils/crypto'
 import { error } from '@sveltejs/kit'
 import { z } from 'zod'
@@ -62,13 +62,26 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     throw error(500, JSON.stringify({ error: `OpenAI API Error: ${err.error.message}` }))
   }
 
+  let answer = ''
   const { readable, writable } = new TransformStream({
     async transform(chunk, controller) {
-      const chunkString = new TextDecoder().decode(chunk)
+      const lastData = getLastDataFromChunk(new TextDecoder().decode(chunk))
 
-      if (chunkString.includes('[DONE]')) {
-        console.log('Detected [DONE]')
-        // Execute your server-side logic here
+      if (lastData === '[DONE]') {
+        try {
+          await createMessage(chat.id, schema.data.question, answer)
+        } catch (e) {
+          console.error(`Error: ${e}`)
+        }
+      } else {
+        if (lastData) {
+          const parsedLastData = JSON.parse(lastData)
+
+          if (parsedLastData.choices) {
+            const [{ delta }] = parsedLastData.choices
+            answer += delta.content
+          }
+        }
       }
 
       // Forward the chunk to the frontend immediately
@@ -83,4 +96,20 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       'Content-Type': 'text/event-stream',
     },
   })
+}
+
+const getLastDataFromChunk = (chunk: string) => {
+  // This regex looks for "data: " at the beginning of a line, captures the JSON string
+  // until it reaches the end of the line or two newline characters.
+  const regex = /data: (.*?)(?:\n\n|$)/gs
+
+  let match
+  let lastData
+
+  // Iterate over all matches to find the last "data:" entry in the chunk
+  while ((match = regex.exec(chunk)) !== null) {
+    lastData = match[1]
+  }
+
+  return lastData
 }
