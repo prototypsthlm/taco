@@ -1,8 +1,10 @@
-import { transformChatToCompletionRequest } from '$lib/server/api/openai'
+import {
+  generateChatName,
+  getApiKey,
+  transformChatToCompletionRequest,
+} from '$lib/server/api/openai'
 import type { ChatWithRelations } from '$lib/server/entities/chat'
 import { createChat, createMessage, getChatWithRelationsById } from '$lib/server/entities/chat'
-import { nameChat } from '$lib/server/utils/chatting'
-import { decrypt } from '$lib/server/utils/crypto'
 import { decodeChunkData, encodeChunkData } from '$lib/utils/stream'
 import { error } from '@sveltejs/kit'
 import { z } from 'zod'
@@ -28,7 +30,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   if (schema.data.id) {
     try {
       chat = await getChatWithRelationsById(schema.data.id)
-      chat = await nameChat(chat)
+      chat = await generateChatName(chat)
     } catch (e) {
       throw error(500, JSON.stringify({ error: `Error getting chat ${e}` }))
     }
@@ -41,19 +43,9 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
 
   const chatRequest = transformChatToCompletionRequest(chat, schema.data.question, true)
 
-  if (!chat?.owner?.team?.openAiApiKey) {
-    throw error(500, JSON.stringify({ error: `Open AI API key is not set!` }))
-  }
-
-  if (!process.env.SECRET_KEY) {
-    throw error(500, JSON.stringify({ error: `You must have SECRET_KEY set in your env.` }))
-  }
-
-  const apiKey = decrypt(chat.owner.team.openAiApiKey, process.env.SECRET_KEY)
-
   const chatResponse = await fetch('https://api.openai.com/v1/chat/completions', {
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${getApiKey(chat)}`,
       'Content-Type': 'application/json',
     },
     method: 'POST',
@@ -90,7 +82,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
 
         controller.enqueue(encodeChunkData(modifiedDataArray))
       } catch (e) {
-        console.error(`Error: ${e}`)
+        console.error(`Streaming Error: ${e}`)
         controller.enqueue(chunk)
       }
     },
