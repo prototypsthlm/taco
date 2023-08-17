@@ -99,7 +99,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
 }
 
 const getLastDataFromChunk = (chunk: string) => {
-  // This regex looks for "data: " at the beginning of a line, captures the JSON string
+  // This regex looks for "data: " at the beginning of a line, captures its contents
   // until it reaches the end of the line or two newline characters.
   const regex = /data: (.*?)(?:\n\n|$)/gs
 
