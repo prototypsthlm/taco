@@ -79,6 +79,7 @@
             await goto(`/app/chat/${chatIdJson.chatId}`)
           }
           await invalidateAll()
+          scrollToBottom()
           return
         }
 

@@ -1,6 +1,7 @@
 import { transformChatToCompletionRequest } from '$lib/server/api/openai'
 import type { ChatWithRelations } from '$lib/server/entities/chat'
 import { createChat, createMessage, getChatWithRelationsById } from '$lib/server/entities/chat'
+import { nameChat } from '$lib/server/utils/chatting'
 import { decrypt } from '$lib/server/utils/crypto'
 import { decodeChunkData, encodeChunkData } from '$lib/utils/stream'
 import { error } from '@sveltejs/kit'
@@ -27,8 +28,9 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   if (schema.data.id) {
     try {
       chat = await getChatWithRelationsById(schema.data.id)
+      chat = await nameChat(chat)
     } catch (e) {
-      throw error(500, JSON.stringify({ error: `Error getting user ${e}` }))
+      throw error(500, JSON.stringify({ error: `Error getting chat ${e}` }))
     }
   } else {
     if (!currentUser.activeUserTeamId) {

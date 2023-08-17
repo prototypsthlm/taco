@@ -32,17 +32,7 @@ export async function sendMessage(formData: unknown, user: UserBySessionId) {
       chat = await getChatWithRelationsById(chatId)
     }
 
-    try {
-      if (!chat.name && chat.messages.some((x) => x.answer)) {
-        let name = await generateChatName(chat)
-        name = trim(name, '"').trim()
-        name = trim(name, '.').trim()
-        name = trim(name, 'Topic:').trim()
-        chat = await setChatName(chat.id, name)
-      }
-    } catch (e) {
-      console.error(`something went south ${e}`)
-    }
+    chat = await nameChat(chat)
 
     chat = await addQuestionToChat(chat.id, schema.message)
     const llmResponse = await ask(chat)
@@ -76,4 +66,15 @@ export async function sendMessage(formData: unknown, user: UserBySessionId) {
       },
     }
   }
+}
+
+export const nameChat = async (chat: ChatWithRelations) => {
+  if (!chat.name && chat.messages.some((x) => x.answer)) {
+    let name = await generateChatName(chat)
+    name = trim(name, '"').trim()
+    name = trim(name, '.').trim()
+    name = trim(name, 'Topic:').trim()
+    return setChatName(chat.id, name)
+  }
+  return chat
 }
