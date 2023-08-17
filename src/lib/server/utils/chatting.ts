@@ -45,23 +45,17 @@ export async function sendMessage(formData: unknown, user: User) {
     }
 
     chat = await addMessageToChat(chat, schema.message)
+    const lastMessage = chat.messages[chat.messages.length - 1]
     try {
       const llmResponse = await ask(chat)
-      const lastMessage = chat.messages[chat.messages.length - 1]
       await storeAnswer(lastMessage.id, llmResponse)
-      chat = await getChatWithRelationsById(chat.id)
-
-      return {
-        chat,
-      }
     } catch (e) {
-      const lastMessage = chat.messages[chat.messages.length - 1]
       await storeError(lastMessage.id, e.message)
-      chat = await getChatWithRelationsById(chat.id)
+    }
 
-      return {
-        chat,
-      }
+    chat = await getChatWithRelationsById(chat.id)
+    return {
+      chat,
     }
   } catch (error) {
     if (error instanceof ZodError) {
