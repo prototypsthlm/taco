@@ -83,6 +83,15 @@ export const storeAnswer = (id: number, answer: string) => {
   })
 }
 
+export const storeError = (id: number, error: string) => {
+  return prisma.message.update({
+    where: {
+      id,
+    },
+    data: { error },
+  })
+}
+
 export const setChatName = (id: number, name: string) => {
   return prisma.chat.update({
     where: {

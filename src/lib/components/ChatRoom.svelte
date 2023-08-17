@@ -8,6 +8,7 @@
   import { slide } from 'svelte/transition'
 
   export let chat: ChatWithRelations | undefined
+  export let error: any
   let messages: ChatWithRelations['messages'] = []
 
   $: {

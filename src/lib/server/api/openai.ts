@@ -32,8 +32,9 @@ export const ask = async (chat: ChatWithRelations) => {
 
     return res.data.choices[0].message.content
   } catch (error) {
-    console.error(error)
-    throw new Error(`Error getting an answer from API: ${error}`)
+    throw new Error(
+      `(${error?.response?.status}) ChatGPT API error: ${error?.response?.statusText}`
+    )
   }
 }
 

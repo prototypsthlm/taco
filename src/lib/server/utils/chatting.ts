@@ -1,5 +1,5 @@
 import { ask, generateChatName } from '$lib/server/api/openai'
-import type { ChatWithRelations } from '$lib/server/entities/chat'
+import { storeError, type ChatWithRelations } from '$lib/server/entities/chat'
 import {
   addMessageToChat,
   createChat,
@@ -7,12 +7,12 @@ import {
   setChatName,
   storeAnswer,
 } from '$lib/server/entities/chat'
-import type { UserBySessionId } from '$lib/server/entities/user'
 import { getUserWithActiveUserTeamById } from '$lib/server/entities/user'
 import { trim } from '$lib/utils/string'
+import type { User } from '@prisma/client'
 import { z, ZodError } from 'zod'
 
-export async function sendMessage(formData: unknown, user: UserBySessionId) {
+export async function sendMessage(formData: unknown, user: User) {
   try {
     const schema = z
       .object({
@@ -45,17 +45,25 @@ export async function sendMessage(formData: unknown, user: UserBySessionId) {
     }
 
     chat = await addMessageToChat(chat, schema.message)
-    const llmResponse = await ask(chat)
+    try {
+      const llmResponse = await ask(chat)
+      const lastMessage = chat.messages[chat.messages.length - 1]
+      await storeAnswer(lastMessage.id, llmResponse)
+      chat = await getChatWithRelationsById(chat.id)
 
-    const lastMessage = chat.messages[chat.messages.length - 1]
-    await storeAnswer(lastMessage.id, llmResponse)
-    chat = await getChatWithRelationsById(chat.id)
+      return {
+        chat,
+      }
+    } catch (e) {
+      const lastMessage = chat.messages[chat.messages.length - 1]
+      await storeError(lastMessage.id, e.message)
+      chat = await getChatWithRelationsById(chat.id)
 
-    return {
-      chat,
+      return {
+        chat,
+      }
     }
   } catch (error) {
-    console.error(error)
     if (error instanceof ZodError) {
       const errors = error.flatten().fieldErrors
 

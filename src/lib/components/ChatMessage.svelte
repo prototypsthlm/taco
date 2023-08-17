@@ -6,6 +6,7 @@
   import { TrashIcon } from '@babeard/svelte-heroicons/outline'
   import { ArrowPathIcon } from '@babeard/svelte-heroicons/solid'
   import { createEventDispatcher } from 'svelte'
+  import Alert from './Alert.svelte'
 
   export let chat: ChatWithRelations | undefined
   export let message: ChatWithRelations['messages'][number]
@@ -42,6 +43,8 @@
           {@html parsedText}
         {/await}
       </div>
+    {:else if message?.error}
+      <Alert type="error" message={message?.error} />
     {:else}
       <div class="flex items-center justify-center space-x-2">
         <ArrowPathIcon class="h-6 w-6 text-white animate-spin" />
