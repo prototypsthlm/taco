@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { invalidateAll } from '$app/navigation'
+  import { goto, invalidateAll } from '$app/navigation'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import RoleSelector from '$lib/components/RoleSelector.svelte'
@@ -69,14 +69,16 @@
 
     eventSource.addEventListener('error', handleError)
 
-    eventSource.addEventListener('message', (e) => {
-      scrollToBottom()
+    eventSource.addEventListener('message', async (e) => {
       try {
-        if (e.data === '[DONE]') {
+        if (e.data.includes('[DONE]')) {
           loading = false
           answer = ''
-          console.log(e.data)
-          invalidateAll()
+          if (!chat) {
+            const chatIdJson = JSON.parse(e.data.replace('[DONE]', ''))
+            await goto(`/app/chat/${chatIdJson.chatId}`)
+          }
+          await invalidateAll()
           return
         }
 
@@ -95,13 +97,13 @@
               updatedAt: new Date(),
             } as ChatWithRelations['messages'][number],
           ]
+          scrollToBottom()
         }
       } catch (err) {
         handleError(err)
       }
     })
     eventSource.stream()
-    scrollToBottom()
   }
 
   function handleError<T>(err: T) {

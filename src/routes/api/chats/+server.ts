@@ -1,7 +1,8 @@
 import { transformChatToCompletionRequest } from '$lib/server/api/openai'
 import type { ChatWithRelations } from '$lib/server/entities/chat'
-import { createChat, getChatWithRelationsById, createMessage } from '$lib/server/entities/chat'
+import { createChat, createMessage, getChatWithRelationsById } from '$lib/server/entities/chat'
 import { decrypt } from '$lib/server/utils/crypto'
+import { decodeChunkData, encodeChunkData } from '$lib/utils/stream'
 import { error } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { RequestHandler } from './$types'
@@ -65,27 +66,31 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   let answer = ''
   const { readable, writable } = new TransformStream({
     async transform(chunk, controller) {
-      const lastData = getLastDataFromChunk(new TextDecoder().decode(chunk))
+      try {
+        const dataArray = decodeChunkData(chunk)
 
-      if (lastData === '[DONE]') {
-        try {
-          await createMessage(chat.id, schema.data.question, answer)
-        } catch (e) {
-          console.error(`Error: ${e}`)
-        }
-      } else {
-        if (lastData) {
-          const parsedLastData = JSON.parse(lastData)
+        const modifiedDataArray = await Promise.all(
+          dataArray.map(async (data) => {
+            if (data === '[DONE]') {
+              await createMessage(chat.id, schema.data.question, answer)
+              return `${data} {"chatId": ${chat.id}}`
+            }
 
-          if (parsedLastData.choices) {
-            const [{ delta }] = parsedLastData.choices
-            answer += delta.content
-          }
-        }
+            const parsedData = JSON.parse(data)
+            const [{ delta }] = parsedData.choices
+
+            if (delta?.content) {
+              answer += delta.content
+            }
+            return JSON.stringify({ ...parsedData, chatId: chat.id })
+          })
+        )
+
+        controller.enqueue(encodeChunkData(modifiedDataArray))
+      } catch (e) {
+        console.error(`Error: ${e}`)
+        controller.enqueue(chunk)
       }
-
-      // Forward the chunk to the frontend immediately
-      controller.enqueue(chunk)
     },
   })
 
@@ -96,20 +101,4 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       'Content-Type': 'text/event-stream',
     },
   })
-}
-
-const getLastDataFromChunk = (chunk: string) => {
-  // This regex looks for "data: " at the beginning of a line, captures its contents
-  // until it reaches the end of the line or two newline characters.
-  const regex = /data: (.*?)(?:\n\n|$)/gs
-
-  let match
-  let lastData
-
-  // Iterate over all matches to find the last "data:" entry in the chunk
-  while ((match = regex.exec(chunk)) !== null) {
-    lastData = match[1]
-  }
-
-  return lastData
 }
