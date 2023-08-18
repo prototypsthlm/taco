@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   if (schema.data.id) {
     try {
       chat = await getChatWithRelationsById(schema.data.id)
-      chat = await generateChatName(chat)
+      generateChatName(chat)
     } catch (e) {
       throw error(500, JSON.stringify({ error: `Error getting chat ${e}` }))
     }

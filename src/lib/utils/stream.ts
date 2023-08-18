@@ -1,6 +1,5 @@
 export const decodeChunkData = (chunk: Uint8Array) => {
   const chunkString = new TextDecoder().decode(chunk)
-  console.log({ chunkString })
 
   return chunkString
     .split('\n\n')
