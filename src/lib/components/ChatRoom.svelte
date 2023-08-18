@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto, invalidateAll } from '$app/navigation'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import RoleSelector from '$lib/components/RoleSelector.svelte'
@@ -6,39 +7,24 @@
   import { onMount } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
+  import { SSE } from 'sse.js'
 
   export let chat: ChatWithRelations | undefined
   let messages: ChatWithRelations['messages'] = []
-
-  $: {
-    messages = chat?.messages || []
-  }
-
-  function addPlaceholderMessage(event: CustomEvent<string>) {
-    const message = event.detail
-
-    messages = [
-      ...messages,
-      {
-        question: message,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as ChatWithRelations['messages'][number],
-    ]
-
-    scrollToBottom(element)
-  }
-
+  let loading = false
+  let answer = ''
   let selectedRolePrompt: string | null = 'You are a helpful assistant.'
   let element: HTMLElement
 
+  $: messages = chat?.messages || []
+
   onMount(() => {
-    scrollToBottom(element)
+    scrollToBottom()
   })
 
-  const scrollToBottom = (node: HTMLElement) => {
+  const scrollToBottom = () => {
     setTimeout(() => {
-      node?.scroll({ top: node.scrollHeight, behavior: 'smooth' })
+      element?.scroll({ top: element.scrollHeight, behavior: 'smooth' })
     }, 500)
   }
 
@@ -51,6 +37,77 @@
     } else {
       console.log(json?.error)
     }
+  }
+
+  async function handleSubmit(event: CustomEvent<{ question: string }>) {
+    const { question } = event.detail
+    loading = true
+
+    messages = [
+      ...(chat?.messages || []),
+      {
+        question,
+        answer,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as ChatWithRelations['messages'][number],
+    ]
+    scrollToBottom()
+
+    const eventSource = new SSE('/api/chats', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      payload: JSON.stringify({
+        id: chat?.id,
+        role: selectedRolePrompt,
+        question,
+      }),
+    })
+
+    eventSource.addEventListener('error', handleError)
+
+    eventSource.addEventListener('message', async (e) => {
+      try {
+        if (e.data.includes('[DONE]')) {
+          loading = false
+          answer = ''
+          if (!chat) {
+            const chatIdJson = JSON.parse(e.data.replace('[DONE]', ''))
+            await goto(`/app/chat/${chatIdJson.chatId}`)
+          }
+          await invalidateAll()
+          scrollToBottom()
+          return
+        }
+
+        const completionResponse = JSON.parse(e.data)
+        const [{ delta }] = completionResponse.choices
+
+        if (delta.content) {
+          answer += delta.content
+
+          messages = [
+            ...(chat?.messages || []),
+            {
+              question,
+              answer,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            } as ChatWithRelations['messages'][number],
+          ]
+          scrollToBottom()
+        }
+      } catch (err) {
+        handleError(err)
+      }
+    })
+    eventSource.stream()
+  }
+
+  function handleError<T>(err: T) {
+    loading = false
+    console.error(err)
   }
 </script>
 
@@ -79,6 +136,6 @@
   {/if}
 
   <div class="self-end py-3 md:py-6 w-full bg-gray-900">
-    <ChatInput chatId={chat?.id} role={selectedRolePrompt} on:message={addPlaceholderMessage} />
+    <ChatInput {loading} on:message={handleSubmit} />
   </div>
 </div>

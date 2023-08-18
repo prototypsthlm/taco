@@ -47,6 +47,7 @@
     "prisma": "^5.1.0",
     "remark": "^14.0.3",
     "remark-html": "^15.0.2",
+    "sse.js": "^0.6.1",
     "svelte": "^3.54.0",
     "svelte-autosize": "^1.1.0",
     "svelte-check": "^3.0.1",

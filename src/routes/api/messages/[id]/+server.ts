@@ -11,14 +11,13 @@ export const DELETE: RequestHandler = async ({ params }) => {
     .safeParse(params)
 
   if (!schema.success) {
-    throw error(422, json({ errors: schema.error.flatten().fieldErrors }))
+    throw error(422, JSON.stringify({ errors: schema.error.flatten().fieldErrors }))
   }
 
   try {
     await deleteMessage(schema.data.id)
+    return json({ success: true })
   } catch (e) {
-    throw error(500, json({ error: `${e}` }))
+    throw error(500, JSON.stringify({ error: `${e}` }))
   }
-
-  return json({ success: true })
 }
