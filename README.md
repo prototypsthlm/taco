@@ -1,5 +1,7 @@
 # TACO (Team AI Chat pOrtal) 🌀
 
+A helpful frontend for ChatGPT with the possibility to share the API key with the whole team. 
+
 ## Developing
 
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install`
@@ -11,29 +13,6 @@ npm run dev
 # or start the server and open the app in a new browser tab
 npm run dev -- --open
 ```
-
-### Helpers
-
-run
-
-```
-npx prisma studio
-```
-
-to get a browser view of the database
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for
-> your target environment.
 
 ## Prisma Setup
 
@@ -73,6 +52,29 @@ the `.env` file before running the migration and seed commands.
 
 For more information on Prisma and its usage, refer to
 the [Prisma documentation](https://www.prisma.io/docs/).
+
+### Helpers
+
+run
+
+```
+npx prisma studio
+```
+
+to get a browser view of the database
+
+## Building
+
+To create a production version of your app:
+
+```bash
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for
+> your target environment.
 
 ## Tailwind UI
 
