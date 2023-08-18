@@ -51,6 +51,7 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
 export const actions: Actions = {
   updateTeamDetails: async ({ request, params, locals }) => {
     const fields = Object.fromEntries(await request.formData())
+    const teamId = Number(params.id)
     try {
       const schema = z
         .object({
@@ -59,7 +60,7 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      if (!(await isUserAdmin(Number(params.id), locals.currentUser.id))) {
+      if (!(await isUserAdmin(teamId, locals.currentUser.id))) {
         return fail(422, {
           keySection: {
             fields,
@@ -69,7 +70,7 @@ export const actions: Actions = {
       }
 
       const team = await getTeamByName(schema.name)
-      if (team) {
+      if (team && team.id !== teamId) {
         return fail(409, {
           keySection: {
             fields,
@@ -78,7 +79,7 @@ export const actions: Actions = {
         })
       }
 
-      await updateTeam(Number(params.id), schema.name, schema.openAiApiKey ?? null)
+      await updateTeam(teamId, schema.name, schema.openAiApiKey ?? null)
 
       return {
         keySection: {
