@@ -4,22 +4,24 @@
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import RoleSelector from '$lib/components/RoleSelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
-  import { onMount } from 'svelte'
+  import { onDestroy, onMount } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
   import { SSE } from 'sse.js'
 
-  export let chat: ChatWithRelations | undefined
-  let messages: ChatWithRelations['messages'] = []
+  export let chat: ChatWithRelations | undefined = undefined
+
   let loading = false
-  let answer = ''
   let selectedRolePrompt: string | null = 'You are a helpful assistant.'
   let element: HTMLElement
-
-  $: messages = chat?.messages || []
+  let eventSource: SSE | undefined
 
   onMount(() => {
     scrollToBottom()
+  })
+
+  onDestroy(() => {
+    eventSource?.close()
   })
 
   const scrollToBottom = () => {
@@ -32,7 +34,7 @@
     const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' })
 
     const json = await res.json()
-    if (json?.success && chat) {
+    if (json?.success && chat?.messages) {
       chat.messages = chat.messages.filter((x) => x.id !== id)
     } else {
       console.log(json?.error)
@@ -43,18 +45,7 @@
     const { question } = event.detail
     loading = true
 
-    messages = [
-      ...(chat?.messages || []),
-      {
-        question,
-        answer,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as ChatWithRelations['messages'][number],
-    ]
-    scrollToBottom()
-
-    const eventSource = new SSE('/api/chats', {
+    eventSource = new SSE('/api/chats', {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -71,31 +62,20 @@
       try {
         if (e.data.includes('[DONE]')) {
           loading = false
-          answer = ''
           if (!chat) {
-            const chatIdJson = JSON.parse(e.data.replace('[DONE]', ''))
-            await goto(`/app/chat/${chatIdJson.chatId}`)
+            const chatJson = JSON.parse(e.data.replace('[DONE]', ''))
+            await goto(`/app/chat/${chatJson.chat.id}`)
           }
           await invalidateAll()
           scrollToBottom()
+          eventSource?.close()
           return
         }
 
-        const completionResponse = JSON.parse(e.data)
-        const [{ delta }] = completionResponse.choices
+        const data = JSON.parse(e.data)
 
-        if (delta.content) {
-          answer += delta.content
-
-          messages = [
-            ...(chat?.messages || []),
-            {
-              question,
-              answer,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            } as ChatWithRelations['messages'][number],
-          ]
+        if (data.chat) {
+          chat = data.chat
           scrollToBottom()
         }
       } catch (err) {
@@ -112,7 +92,7 @@
 </script>
 
 <div class="flex flex-col justify-between items-center h-full w-full">
-  {#if !messages.length}
+  {#if !chat?.messages?.length}
     <div class="flex flex-col gap-4 justify-center items-center grow h-full">
       <h1 class="text-accent text-5xl font-bold">New Chat!</h1>
       <p class="text-accent text-2xl">Choose your LLM personality</p>
@@ -121,7 +101,7 @@
     </div>
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-scroll">
-      {#each messages as message (message.id)}
+      {#each chat?.messages as message (message.id)}
         <div out:slide animate:flip={{ duration: (d) => d * 1.2 }}>
           <ChatMessage
             {chat}

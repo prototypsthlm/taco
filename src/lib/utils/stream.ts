@@ -16,3 +16,22 @@ export const encodeChunkData = (data: string[]) => {
   })
   return new TextEncoder().encode(`${formatted.join('\n\n')}\n\n`)
 }
+
+export type Delta = {
+  choices: [{ delta: { content?: string } }]
+}
+
+export const extractDelta = (data: Delta) => {
+  try {
+    const [{ delta }] = data.choices
+
+    if (delta?.content) {
+      return delta.content
+    }
+
+    return ''
+  } catch (e) {
+    console.error('extractDelta.e', e)
+    return data
+  }
+}
