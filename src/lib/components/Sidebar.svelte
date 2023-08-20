@@ -8,7 +8,7 @@
   export let user: UserWithUserTeamsActiveTeamAndChats
 </script>
 
-<aside class="flex flex-col grow overflow-hidden">
+<aside class="flex flex-col grow overflow-hidden h-full">
   {#if user.activeUserTeam}
     <a href="/app/settings/teams" class="flex justify-between items-center pb-6 w-full">
       <div class="flex gap-2 items-center">
