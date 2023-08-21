@@ -1,4 +1,4 @@
-# TACO (Team AI Chat pOrtal) 🌀
+# TACO (Team AI Chat pOrtal) 🌮
 
 A helpful frontend for ChatGPT with the possibility to share the API key with the whole team.
 
