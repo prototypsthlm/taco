@@ -14,13 +14,15 @@
     "format": "prettier --plugin-search-dir . --write .",
     "test": "npm run test:integration && npm run test:unit",
     "test:integration": "playwright test",
-    "test:unit": "vitest"
+    "test:unit": "vitest",
+    "m:gen": "prisma migrate dev --create-only",
+    "m:apply": "prisma migrate deploy"
   },
   "dependencies": {
     "@babeard/svelte-heroicons": "^2.0.0-rc.0",
     "@faker-js/faker": "^8.0.2",
     "@playwright/test": "^1.35.1",
-    "@prisma/client": "^5.1.0",
+    "@prisma/client": "^5.1.1",
     "@rgossiaux/svelte-headlessui": "^2.0.0",
     "@sveltejs/adapter-auto": "^2.0.0",
     "@sveltejs/adapter-node": "^1.2.4",
@@ -44,7 +46,7 @@
     "postcss": "^8.4.24",
     "prettier": "^2.8.8",
     "prettier-plugin-svelte": "^2.8.1",
-    "prisma": "^5.1.0",
+    "prisma": "^5.1.1",
     "remark": "^14.0.3",
     "remark-html": "^15.0.2",
     "sse.js": "^0.6.1",
