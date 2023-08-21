@@ -1,16 +1,14 @@
 <script lang="ts">
-  import { page } from '$app/stores'
   import ChatLink from '$lib/components/ChatLink.svelte'
   import Gravatar from '$lib/components/Gravatar.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
-  import { resetToNewChat } from '$lib/stores/chat'
   import { PlusIcon } from '@babeard/svelte-heroicons/solid'
   import ChevronRight from '@babeard/svelte-heroicons/solid/ChevronRight'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
 </script>
 
-<aside class="flex flex-col grow overflow-hidden">
+<aside class="flex flex-col grow overflow-hidden h-full">
   {#if user.activeUserTeam}
     <a href="/app/settings/teams" class="flex justify-between items-center pb-6 w-full">
       <div class="flex gap-2 items-center">
@@ -25,9 +23,6 @@
     {#if user?.activeUserTeam?.chats?.length}
       <a
         href="/app"
-        on:click={() => {
-          if ($page.route.id === '/app') $resetToNewChat = true
-        }}
         class="mb-2 px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl border-2 border-white border-opacity-20"
       >
         <div class="flex items-center gap-x-3">

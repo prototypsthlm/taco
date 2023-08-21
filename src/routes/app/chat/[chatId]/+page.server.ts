@@ -14,10 +14,9 @@ export const load: PageServerLoad = async ({ params }) => {
 }
 
 export const actions: Actions = {
-  deleteChat: async ({ locals, request }) => {
+  deleteChat: async ({ locals: { currentUser }, request }) => {
     const data = Object.fromEntries(await request.formData())
     const chatId = Number(data.chatId)
-    const currentUser = locals.currentUser
 
     if (!(await isUserOwningChat(chatId, currentUser.id))) {
       return fail(401, { message: `You don't own the chat ${chatId}` })
