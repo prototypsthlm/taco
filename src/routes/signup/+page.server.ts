@@ -22,27 +22,10 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      let user
-      try {
-        user = await createUser(schema.name, schema.email, schema.password)
-      } catch (error) {
-        // unique constraint error
-        if (error instanceof PrismaClientKnownRequestError && error?.code === 'P2002') {
-          return fail(422, {
-            fields,
-            errors: {
-              email: ['Email already exists'],
-            },
-          })
-        }
-        return fail(500, {
-          fields,
-          error: `${error}`,
-        })
-      }
+      const { sessionId } = await createUser(schema.name, schema.email, schema.password)
 
-      if (user.sessionId) {
-        cookies.set('session_id', user.sessionId, {
+      if (sessionId) {
+        cookies.set('session_id', sessionId, {
           path: '/',
           httpOnly: true,
           sameSite: 'strict',
@@ -55,6 +38,15 @@ export const actions: Actions = {
         return fail(422, {
           fields,
           errors: error.flatten().fieldErrors,
+        })
+      }
+
+      if (error instanceof PrismaClientKnownRequestError && error?.code === 'P2002') {
+        return fail(422, {
+          fields,
+          errors: {
+            email: ['Email already exists'],
+          },
         })
       }
 
