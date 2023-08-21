@@ -22,5 +22,4 @@ export const isUserOwningChat = async (chatId: number, userId: number) => {
 
 export const escapeUserSecrets = (user: User) => {
   user.password = null
-  user.sessionId = null
 }
