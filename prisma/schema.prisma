@@ -31,7 +31,7 @@ model User {
 model UserSession {
   id Int @id @default(autoincrement())
 
-  sessionId String? @unique
+  sessionId String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
