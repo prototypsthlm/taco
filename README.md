@@ -98,3 +98,7 @@ We control the dark mode toggling here: `src/routes/+layout.svelte`.
 
 We use zod validation library to validate forms. See settings and auth routes for ref. There is
 probably a good opportunity for an abstraction there given we use everywhere the same pattern.
+
+## Contribution
+
+Your are very welcome to do any kind of contribution that being issue reporting, code contribution or feature requests! Please take a look into the issue section of this repo to make sure your request isn't already existing. If not feel free to create an issue and tag it with suiting labels.
