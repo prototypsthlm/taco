@@ -51,37 +51,28 @@ export const getUserIfCredentialsMatch = async (email: string, password: string)
   return user
 }
 
-export const setSessionId = (id: number) => {
-  return prisma.user.update({
-    data: {
-      userSessions: {
-        create: {
-          sessionId: generateSessionId(),
-        },
-      },
-    },
-    where: {
-      id,
-    },
-  })
-}
-
 export const createUser = async (name: string, email: string, password: string) => {
   const user = await prisma.user.create({
     data: {
       email,
       name,
-      userSessions: {
-        create: {
-          sessionId: generateSessionId(),
-        },
-      },
       password: await bcrypt.hash(password, 10),
+    },
+    include: {
+      userSessions: true,
     },
   })
   escapeUserSecrets(user)
   return user
 }
+
+export const createUserSession = (userId: number) =>
+  prisma.userSession.create({
+    data: {
+      userId,
+      sessionId: generateSessionId(),
+    },
+  })
 
 export const updateUserPersonalData = (id: number, name: string, email: string) =>
   prisma.user.update({
