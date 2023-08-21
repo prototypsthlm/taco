@@ -32,15 +32,17 @@
           name="message"
           bind:value={question}
           on:keydown={(e) => {
-            if (e.key === 'Enter') {
-              if (!isShiftPressed && question.trim()) {
-                dispatchMessage()
-                e.preventDefault()
-              }
-            } else if (e.key === 'Shift') isShiftPressed = true
+            if (e.key === 'Enter' && !isShiftPressed && question.trim() && !loading) {
+              dispatchMessage()
+              e.preventDefault()
+            } else if (e.key === 'Shift') {
+              isShiftPressed = true
+            }
           }}
           on:keyup={(e) => {
-            if (e.key === 'Shift') isShiftPressed = false
+            if (e.key === 'Shift') {
+              isShiftPressed = false
+            }
           }}
           placeholder="Type your message"
           class="no-border w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white max-h-96"
