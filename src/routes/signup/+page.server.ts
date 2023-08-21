@@ -11,7 +11,7 @@ export const actions: Actions = {
       const schema = z
         .object({
           name: z.string().min(1),
-          email: z.string().email(),
+          email: z.string().email().toLowerCase(),
           password: z.string().min(6),
           confirmPassword: z.string().min(6),
         })
