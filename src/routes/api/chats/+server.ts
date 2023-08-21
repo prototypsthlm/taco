@@ -4,8 +4,13 @@ import {
   transformChatToCompletionRequest,
 } from '$lib/server/api/openai'
 import type { ChatWithRelations } from '$lib/server/entities/chat'
-import { createChat, createMessage, getChatWithRelationsById } from '$lib/server/entities/chat'
-import { decodeChunkData, encodeChunkData } from '$lib/utils/stream'
+import {
+  addQuestionToChat,
+  createChat,
+  getChatWithRelationsById,
+  storeAnswer,
+} from '$lib/server/entities/chat'
+import { decodeChunkData, encodeChunkData, extractDelta } from '$lib/utils/stream'
 import { error } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { RequestHandler } from './$types'
@@ -42,7 +47,6 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   }
 
   const chatRequest = transformChatToCompletionRequest(chat, schema.data.question, true)
-
   const chatResponse = await fetch('https://api.openai.com/v1/chat/completions', {
     headers: {
       Authorization: `Bearer ${getApiKey(chat)}`,
@@ -57,40 +61,59 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     throw error(500, JSON.stringify({ error: `OpenAI API Error: ${err.error.message}` }))
   }
 
-  let answer = ''
-  const { readable, writable } = new TransformStream({
-    async transform(chunk, controller) {
-      try {
-        const dataArray = decodeChunkData(chunk)
+  const stream = new ReadableStream({
+    async start(controller) {
+      controller.enqueue(encodeChunkData([JSON.stringify({ chat })]))
 
-        const modifiedDataArray = await Promise.all(
-          dataArray.map(async (data) => {
-            if (data === '[DONE]') {
-              await createMessage(chat.id, schema.data.question, answer)
-              return `${data} {"chatId": ${chat.id}}`
-            }
+      const chatResponseReader = chatResponse.body?.getReader()
+      chat = await addQuestionToChat(chat.id, schema.data.question)
+      const lastMessage = chat.messages[chat.messages.length - 1]
+      lastMessage.answer = ''
+      const readAndEnqueue = async () => {
+        if (!chatResponseReader) return
 
-            const parsedData = JSON.parse(data)
-            const [{ delta }] = parsedData.choices
+        const { value, done } = await chatResponseReader.read()
 
-            if (delta?.content) {
-              answer += delta.content
-            }
-            return JSON.stringify({ ...parsedData, chatId: chat.id })
-          })
-        )
+        if (done) {
+          controller.close()
+          return
+        }
 
-        controller.enqueue(encodeChunkData(modifiedDataArray))
-      } catch (e) {
-        console.error(`Streaming Error: ${e}`)
-        controller.enqueue(chunk)
+        try {
+          const dataArray = decodeChunkData(value)
+
+          const modifiedDataArray = await Promise.all(
+            dataArray.map(async (data) => {
+              if (data === '[DONE]') {
+                if (lastMessage?.answer) {
+                  await storeAnswer(lastMessage.id, lastMessage.answer)
+                }
+                return `[DONE] ${JSON.stringify({ chat })}`
+              }
+
+              const parsedData = JSON.parse(data)
+              lastMessage.answer! += extractDelta(parsedData)
+
+              return JSON.stringify({ chat })
+            })
+          )
+
+          controller.enqueue(encodeChunkData(modifiedDataArray))
+        } catch (e) {
+          console.error(`Streaming Error: ${e}`)
+          controller.enqueue(value)
+        }
+
+        // controller.enqueue(value)
+        await readAndEnqueue()
       }
+
+      // Initiate the reading/enqueueing
+      await readAndEnqueue()
     },
   })
 
-  chatResponse.body.pipeThrough({ writable, readable })
-
-  return new Response(readable, {
+  return new Response(stream, {
     headers: {
       'Content-Type': 'text/event-stream',
     },

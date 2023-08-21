@@ -1,10 +1,9 @@
 <script lang="ts">
   import ChatRoom from '$lib/components/ChatRoom.svelte'
 
-  import type { PageData, ActionData } from './$types'
+  import type { PageData } from './$types'
 
   export let data: PageData
-  export let form: ActionData
 </script>
 
-<ChatRoom chat={form?.chat || data?.chat} />
+<ChatRoom chat={data.chat} />

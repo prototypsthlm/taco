@@ -24,9 +24,10 @@ export const getClient = (chat: ChatWithRelations) => {
 
 export const generateChatName = async (chat: ChatWithRelations) => {
   if (chat.messages.every((x) => !x.answer)) {
-    throw new Error(
+    console.error(
       'API Error: At least one message completed (question and answer) is needed to generate a title.'
     )
+    return chat
   }
 
   const client = getClient(chat)
@@ -36,7 +37,8 @@ export const generateChatName = async (chat: ChatWithRelations) => {
   )
 
   if (!res.data.choices[0].message?.content) {
-    throw new Error('API Error: no content.')
+    console.error('API Error: no content.')
+    return chat
   }
 
   let name = res.data.choices[0].message.content

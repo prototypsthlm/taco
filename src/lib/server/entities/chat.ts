@@ -81,12 +81,6 @@ export const storeAnswer = (id: number, answer: string) => {
   })
 }
 
-export const createMessage = (chatId: number, question: string, answer: string) => {
-  return prisma.message.create({
-    data: { chatId, question, answer },
-  })
-}
-
 export const setChatName = (id: number, name: string) => {
   return prisma.chat.update({
     where: {

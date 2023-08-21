@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
-  import { createEventDispatcher, afterUpdate } from 'svelte'
+  import { createEventDispatcher, afterUpdate, onMount } from 'svelte'
   import autosize from 'svelte-autosize'
 
   let question = ''
@@ -14,6 +14,9 @@
   }
 
   let textareaRef: HTMLTextAreaElement
+  onMount(() => {
+    textareaRef.focus()
+  })
   afterUpdate(() => {
     textareaRef.focus()
   })

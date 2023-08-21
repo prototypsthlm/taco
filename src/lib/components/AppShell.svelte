@@ -80,7 +80,9 @@
   </TransitionRoot>
 
   <!-- Static sidebar for desktop -->
-  <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r-2 border-gray-800">
+  <div
+    class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r-2 border-gray-800"
+  >
     <!-- Sidebar component, swap this element with another sidebar if you like -->
     <div class="flex grow flex-col gap-y-5 bg-gray-900 h-screen">
       <div class="flex h-20 items-center pl-6">
@@ -90,7 +92,7 @@
       </div>
       <nav class="flex flex-col overflow-hidden h-full">
         <div class="flex flex-col gap-y-7 overflow-hidden h-full">
-          <div class="px-4">
+          <div class="px-4 h-full">
             <slot name="sidebar" />
           </div>
           <div class="mt-auto">
