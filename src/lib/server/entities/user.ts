@@ -21,8 +21,14 @@ export const getUserWithRelationsById = async (id: number) => {
 export type UserBySessionId = Awaited<ReturnType<typeof getUserBySessionId>>
 
 export const getUserBySessionId = (sessionId: string) =>
-  prisma.user.findUniqueOrThrow({
-    where: { sessionId },
+  prisma.user.findFirstOrThrow({
+    where: {
+      userSessions: {
+        some: {
+          sessionId: sessionId,
+        },
+      },
+    },
     include: {
       activeUserTeam: true,
     },
@@ -46,7 +52,18 @@ export const getUserIfCredentialsMatch = async (email: string, password: string)
 }
 
 export const setSessionId = (id: number) => {
-  return prisma.user.update({ data: { sessionId: generateSessionId() }, where: { id } })
+  return prisma.user.update({
+    data: {
+      userSessions: {
+        create: {
+          sessionId: generateSessionId(),
+        },
+      },
+    },
+    where: {
+      id,
+    },
+  })
 }
 
 export const createUser = async (name: string, email: string, password: string) => {
@@ -54,7 +71,11 @@ export const createUser = async (name: string, email: string, password: string) 
     data: {
       email,
       name,
-      sessionId: generateSessionId(),
+      userSessions: {
+        create: {
+          sessionId: generateSessionId(),
+        },
+      },
       password: await bcrypt.hash(password, 10),
     },
   })
@@ -129,17 +150,6 @@ export const getUserWithChatsById = async (id: number) => {
           chats: { orderBy: { updatedAt: 'desc' } },
         },
       },
-    },
-  })
-  escapeUserSecrets(user)
-  return user
-}
-
-export const getUserWithActiveUserTeamById = async (id: number) => {
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id },
-    include: {
-      activeUserTeam: true,
     },
   })
   escapeUserSecrets(user)
