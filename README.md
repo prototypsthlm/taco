@@ -1,6 +1,6 @@
-# TACO (Team AI Chat pOrtal) 🌀
+# TACO (Team AI Chat pOrtal) 🌮
 
-A helpful frontend for ChatGPT with the possibility to share the API key with the whole team. 
+A helpful frontend for ChatGPT with the possibility to share the API key with the whole team.
 
 ## Developing
 
@@ -21,28 +21,28 @@ Follow these steps to initialize Prisma in your project:
 1. Start by running Docker Compose to set up the PostgreSQL database for your development
    environment:
 
-   ```bash
-   docker-compose up -d
-   ```
+    ```bash
+    docker-compose up -d
+    ```
 
 2. Copy the `.env.example` file to `.env`:
 
-   ```bash
-   cp .env.example .env
-   ```
+    ```bash
+    cp .env.example .env
+    ```
 
 3. Run the Prisma migration command to apply database schema changes:
 
-   ```bash
-   npx prisma migrate dev
-   ```
+    ```bash
+    npx prisma migrate dev
+    ```
 
 4. (Optional) Seed the database with initial data (no need to manually do it, since it's done
    automatically by the migrate command):
 
-   ```bash
-   npx prisma db seed
-   ```
+    ```bash
+    npx prisma db seed
+    ```
 
 5. Your Prisma setup is now complete! You can start using the Prisma client in your application code
    to interact with the database.
@@ -98,3 +98,7 @@ We control the dark mode toggling here: `src/routes/+layout.svelte`.
 
 We use zod validation library to validate forms. See settings and auth routes for ref. There is
 probably a good opportunity for an abstraction there given we use everywhere the same pattern.
+
+## Contribution
+
+Your are very welcome to do any kind of contribution that being issue reporting, code contribution or feature requests! Please take a look into the issue section of this repo to make sure your request isn't already existing. If not feel free to create an issue and tag it with suiting labels.
