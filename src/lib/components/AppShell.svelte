@@ -84,30 +84,22 @@
     class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r-2 border-gray-800"
   >
     <!-- Sidebar component, swap this element with another sidebar if you like -->
-    <div class="flex grow flex-col gap-y-5 bg-gray-900 h-screen">
-      <div class="flex h-20 items-center pl-6">
-        <a class="text-white text-2xl" href="/app">
-          <TacoIcon class="h-12 w-auto" />
-        </a>
+    <nav class="flex flex-col justify-between gap-y-4 bg-gray-900 h-screen">
+      <a class="flex h-20 pt-3 items-center pl-8 text-white text-2xl" href="/app">
+        <TacoIcon class="h-12 w-auto" />
+      </a>
+      <div class="flex flex-col overflow-hidden px-4">
+        <slot name="sidebar" />
       </div>
-      <nav class="flex flex-col overflow-hidden h-full">
-        <div class="flex flex-col gap-y-7 overflow-hidden h-full">
-          <div class="px-4 h-full">
-            <slot name="sidebar" />
-          </div>
-          <div class="mt-auto">
-            <a
-              href="/app/settings"
-              class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
-            >
-              <Gravatar class="h-8 w-8 rounded-full bg-gray-800" value={user.email} />
-              <span class="sr-only">Your profile</span>
-              <span aria-hidden="true">{user.name}</span>
-            </a>
-          </div>
-        </div>
-      </nav>
-    </div>
+      <a
+        href="/app/settings"
+        class="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-white hover:bg-gray-800"
+      >
+        <Gravatar class="h-8 w-8 rounded-full bg-gray-800" value={user.email} />
+        <span class="sr-only">Your profile</span>
+        <span aria-hidden="true">{user.name}</span>
+      </a>
+    </nav>
   </div>
 
   <div
