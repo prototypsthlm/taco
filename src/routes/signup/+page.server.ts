@@ -3,6 +3,7 @@ import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
 import { dev } from '$app/environment'
 import { fail, redirect } from '@sveltejs/kit'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
@@ -21,10 +22,27 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      const { sessionId } = await createUser(schema.name, schema.email, schema.password)
+      let user
+      try {
+        user = await createUser(schema.name, schema.email, schema.password)
+      } catch (error) {
+        // unique constraint error
+        if (error instanceof PrismaClientKnownRequestError && error?.code === 'P2002') {
+          return fail(422, {
+            fields,
+            errors: {
+              email: ['Email already exists'],
+            },
+          })
+        }
+        return fail(500, {
+          fields,
+          error: `${error}`,
+        })
+      }
 
-      if (sessionId) {
-        cookies.set('session_id', sessionId, {
+      if (user.sessionId) {
+        cookies.set('session_id', user.sessionId, {
           path: '/',
           httpOnly: true,
           sameSite: 'strict',
@@ -34,11 +52,10 @@ export const actions: Actions = {
       }
     } catch (error) {
       if (error instanceof ZodError) {
-        const errors = error.flatten().fieldErrors
-
+        console.log(error.flatten().fieldErrors)
         return fail(422, {
           fields,
-          errors,
+          errors: error.flatten().fieldErrors,
         })
       }
 
