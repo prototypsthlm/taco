@@ -16,7 +16,8 @@
     "test:integration": "playwright test",
     "test:unit": "vitest",
     "m:gen": "prisma migrate dev --create-only",
-    "m:apply": "prisma migrate deploy"
+    "m:apply:dev": "prisma migrate dev",
+    "m:apply:prod": "prisma migrate deploy"
   },
   "dependencies": {
     "@babeard/svelte-heroicons": "^2.0.0-rc.0",
