@@ -34,6 +34,19 @@ export const getUserBySessionId = (sessionId: string) =>
     },
   })
 
+export const getUserByEmail = (email: string) =>
+  prisma.user.findUnique({
+    where: { email },
+  })
+
+export const addResetTokenToUser = (resetToken: string, userId: number) =>
+  prisma.user.update({
+    where: { id: userId },
+    data: {
+      resetToken,
+    },
+  })
+
 export const getUserIfCredentialsMatch = async (email: string, password: string) => {
   const user = await prisma.user.findUnique({ where: { email } })
 
