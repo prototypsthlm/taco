@@ -15,12 +15,12 @@
     }
   }
 
-  let textareaRef: HTMLTextAreaElement
+  let textarea: HTMLTextAreaElement
   onMount(() => {
-    textareaRef.focus()
+    textarea.focus()
   })
   afterUpdate(() => {
-    textareaRef.focus()
+    textarea.focus()
   })
 </script>
 
@@ -29,7 +29,7 @@
     <div class="flex w-5/6 max-w-5xl shadow-xl">
       <div class="flex justify-centermin-h-[4rem] w-full bg-primary rounded-l-xl">
         <textarea
-          bind:this={textareaRef}
+          bind:this={textarea}
           rows="1"
           name="message"
           bind:value={question}
