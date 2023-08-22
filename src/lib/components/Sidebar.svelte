@@ -10,7 +10,7 @@
 
 <aside class="flex flex-col grow overflow-hidden h-full">
   {#if user.activeUserTeam}
-    <a href="/app/settings/teams" class="flex justify-between items-center pb-6 w-full">
+    <a href="/app/settings/teams" class="flex justify-between items-center pb-6 px-2 w-full">
       <div class="flex gap-2 items-center">
         <Gravatar class="w-8 h-8 rounded-lg" value={user.activeUserTeam.team?.name} />
         <div class="flex flex-col items-start leading-none">
@@ -23,11 +23,11 @@
     {#if user?.activeUserTeam?.chats?.length}
       <a
         href="/app"
-        class="mb-2 px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl border-2 border-white border-opacity-20"
+        class="mb-2 px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-lg border-2 border-white border-opacity-20"
       >
         <div class="flex items-center gap-x-3">
           <PlusIcon class="h-6 w-6 text-white flex-none" />
-          <h3 class="flex-auto truncate text-md font-semibold leading-6 text-white">New Chat</h3>
+          <h3 class="flex-auto truncate text-lg font-semibold leading-6 text-white">New Chat</h3>
         </div>
       </a>
       <ul class="overflow-scroll grow flex flex-col gap-2 pt-4">
