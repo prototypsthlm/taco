@@ -39,7 +39,12 @@ export const getUserByEmail = (email: string) =>
     where: { email },
   })
 
-export const addResetTokenToUser = (resetToken: string, userId: number) =>
+export const getUserByResetToken = (resetToken: string) =>
+  prisma.user.findUnique({
+    where: { resetToken },
+  })
+
+export const updateResetTokenToUser = (userId: number, resetToken: string | null) =>
   prisma.user.update({
     where: { id: userId },
     data: {

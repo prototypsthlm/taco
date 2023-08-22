@@ -1,4 +1,4 @@
-import { addResetTokenToUser, getUserByEmail } from '$lib/server/entities/user'
+import { updateResetTokenToUser, getUserByEmail } from '$lib/server/entities/user'
 import postmark from '$lib/server/postmark'
 import { fail } from '@sveltejs/kit'
 import { randomUUID } from 'crypto'
@@ -25,7 +25,7 @@ export const actions: Actions = {
       }
 
       const uuid = randomUUID()
-      user = await addResetTokenToUser(uuid, user.id)
+      user = await updateResetTokenToUser(user.id, uuid)
       const resetUrl = `${url.origin}/reset-password/${uuid}`
 
       await postmark.sendEmail({
@@ -53,6 +53,9 @@ export const actions: Actions = {
     }
 
     return {
+      fields: {
+        email: '',
+      },
       success: 'Password reset email sent.',
     }
   },
