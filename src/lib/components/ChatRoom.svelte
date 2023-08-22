@@ -1,13 +1,14 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation'
+  import { page } from '$app/stores'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import RoleSelector from '$lib/components/RoleSelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
+  import { SSE } from 'sse.js'
   import { onDestroy, onMount } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
-  import { SSE } from 'sse.js'
 
   export let chat: ChatWithRelations | undefined = undefined
 
@@ -62,9 +63,8 @@
       try {
         if (e.data.includes('[DONE]')) {
           loading = false
-          if (!chat) {
-            const chatJson = JSON.parse(e.data.replace('[DONE]', ''))
-            await goto(`/app/chat/${chatJson.chat.id}`)
+          if (!$page.url.href.endsWith(`/app/chat/${chat?.id}`)) {
+            await goto(`/app/chat/${chat?.id}`)
           }
           await invalidateAll()
           scrollToBottom()
