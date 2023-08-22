@@ -37,7 +37,7 @@
     if (json?.success && chat?.messages) {
       chat.messages = chat.messages.filter((x) => x.id !== id)
     } else {
-      console.log(json?.error)
+      console.error(json?.error)
     }
   }
 
