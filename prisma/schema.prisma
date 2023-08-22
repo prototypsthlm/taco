@@ -16,7 +16,7 @@ model User {
   email      String  @unique
   name       String
   password   String?
-  resetToken String?
+  resetToken String? @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
