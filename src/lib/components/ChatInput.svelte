@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
-  import { createEventDispatcher, afterUpdate, onMount } from 'svelte'
+  import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
   import autosize from 'svelte-autosize'
 
   let question = ''
@@ -49,6 +49,7 @@
           placeholder="Type your message"
           class="no-border w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white max-h-96"
           use:autosize
+          on:focus={() => dispatch('focus')}
         />
       </div>
       <button
