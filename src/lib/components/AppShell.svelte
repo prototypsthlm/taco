@@ -88,7 +88,7 @@
       <a class="flex h-20 pt-3 items-center pl-8 text-white text-2xl" href="/app">
         <TacoIcon class="h-12 w-auto" />
       </a>
-      <div class="flex flex-col overflow-hidden px-4">
+      <div class="grow overflow-hidden px-4">
         <slot name="sidebar" />
       </div>
       <a
