@@ -1,4 +1,4 @@
-import { createUser } from '$lib/server/entities/user'
+import { createUser, createUserSession } from '$lib/server/entities/user'
 import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
 import { dev } from '$app/environment'
@@ -22,17 +22,16 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      const { sessionId } = await createUser(schema.name, schema.email, schema.password)
+      const user = await createUser(schema.name, schema.email, schema.password)
+      const { sessionId } = await createUserSession(user.id)
 
-      if (sessionId) {
-        cookies.set('session_id', sessionId, {
-          path: '/',
-          httpOnly: true,
-          sameSite: 'strict',
-          secure: !dev,
-          maxAge: 60 * 60 * 24 * 7, // one week
-        })
-      }
+      cookies.set('session_id', sessionId, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: !dev,
+        maxAge: 60 * 60 * 24 * 7, // one week
+      })
     } catch (error) {
       if (error instanceof ZodError) {
         return fail(422, {

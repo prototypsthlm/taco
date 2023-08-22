@@ -1,5 +1,5 @@
 import { dev } from '$app/environment'
-import { getUserIfCredentialsMatch, setSessionId } from '$lib/server/entities/user'
+import { getUserIfCredentialsMatch, createUserSession } from '$lib/server/entities/user'
 import { fail, redirect } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
@@ -25,9 +25,9 @@ export const actions: Actions = {
         })
       }
 
-      const { sessionId } = await setSessionId(maybeUser.id)
+      const { sessionId } = await createUserSession(maybeUser.id)
 
-      cookies.set('session_id', sessionId || '', {
+      cookies.set('session_id', sessionId, {
         path: '/',
         httpOnly: true,
         sameSite: 'strict',
