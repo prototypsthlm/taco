@@ -3,6 +3,7 @@ import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
 import { dev } from '$app/environment'
 import { fail, redirect } from '@sveltejs/kit'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
@@ -11,7 +12,7 @@ export const actions: Actions = {
       const schema = z
         .object({
           name: z.string().min(1),
-          email: z.string().email(),
+          email: z.string().email().toLowerCase(),
           password: z.string().min(6),
           confirmPassword: z.string().min(6),
         })
@@ -34,11 +35,18 @@ export const actions: Actions = {
       }
     } catch (error) {
       if (error instanceof ZodError) {
-        const errors = error.flatten().fieldErrors
-
         return fail(422, {
           fields,
-          errors,
+          errors: error.flatten().fieldErrors,
+        })
+      }
+
+      if (error instanceof PrismaClientKnownRequestError && error?.code === 'P2002') {
+        return fail(422, {
+          fields,
+          errors: {
+            email: ['Email already exists'],
+          },
         })
       }
 
