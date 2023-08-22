@@ -45,6 +45,7 @@
     "eslint-plugin-svelte": "^2.26.0",
     "openai": "^3.3.0",
     "postcss": "^8.4.24",
+    "postmark": "^3.0.19",
     "prettier": "^2.8.8",
     "prettier-plugin-svelte": "^2.8.1",
     "prisma": "^5.1.1",
