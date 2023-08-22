@@ -9,8 +9,10 @@
   const dispatch = createEventDispatcher()
 
   function dispatchMessage() {
-    dispatch('message', { question })
-    question = ''
+    if (question.trim() && !loading) {
+      dispatch('message', { question })
+      question = ''
+    }
   }
 
   let textareaRef: HTMLTextAreaElement
@@ -32,7 +34,7 @@
           name="message"
           bind:value={question}
           on:keydown={(e) => {
-            if (e.key === 'Enter' && !isShiftPressed && question.trim() && !loading) {
+            if (e.key === 'Enter' && !isShiftPressed) {
               dispatchMessage()
               e.preventDefault()
             } else if (e.key === 'Shift') {
@@ -49,7 +51,11 @@
           use:autosize
         />
       </div>
-      <button disabled={loading} class="p-3 pr-14 w-12 rounded-r-xl bg-primary group">
+      <button
+        on:click={dispatchMessage}
+        disabled={loading}
+        class="p-3 pr-14 w-12 rounded-r-xl bg-primary group"
+      >
         {#if !loading}
           <PaperAirplaneIcon
             class="text-white h-8 w-10 opacity-40 group-hover:opacity-95 duration-200"
