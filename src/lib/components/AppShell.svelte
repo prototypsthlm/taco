@@ -3,6 +3,7 @@
   import { isSidebarOpen } from '$lib/stores/general'
   import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
   import { TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
+  import { onMount } from 'svelte'
   import Gravatar from './Gravatar.svelte'
   import TacoIcon from './icons/TacoIcon.svelte'
 
@@ -13,9 +14,18 @@
   isSidebarOpen.subscribe((value) => {
     sidebarOpen = value
   })
+
+  const viewportHeight = () => {
+    document.documentElement.style.setProperty('--viewport-height', `${window.innerHeight}px`)
+  }
+
+  onMount(() => {
+    window.addEventListener('resize', viewportHeight)
+    viewportHeight()
+  })
 </script>
 
-<div class="flex flex-col justify-between h-screen bg-gray-900">
+<div class="flex flex-col justify-between h-screen max-h-[-webkit-fill-available] bg-gray-900">
   <TransitionRoot show={sidebarOpen}>
     <div class="relative z-50 lg:hidden">
       <TransitionChild
