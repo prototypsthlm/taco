@@ -14,15 +14,6 @@
   isSidebarOpen.subscribe((value) => {
     sidebarOpen = value
   })
-
-  const viewportHeight = () => {
-    document.documentElement.style.setProperty('--viewport-height', `${window.innerHeight}px`)
-  }
-
-  onMount(() => {
-    window.addEventListener('resize', viewportHeight)
-    viewportHeight()
-  })
 </script>
 
 <div class="flex flex-col justify-between h-screen max-h-[-webkit-fill-available] bg-gray-900">

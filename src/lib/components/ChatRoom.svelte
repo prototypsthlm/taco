@@ -89,10 +89,6 @@
     loading = false
     console.error(err)
   }
-
-  function handleChatInputFocus() {
-    console.log('ChatInput focused')
-  }
 </script>
 
 <div class="flex flex-col justify-between items-center h-full w-full">
@@ -120,6 +116,6 @@
   {/if}
 
   <div class="self-end py-3 md:py-6 w-full bg-gray-900">
-    <ChatInput {loading} on:message={handleSubmit} on:focus={handleChatInputFocus} />
+    <ChatInput {loading} on:message={handleSubmit} />
   </div>
 </div>
