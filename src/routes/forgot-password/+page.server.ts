@@ -1,3 +1,4 @@
+import { NODE_ENV } from '$env/static/private'
 import { createHtmlTemplate, createTextTemplate } from '$lib/server/email/forgot-password-template'
 import { updateResetTokenToUser, getUserByEmail } from '$lib/server/entities/user'
 import postmark from '$lib/server/postmark'
@@ -28,9 +29,10 @@ export const actions: Actions = {
       const uuid = randomUUID()
       user = await updateResetTokenToUser(user.id, uuid)
       const resetUrl = `${url.origin}/reset-password/${uuid}`
+      const senderEmail = NODE_ENV === 'development' ? 'taco.dev@prototyp.se' : 'taco@prototyp.se'
 
       await postmark.sendEmail({
-        From: 'info@prototyp.se',
+        From: senderEmail,
         To: user.email,
         Subject: 'Password Reset',
         HtmlBody: createHtmlTemplate(resetUrl, user.name),
