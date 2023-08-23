@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
-  import { createEventDispatcher, afterUpdate, onMount } from 'svelte'
+  import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
   import autosize from 'svelte-autosize'
 
   let question = ''
@@ -9,16 +9,18 @@
   const dispatch = createEventDispatcher()
 
   function dispatchMessage() {
-    dispatch('message', { question })
-    question = ''
+    if (question.trim() && !loading) {
+      dispatch('message', { question })
+      question = ''
+    }
   }
 
-  let textareaRef: HTMLTextAreaElement
+  let textarea: HTMLTextAreaElement
   onMount(() => {
-    textareaRef.focus()
+    textarea.focus()
   })
   afterUpdate(() => {
-    textareaRef.focus()
+    textarea.focus()
   })
 </script>
 
@@ -27,12 +29,12 @@
     <div class="flex w-5/6 max-w-5xl shadow-xl">
       <div class="flex justify-centermin-h-[4rem] w-full bg-primary rounded-l-xl">
         <textarea
-          bind:this={textareaRef}
+          bind:this={textarea}
           rows="1"
           name="message"
           bind:value={question}
           on:keydown={(e) => {
-            if (e.key === 'Enter' && !isShiftPressed && question.trim() && !loading) {
+            if (e.key === 'Enter' && !isShiftPressed) {
               dispatchMessage()
               e.preventDefault()
             } else if (e.key === 'Shift') {
@@ -49,7 +51,11 @@
           use:autosize
         />
       </div>
-      <button disabled={loading} class="p-3 pr-14 w-12 rounded-r-xl bg-primary group">
+      <button
+        on:click={dispatchMessage}
+        disabled={loading}
+        class="p-3 pr-14 w-12 rounded-r-xl bg-primary group"
+      >
         {#if !loading}
           <PaperAirplaneIcon
             class="text-white h-8 w-10 opacity-40 group-hover:opacity-95 duration-200"
