@@ -63,7 +63,7 @@
       try {
         if (e.data.includes('[DONE]')) {
           loading = false
-          if (!$page.url.href.endsWith(`/app/chat/${chat?.id}`)) {
+          if ($page.url.pathname !== `/app/chat/${chat?.id}`) {
             await goto(`/app/chat/${chat?.id}`)
           }
           await invalidateAll()
