@@ -29,7 +29,7 @@ export const actions: Actions = {
       const uuid = randomUUID()
       user = await updateResetTokenToUser(user.id, uuid)
       const resetUrl = `${url.origin}/reset-password/${uuid}`
-      const senderEmail = NODE_ENV === 'development' ? 'taco.dev@prototyp.se' : 'taco@prototyp.se'
+      const senderEmail = NODE_ENV === 'production' ? 'taco@prototyp.se' : 'taco.dev@prototyp.se'
 
       await postmark.sendEmail({
         From: senderEmail,
