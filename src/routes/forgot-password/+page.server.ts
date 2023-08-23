@@ -1,3 +1,4 @@
+import { createHtmlTemplate, createTextTemplate } from '$lib/server/email/forgot-password-template'
 import { updateResetTokenToUser, getUserByEmail } from '$lib/server/entities/user'
 import postmark from '$lib/server/postmark'
 import { fail } from '@sveltejs/kit'
@@ -29,11 +30,11 @@ export const actions: Actions = {
       const resetUrl = `${url.origin}/reset-password/${uuid}`
 
       await postmark.sendEmail({
-        From: 'philipp.krause@prototyp.se',
+        From: 'info@prototyp.se',
         To: user.email,
         Subject: 'Password Reset',
-        HtmlBody: `<strong>Hello</strong> dear ${user.name}, <br> Please reset your password here ${resetUrl}`,
-        TextBody: `Hello dear ${user.name}, Please reset your password here ${resetUrl}`,
+        HtmlBody: createHtmlTemplate(resetUrl, user.name),
+        TextBody: createTextTemplate(resetUrl, user.name),
         MessageStream: 'outbound',
       })
     } catch (error) {
