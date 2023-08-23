@@ -6,8 +6,8 @@
 </script>
 
 <div class="flex gap-6 items-center justify-center">
-  <img class="{$$props.class} {dark ? 'invert': 'invert-0'}" src={logo} alt="TACO Logo" />
+  <img class="{$$props.class} {dark ? 'invert' : 'invert-0'}" src={logo} alt="TACO Logo" />
   {#if showText}
-    <span class="font-bold {dark ? 'text-black': 'text-accent'}"> T A C O </span>
+    <span class="font-bold {dark ? 'text-black' : 'text-accent'}"> T A C O </span>
   {/if}
 </div>

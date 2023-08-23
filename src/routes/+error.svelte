@@ -10,9 +10,13 @@
         {$page.error?.message}
       </h1>
       {#if $page.status === 404}
-      <p class="mt-6 text-base leading-7 text-gray-500">Sorry we could not find what your where looking for. Please try again</p>
+        <p class="mt-6 text-base leading-7 text-gray-500">
+          Sorry we could not find what your where looking for. Please try again
+        </p>
       {:else}
-      <p class="mt-6 text-base leading-7 text-gray-500">Sorry something went wrong. Please try again</p>
+        <p class="mt-6 text-base leading-7 text-gray-500">
+          Sorry something went wrong. Please try again
+        </p>
       {/if}
       <div class="mt-10 flex items-center justify-center gap-x-6">
         <a

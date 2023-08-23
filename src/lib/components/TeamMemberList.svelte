@@ -2,11 +2,7 @@
   import { enhance } from '$app/forms'
   import Alert from '$lib/components/Alert.svelte'
   import Gravatar from '$lib/components/Gravatar.svelte'
-  import {
-    ArrowDownIcon,
-    ChevronUpIcon,
-    TrashIcon,
-  } from '@babeard/svelte-heroicons/solid'
+  import { ArrowDownIcon, ChevronUpIcon, TrashIcon } from '@babeard/svelte-heroicons/solid'
 
   const formatDate = (date: Date) =>
     date.toLocaleString('sv-SE', {

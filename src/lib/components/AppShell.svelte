@@ -3,7 +3,6 @@
   import { isSidebarOpen } from '$lib/stores/general'
   import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
   import { TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
-  import { onMount } from 'svelte'
   import Gravatar from './Gravatar.svelte'
   import TacoIcon from './icons/TacoIcon.svelte'
 

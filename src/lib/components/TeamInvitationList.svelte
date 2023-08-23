@@ -16,10 +16,10 @@
     })
 
   export let invitations: Invitation[] = []
-  export let isAdmin: boolean = false
+  export let isAdmin = false
   export let form: Record<string, string> = {}
 
-  let currentClipboardText: string = ''
+  let currentClipboardText = ''
 
   function copyToClipboard(text: string) {
     navigator.clipboard

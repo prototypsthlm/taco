@@ -2,7 +2,6 @@
   import { enhance } from '$app/forms'
   import { ArrowPathIcon } from '@babeard/svelte-heroicons/solid'
 
-  export let userTeam: any
   export let team: any
   export let numberChats: number
   export let form: any | null
@@ -41,12 +40,14 @@
                 Calculate
               </button>
             </form>
-            {:else}
+          {:else}
             <ArrowPathIcon class="animate-spin mt-4 h-8 w-8 text-white" />
           {/if}
         {:else}
           <p class="mt-2 flex items-baseline gap-x-2">
-            <span class="text-4xl font-semibold tracking-tight text-white">{form?.estimatedCost}</span>
+            <span class="text-4xl font-semibold tracking-tight text-white"
+              >{form?.estimatedCost}</span
+            >
             <span class="text-sm text-gray-400">$</span>
           </p>
         {/if}
