@@ -90,7 +90,7 @@ We changed the default dark mode styling strategy in Tailwind to be class based 
 config) instead of based in the system preference only. So now, the site respects user pref on dark
 mode but also allows us to force dark mode where there's no "non-dark" mode implemented. that can be
 done just adding the class `dark` to any part we want to force dark mode. See `Input` component
-usage in signin and signup for reference.
+usage in sign in and sign up for reference.
 
 We control the dark mode toggling here: `src/routes/+layout.svelte`.
 

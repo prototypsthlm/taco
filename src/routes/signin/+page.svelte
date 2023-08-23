@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-  <title>Signin</title>
+  <title>Sign in</title>
 </svelte:head>
 
 <div
