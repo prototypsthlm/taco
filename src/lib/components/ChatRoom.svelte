@@ -95,7 +95,10 @@
   {#if !chat?.messages?.length}
     <div class="flex flex-col gap-4 justify-center items-center grow h-full">
       <h1 class="text-accent text-5xl font-bold">New Chat!</h1>
-      <p class="text-accent text-2xl">Choose your LLM personality</p>
+      <p class="text-accent text-2xl">
+        Choose your LLM personality or create a custom one 
+        <a href="/app/settings/customization" class="text-indigo-500"> here </a>
+      </p>
       <RoleSelector on:roleChange={(event) => (selectedRolePrompt = event.detail.prompt)} />
       <p class="text-accent max-w-2xl text-center text-xl text-opacity-70">{selectedRolePrompt}</p>
     </div>

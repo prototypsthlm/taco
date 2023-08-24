@@ -5,3 +5,13 @@ export const getLlmPersonalitiesByUserId = (userId: number) => {
     where: { ownerId: userId },
   })
 }
+
+export const createLlmPersonality = (ownerId: number, name: string, context: string) => {
+  return prisma.llmPersonality.create({
+    data: {
+      name,
+      context,
+      ownerId,
+    },
+  })
+}
