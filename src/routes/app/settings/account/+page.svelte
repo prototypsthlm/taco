@@ -1,6 +1,5 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
   import InputGroup from '$lib/components/InputGroup.svelte'
   import ModalConfirm from '$lib/components/ModalConfirm.svelte'
