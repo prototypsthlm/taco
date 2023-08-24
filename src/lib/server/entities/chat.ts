@@ -1,3 +1,4 @@
+import type { UserBySessionId } from '$lib/server/entities/user'
 import { prisma } from '$lib/server/prisma'
 
 export type ChatWithRelations = Awaited<ReturnType<typeof getChatWithRelationsById>>
@@ -45,13 +46,14 @@ export const createChat = (userTeamId: number, role: string | undefined) => {
   })
 }
 
-export const addQuestionToChat = (id: number, question: string) => {
+export const addQuestionToChat = (id: number, question: string, userId: number) => {
   return prisma.chat.update({
     where: { id },
     data: {
       messages: {
         create: {
           question,
+          authorId: userId,
         },
       },
     },
@@ -112,7 +114,12 @@ export const deleteChat = (id: number) => {
   })
 }
 
-export const forkChat = async (chatId: number, ownerId: number, name: string) => {
+export const forkChat = async (
+  chatId: number,
+  userId: number,
+  activeUserTeamId: number,
+  name: string
+) => {
   const chat = await getChatWithRelationsById(chatId)
 
   return prisma.chat.create({
@@ -126,9 +133,10 @@ export const forkChat = async (chatId: number, ownerId: number, name: string) =>
         create: chat.messages.map((x) => ({
           question: x.question,
           answer: x.answer,
+          authorId: userId,
         })),
       },
-      ownerId,
+      ownerId: activeUserTeamId,
     },
   })
 }

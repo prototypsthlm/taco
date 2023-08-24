@@ -66,7 +66,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       controller.enqueue(encodeChunkData([JSON.stringify({ chat })]))
 
       const chatResponseReader = chatResponse.body?.getReader()
-      chat = await addQuestionToChat(chat.id, schema.data.question)
+      chat = await addQuestionToChat(chat.id, schema.data.question, currentUser.id)
       const lastMessage = chat.messages[chat.messages.length - 1]
       lastMessage.answer = ''
       const readAndEnqueue = async () => {

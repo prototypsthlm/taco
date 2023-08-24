@@ -38,7 +38,28 @@ async function seed() {
     },
   })
 
-  await prisma.chat.create({
+  const userToShare = await prisma.user.create({
+    data: {
+      email: 'user2@prototyp.se',
+      name: 'Prototyp User 2',
+      password: await bcrypt.hash('password', 10),
+      userTeams: {
+        create: {
+          role: Role.OWNER,
+          team: {
+            create: {
+              name: 'Prototyp 2',
+            },
+          },
+        },
+      },
+    },
+    include: {
+      userTeams: true,
+    },
+  })
+
+  const chat = await prisma.chat.create({
     data: {
       name: 'Test Chat',
       ownerId: user.userTeams[0].id,
@@ -47,10 +68,42 @@ async function seed() {
           data: [
             {
               question: 'Are you a helpful assistant?',
+              authorId: user.id,
+              answer: 'Yes I am.',
             },
           ],
         },
       },
+    },
+  })
+
+  const sharedChat = await prisma.chat.create({
+    data: {
+      name: 'Test Shared Chat',
+      ownerId: user.userTeams[0].id,
+      messages: {
+        createMany: {
+          data: [
+            {
+              question: 'Are you a helpful assistant?',
+              authorId: user.id,
+              answer: 'Yes of course.',
+            },
+            {
+              question: 'Are you Sure about that??',
+              authorId: userToShare.id,
+              answer: 'No doubt.',
+            },
+          ],
+        },
+      },
+    },
+  })
+
+  await prisma.chatUser.create({
+    data: {
+      chatId: sharedChat.id,
+      userId: userToShare.id,
     },
   })
 }

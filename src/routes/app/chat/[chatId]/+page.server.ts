@@ -45,6 +45,7 @@ export const actions: Actions = {
     if (schema.success) {
       const newChat = await forkChat(
         schema.data.chatId,
+        currentUser.id,
         currentUser.activeUserTeamId,
         schema.data.newName
       )
