@@ -1,4 +1,3 @@
 import ioClient from 'socket.io-client'
-const ENDPOINT = 'http://localhost:3000'
 
-export const io = ioClient(ENDPOINT)
+export const io = ioClient(import.meta.env.VITE_PUBLIC_BASE_URL)
