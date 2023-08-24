@@ -2,7 +2,6 @@
   import { enhance } from '$app/forms'
   import { ArrowPathIcon } from '@babeard/svelte-heroicons/solid'
 
-  export let userTeam: any
   export let team: any
   export let numberChats: number
   export let form: any | null
