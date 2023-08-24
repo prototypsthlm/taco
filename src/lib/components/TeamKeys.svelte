@@ -1,7 +1,7 @@
 <script lang="ts">
   import Input from '$lib/components/Input.svelte'
   import { enhance } from '$app/forms'
-  import InputGroup from './InputGroup.svelte'
+  import InputGroup from '$lib/components/InputGroup.svelte'
 
   export let userTeam: any
   export let team: any
