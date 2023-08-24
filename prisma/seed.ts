@@ -24,7 +24,7 @@ async function seed() {
       password: await bcrypt.hash('password', 10),
       userTeams: {
         create: {
-          role: Role.ADMIN,
+          role: Role.OWNER,
           team: {
             create: {
               name: 'Prototyp',
@@ -47,7 +47,6 @@ async function seed() {
           data: [
             {
               question: 'Are you a helpful assistant?',
-              authorId: user.id,
             },
           ],
         },
