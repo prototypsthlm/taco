@@ -2,7 +2,7 @@ import * as crypto from 'crypto'
 import * as fs from 'fs'
 
 // Check if the script is running in a local environment
-if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === 'production') {
   console.log('Script can only be run in a local environment.')
   process.exit(0)
 }
