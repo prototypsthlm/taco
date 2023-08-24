@@ -7,16 +7,8 @@ import { Configuration, OpenAIApi } from 'openai'
 import { ChatCompletionRequestMessageRoleEnum } from 'openai/api'
 
 export const getClient = (chat: ChatWithRelations) => {
-  if (!chat?.owner?.team?.openAiApiKey) {
-    throw new Error('API Error: Open AI API key is not set!')
-  }
-
-  if (!process.env.SECRET_KEY) {
-    throw new Error('API Error: You must have SECRET_KEY set in your env.')
-  }
-
   const configuration = new Configuration({
-    apiKey: decrypt(chat.owner.team.openAiApiKey, process.env.SECRET_KEY),
+    apiKey: getApiKey(chat),
   })
 
   return new OpenAIApi(configuration)
@@ -87,6 +79,10 @@ export const transformChatToCompletionRequest = (
 }
 
 export const getApiKey = (chat: ChatWithRelations) => {
+  if (!chat?.owner) {
+    throw new Error('API Error: Chat doesnt have an chat owner!')
+  }
+
   if (!chat?.owner?.team?.openAiApiKey) {
     throw new Error('API Error: Open AI API key is not set')
   }
