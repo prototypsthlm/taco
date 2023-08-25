@@ -4,7 +4,7 @@ export default function injectSocketIO(server) {
   const io = new Server(server)
 
   io.on('connection', (socket) => {
-    const username = `User ${Math.round(Math.random() * 999999)}`
+    let username = `User ${Math.round(Math.random() * 999999)}`
     socket.emit('name', username)
 
     socket.on('message', (message) => {

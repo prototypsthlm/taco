@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { io } from '$lib/webSocketConnection'
   import { onMount } from 'svelte'
+
+  import ioClient from 'socket.io-client'
+  export const io = ioClient()
 
   let textfield = ''
   let username = ''

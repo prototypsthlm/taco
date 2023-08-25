@@ -1,7 +1,7 @@
-import express from 'express'
 import http from 'http'
-import { handler } from '../build/handler.js'
+import express from 'express'
 import injectSocketIO from '../socketIoHandler.js'
+import { handler } from '../build/handler.js'
 
 const app = express()
 const server = http.createServer(app)
@@ -12,6 +12,6 @@ injectSocketIO(server)
 // SvelteKit handlers
 app.use(handler)
 
-server.listen(app.get('port'), () => {
-  console.log(`Running on ${app.get('port')}`)
+server.listen(3000, () => {
+  console.log('Running on http://localhost:3000')
 })
