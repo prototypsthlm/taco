@@ -15,3 +15,12 @@ export const createLlmPersonality = (ownerId: number, name: string, context: str
     },
   })
 }
+
+export const deleteLlmPersonality = (ownerId: number, id: number) => {
+  return prisma.llmPersonality.delete({
+    where: {
+      id,
+      ownerId,
+    },
+  })
+}

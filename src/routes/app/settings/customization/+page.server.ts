@@ -1,5 +1,6 @@
 import {
   createLlmPersonality,
+  deleteLlmPersonality,
   getLlmPersonalitiesByUserId,
 } from '$lib/server/entities/llmPersonalities'
 import { fail } from '@sveltejs/kit'
@@ -32,14 +33,45 @@ export const actions: Actions = {
         const errors = error.flatten().fieldErrors
 
         return fail(422, {
-          fields,
-          errors,
+          personalityCreation: {
+            fields,
+            errors,
+          },
         })
       }
 
       return fail(500, {
-        fields,
-        error: `${error}`,
+        personalityCreation: {
+          fields,
+          error: `${error}`,
+        },
+      })
+    }
+  },
+  deletePersonality: async ({ request, locals }) => {
+    const fields = Object.fromEntries(await request.formData())
+    try {
+      const schema = z.object({ id: z.string() }).parse(fields)
+
+      const userId = locals.currentUser.id
+      await deleteLlmPersonality(userId, Number(schema.id))
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const errors = error.flatten().fieldErrors
+
+        return fail(422, {
+          personalityList: {
+            fields,
+            errors,
+          },
+        })
+      }
+
+      return fail(500, {
+        personalityList: {
+          fields,
+          error: `${error}`,
+        },
       })
     }
   },

@@ -2,6 +2,7 @@
   import type { LlmPersonality } from '@prisma/client'
   import Gravatar from './Gravatar.svelte'
   import { TrashIcon } from '@babeard/svelte-heroicons/solid'
+  import { enhance } from '$app/forms'
 
   export let personalities: LlmPersonality[]
 </script>
@@ -18,7 +19,7 @@
         <p class="text-md font-medium text-gray-100">{personality.name}</p>
         <p class="overflow-hidden text-md text-gray-400">{personality.context}</p>
       </div>
-      <form method="post" action="?/addPersonality">
+      <form method="post" action="?/deletePersonality" use:enhance>
         <button
           on:click={(event) => {
             if (!confirm(`Are you sure you want to remove this personality?`)) {
@@ -28,9 +29,10 @@
           type="submit"
           class="flex gap-1 items-center rounded-md bg-red-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
         >
-          Remove
+          Delete
           <TrashIcon class="h-4 w-4" />
         </button>
+        <input type="hidden" name="id" value={personality.id} />
       </form>
     </div>
   {/each}
