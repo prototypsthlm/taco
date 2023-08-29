@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { ChatBubbleBottomCenterIcon } from '@babeard/svelte-heroicons/solid'
   import Beaker from '@babeard/svelte-heroicons/solid/Beaker'
   import Briefcase from '@babeard/svelte-heroicons/solid/Briefcase'
   import CodeBracket from '@babeard/svelte-heroicons/solid/CodeBracket'
@@ -24,13 +25,16 @@
       return MusicalNote
     if (includesArray(context, ['car', 'mechanic', 'repair'])) return WrenchScrewdriver
     if (includesArray(context, ['photo', 'camera', 'filming', 'movie'])) return VideoCamera
+    if (includesArray(context, ['helpful assistant'])) return ChatBubbleBottomCenterIcon
     return Squares2x2
   }
 
   function includesArray(text: string, array: string[]): boolean {
     for (let index = 0; index < array.length; index++) {
       const substring = array[index]
-      if (text.includes(substring)) return true
+      if (text.includes(substring)) {
+        return true
+      }
     }
     return false
   }

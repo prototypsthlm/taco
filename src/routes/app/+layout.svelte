@@ -6,6 +6,10 @@
   export let data: PageData
 </script>
 
+<svelte:head>
+  <title>TACO</title>
+</svelte:head>
+
 <AppShell user={data.user}>
   <Sidebar slot="sidebar" user={data.user} />
   <slot slot="main" />

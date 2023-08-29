@@ -31,6 +31,8 @@
         class="dark col-span-full"
         label="Context"
         name="context"
+        rows={5}
+        maxLength={350}
         value={form?.personalityCreation?.fields?.context || null}
         errors={form?.personalityCreation?.errors?.context}
       />

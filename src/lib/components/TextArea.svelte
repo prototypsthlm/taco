@@ -10,6 +10,7 @@
   export let autocomplete = 'off'
   export let value = ''
   export let rows = 3
+  export let maxLength = 500
   export let disabled = false
 </script>
 
@@ -22,6 +23,7 @@
       {id}
       {name}
       {rows}
+      {maxLength}
       class={classNames(
         'block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset dark:bg-white/5',
         'sm:text-sm sm:leading-6',
