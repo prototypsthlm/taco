@@ -3,17 +3,19 @@
   import { page } from '$app/stores'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
-  import RoleSelector from '$lib/components/RoleSelector.svelte'
+  import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
+  import type { LlmPersonality } from '@prisma/client'
   import { SSE } from 'sse.js'
   import { onDestroy, onMount } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
 
   export let chat: ChatWithRelations | undefined = undefined
+  export let customPersonalities: LlmPersonality[] | null = null
 
   let loading = false
-  let selectedRolePrompt: string | null = 'You are a helpful assistant.'
+  let selectedPersonalityContext: string | null = 'You are a helpful assistant.'
   let element: HTMLElement
   let eventSource: SSE | undefined
 
@@ -52,7 +54,7 @@
       },
       payload: JSON.stringify({
         id: chat?.id,
-        role: selectedRolePrompt,
+        role: selectedPersonalityContext,
         question,
       }),
     })
@@ -95,9 +97,14 @@
   {#if !chat?.messages?.length}
     <div class="flex flex-col gap-4 justify-center items-center grow h-full">
       <h1 class="text-accent text-5xl font-bold">New Chat!</h1>
-      <p class="text-accent text-2xl">Choose your LLM personality</p>
-      <RoleSelector on:roleChange={(event) => (selectedRolePrompt = event.detail.prompt)} />
-      <p class="text-accent max-w-2xl text-center text-xl text-opacity-70">{selectedRolePrompt}</p>
+      <p class="text-accent text-2xl">
+        Choose you taco topping or bring your
+        <a href="/app/settings/customization" class="text-indigo-500"> own topping </a>
+      </p>
+      <PersonalitySelector
+        {customPersonalities}
+        on:roleChange={(event) => (selectedPersonalityContext = event.detail.context)}
+      />
     </div>
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-scroll">

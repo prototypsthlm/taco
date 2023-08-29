@@ -21,15 +21,15 @@
       </div>
       <ChevronRight class="h-4 w-4 text-white" />
     </a>
+    <a
+      href="/app"
+      class="mb-2 px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-lg border-2 border-white border-opacity-20 flex items-center gap-x-3"
+      on:click={() => isSidebarOpen.set(false)}
+    >
+      <PlusIcon class="h-6 w-6 text-white flex-none" />
+      <h3 class="flex-auto truncate text-lg font-semibold leading-6 text-white">New Chat</h3>
+    </a>
     {#if user?.activeUserTeam?.chats?.length}
-      <a
-        href="/app"
-        class="mb-2 px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-lg border-2 border-white border-opacity-20 flex items-center gap-x-3"
-        on:click={() => isSidebarOpen.set(false)}
-      >
-        <PlusIcon class="h-6 w-6 text-white flex-none" />
-        <h3 class="flex-auto truncate text-lg font-semibold leading-6 text-white">New Chat</h3>
-      </a>
       <ul class="overflow-scroll grow flex flex-col gap-2 pt-4">
         {#each user.activeUserTeam.chats as chat}
           <ChatLink
