@@ -4,6 +4,7 @@
   import Input from '$lib/components/Input.svelte'
   import InputGroup from '$lib/components/InputGroup.svelte'
   import LlmPersonalityList from '$lib/components/LlmPersonalityList.svelte'
+  import TextArea from '$lib/components/TextArea.svelte'
   import type { ActionData, PageData } from './$types'
 
   export let data: PageData
@@ -26,7 +27,7 @@
         errors={form?.personalityCreation?.errors?.name}
       />
 
-      <Input
+      <TextArea
         class="dark col-span-full"
         label="Context"
         name="context"
