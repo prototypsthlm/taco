@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { LlmPersonality } from '@prisma/client'
-  import Gravatar from './Gravatar.svelte'
   import { TrashIcon } from '@babeard/svelte-heroicons/solid'
   import { enhance } from '$app/forms'
   import PersonalityIcon from './PersonalityIcon.svelte'
@@ -20,11 +19,6 @@
       </div>
       <form method="post" action="?/deletePersonality" use:enhance>
         <button
-          on:click={(event) => {
-            if (!confirm(`Are you sure you want to remove this personality?`)) {
-              event.preventDefault()
-            }
-          }}
           type="submit"
           class="flex gap-1 items-center rounded-md bg-red-500 px-2 py-2 text-center text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
         >

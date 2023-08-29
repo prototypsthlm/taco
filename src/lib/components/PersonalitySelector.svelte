@@ -53,18 +53,18 @@
   {#each personalities as personality}
     <button
       on:click={() => selectPersonality(personality)}
-      class="flex flex-col rounded-lg md:min-w-[200px] gap-2 bg-white p-4 md:p-8 {selectedPersonality ===
+      class="flex flex-col rounded-lg md:min-w-[125px] lg:min-w-[150px] gap-2 bg-white p-3 sm:p-4 lg:p-6 {selectedPersonality ===
       personality
         ? 'bg-opacity-20'
         : 'bg-opacity-5'} hover:bg-opacity-20"
     >
       <PersonalityIcon context={personality.context} />
-      <p class="text-md md:text-3xl font-semibold tracking-tight text-white">
+      <p class="text-sm md:text-3xl font-semibold tracking-tight text-white">
         {personality.name}
       </p>
     </button>
   {/each}
 </div>
-<p class="text-accent max-w-2xl text-center text-xl text-opacity-70">
+<p class="text-accent max-w-2xl text-center px-4 text-sm md:text-xl text-opacity-70">
   {selectedPersonality?.context}
 </p>

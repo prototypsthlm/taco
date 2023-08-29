@@ -95,9 +95,9 @@
 
 <div class="flex flex-col justify-between items-center h-full w-full">
   {#if !chat?.messages?.length}
-    <div class="flex flex-col gap-4 justify-center items-center grow h-full">
-      <h1 class="text-accent text-5xl font-bold">New Chat!</h1>
-      <p class="text-accent text-2xl">
+    <div class="flex flex-col gap-3 md:gap-4 justify-center items-center text-center grow h-full">
+      <h1 class="text-accent text-2xl md:text-5xl font-bold">New Chat!</h1>
+      <p class="text-accent text-md px-8 md:text-2xl">
         Choose your taco topping or bring your
         <a href="/app/settings/customization" class="text-indigo-500"> own topping </a>
       </p>
