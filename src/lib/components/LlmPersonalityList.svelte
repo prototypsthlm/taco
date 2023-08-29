@@ -3,6 +3,7 @@
   import Gravatar from './Gravatar.svelte'
   import { TrashIcon } from '@babeard/svelte-heroicons/solid'
   import { enhance } from '$app/forms'
+  import PersonalityIcon from './PersonalityIcon.svelte'
 
   export let personalities: LlmPersonality[]
 </script>
@@ -12,9 +13,7 @@
     <div
       class="flex items-center justify-between space-x-3 rounded-lg border border-gray-600 bg-gray-800/40 px-6 py-5 shadow-sm"
     >
-      <div class="flex-shrink-0 h-10 w-10">
-        <Gravatar email={personality.name} />
-      </div>
+      <PersonalityIcon context={personality.context} />
       <div class="min-w-0 flex-1 px-2">
         <p class="text-md font-medium text-gray-100">{personality.name}</p>
         <p class="overflow-hidden text-md text-gray-400">{personality.context}</p>
