@@ -49,6 +49,12 @@
           placeholder="Type your message"
           class="no-border w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white max-h-96"
           use:autosize
+          on:focus={() => {
+            dispatch('focus')
+          }}
+          on:blur={() => {
+            dispatch('blur')
+          }}
         />
       </div>
       <button

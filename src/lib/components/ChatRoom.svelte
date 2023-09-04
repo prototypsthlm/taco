@@ -5,6 +5,7 @@
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import RoleSelector from '$lib/components/RoleSelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
+  import ioClient from 'socket.io-client'
   import { SSE } from 'sse.js'
   import { onDestroy, onMount } from 'svelte'
   import { flip } from 'svelte/animate'
@@ -16,9 +17,25 @@
   let selectedRolePrompt: string | null = 'You are a helpful assistant.'
   let element: HTMLElement
   let eventSource: SSE | undefined
+  const io = ioClient()
+  let socketUser: string
+
+  let usersTyping: string[] = []
 
   onMount(() => {
     scrollToBottom()
+
+    io.on('typing', (user) => {
+      usersTyping = [...usersTyping, user]
+    })
+
+    io.on('stopped-typing', (user) => {
+      usersTyping = usersTyping.filter((x) => x !== user)
+    })
+
+    io.on('user', (value) => {
+      socketUser = value
+    })
   })
 
   onDestroy(() => {
@@ -91,6 +108,16 @@
   }
 </script>
 
+<div class="text-white">
+  <h1>SOCKET USER {socketUser}</h1>
+  <h2>TYPING:</h2>
+  <ul>
+    {#each usersTyping as userTyping}
+      <li>{userTyping} is typing</li>
+    {/each}
+  </ul>
+</div>
+
 <div class="flex flex-col justify-between items-center h-full w-full">
   {#if !chat?.messages?.length}
     <div class="flex flex-col gap-4 justify-center items-center grow h-full">
@@ -116,6 +143,15 @@
   {/if}
 
   <div class="self-end py-3 md:py-6 w-full bg-gray-900">
-    <ChatInput {loading} on:message={handleSubmit} />
+    <ChatInput
+      {loading}
+      on:message={handleSubmit}
+      on:focus={() => {
+        io.emit('typing')
+      }}
+      on:blur={() => {
+        io.emit('stopped-typing')
+      }}
+    />
   </div>
 </div>
