@@ -2,6 +2,7 @@ import { PrismaClient, Role } from '@prisma/client'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import bcrypt from 'bcryptjs'
+import { encrypt } from '../src/lib/server/utils/crypto'
 
 const prisma = new PrismaClient()
 
@@ -9,12 +10,22 @@ async function seed() {
   const email = 'user@prototyp.se'
   const teamName = 'Prototyp'
 
-  // cleanup the existing database
-  await prisma.user.delete({ where: { email } }).catch(() => {
-    // no worries if it doesn't exist yet
-  })
-  await prisma.team.delete({ where: { name: teamName } }).catch(() => {
-    // no worries if it doesn't exist yet
+  const tables: { tablename: string }[] = await prisma.$queryRawUnsafe(
+    `SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND tablename != '_prisma_migrations';`
+  )
+
+  for (const { tablename } of tables) {
+    await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${tablename}" RESTART IDENTITY CASCADE;`)
+  }
+
+  const team1 = await prisma.team.create({
+    data: {
+      name: teamName,
+      openAiApiKey:
+        process.env.OPENAI_API_KEY && process.env.SECRET_KEY
+          ? encrypt(process.env.OPENAI_API_KEY, process.env.SECRET_KEY)
+          : null,
+    },
   })
 
   const user = await prisma.user.create({
@@ -24,12 +35,8 @@ async function seed() {
       password: await bcrypt.hash('password', 10),
       userTeams: {
         create: {
+          teamId: team1.id,
           role: Role.OWNER,
-          team: {
-            create: {
-              name: 'Prototyp',
-            },
-          },
         },
       },
     },
@@ -49,6 +56,10 @@ async function seed() {
           team: {
             create: {
               name: 'Prototyp 2',
+              openAiApiKey:
+                process.env.OPENAI_API_KEY && process.env.SECRET_KEY
+                  ? encrypt(process.env.OPENAI_API_KEY, process.env.SECRET_KEY)
+                  : null,
             },
           },
         },
@@ -58,6 +69,34 @@ async function seed() {
       userTeams: true,
     },
   })
+
+  // Bulk insert users
+  await prisma.user.createMany({
+    data: Array.from({ length: 10 }, (_, i) => ({
+      email: `bulk-user${i + 3}@prototyp.se`,
+      name: `Prototyp User ${i + 3}`,
+      password: bcrypt.hashSync('password', 10), // Note: Synchronously hashing password for simplicity
+    })),
+  })
+
+  // Then connect them to a team
+  const createdUsers = await prisma.user.findMany({
+    where: {
+      email: {
+        startsWith: 'bulk-user',
+      },
+    },
+  })
+
+  for (const user of createdUsers) {
+    await prisma.userTeam.create({
+      data: {
+        userId: user.id,
+        teamId: team1.id,
+        role: Role.MEMBER,
+      },
+    })
+  }
 
   const chat = await prisma.chat.create({
     data: {
