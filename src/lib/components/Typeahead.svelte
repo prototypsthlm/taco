@@ -12,7 +12,6 @@
   let isInputFocused = false // Track if input is focused
 
   const selectSuggestion = (index: number) => {
-    console.log({ index })
     if (filteredSuggestions[index]) {
       selectedEmails = [...selectedEmails, filteredSuggestions[index].email]
       inputValue = ''
@@ -112,7 +111,7 @@
     on:input={filterSuggestions}
     on:keydown={handleKeydown}
     on:focus={() => (isInputFocused = true)}
-    on:blur={() => (isInputFocused = false)}
+    on:blur={() => setTimeout(() => (isInputFocused = false), 200)}
     bind:this={input}
   />
 
