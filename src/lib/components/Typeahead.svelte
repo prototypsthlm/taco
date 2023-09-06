@@ -89,6 +89,7 @@
   }
 </script>
 
+<input {name} type="hidden" value={selectedEmails.join(',')} />
 <div>
   {#if selectedEmails.length}
     <div class="flex flex-wrap gap-2 mb-4">
@@ -107,7 +108,7 @@
     class="rounded-md py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6"
     placeholder="Search..."
     bind:value={inputValue}
-    {name}
+    name="_typeahead_aux"
     on:input={filterSuggestions}
     on:keydown={handleKeydown}
     on:focus={() => (isInputFocused = true)}
