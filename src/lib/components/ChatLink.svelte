@@ -3,14 +3,17 @@
   import { page } from '$app/stores'
   import ForkIcon from '$lib/components/icons/ForkIcon.svelte'
   import ModalConfirm from '$lib/components/ModalConfirm.svelte'
+  import Typeahead from '$lib/components/Typeahead.svelte'
+  import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
   import { getTimeSince } from '$lib/utils/timeConverter'
-  import { ChatBubbleLeftIcon, TrashIcon } from '@babeard/svelte-heroicons/solid'
+  import { ChatBubbleLeftIcon, TrashIcon, ShareIcon } from '@babeard/svelte-heroicons/solid'
 
   export let chatId: number
   export let name: string
   export let roleContent: string
   export let updatedAt: Date
+  export let user: UserWithUserTeamsActiveTeamAndChats
 
   $: updatedAtShorthand = getTimeSince(updatedAt)
   $: href = `/app/chat/${chatId}`
@@ -18,7 +21,16 @@
 
   let deleteForm: HTMLFormElement
   let forkForm: HTMLFormElement
-  let forkInput: HTMLElement
+  let forkInput: HTMLInputElement
+  let shareForm: HTMLFormElement
+  let shareInput: HTMLInputElement
+
+  const teamMates = user?.activeUserTeam?.team?.teamUsers
+    ?.filter((x) => x.user.id !== user.id)
+    .map((x) => ({
+      email: x?.user.email,
+      name: x?.user.name,
+    }))
 </script>
 
 <a href={isLinkActive ? null : href} title={name} on:click={() => isSidebarOpen.set(false)}>
@@ -42,6 +54,33 @@
         <p class="truncate text-sm text-gray-500">
           {roleContent}
         </p>
+        <ModalConfirm initialFocus={shareInput} on:confirm={() => shareForm.requestSubmit()}>
+          <button type="button" title="Share" slot="trigger">
+            <ShareIcon class="h-5 w-5 text-gray-500 hover:text-blue-500 duration-200" />
+          </button>
+          <svelte:fragment slot="title">Do you want to share the chat?</svelte:fragment>
+          <svelte:fragment slot="body">
+            <form
+              method="post"
+              action="/app/chat/{chatId}?/shareForm"
+              bind:this={shareForm}
+              use:enhance
+              class="w-full"
+            >
+              <div class="mt-2 max-w-xl text-sm text-gray-500">
+                <p>Select the persons to share it with.</p>
+              </div>
+              <div class="mt-5 sm:flex sm:items-center">
+                <div class="w-full sm:max-w-xl flex">
+                  <label class="sr-only" for="emails">Emails</label>
+                  <Typeahead bind:input={shareInput} name="emails" suggestions={teamMates} />
+                </div>
+              </div>
+              <input type="hidden" name="chatId" value={chatId} />
+            </form>
+          </svelte:fragment>
+          <svelte:fragment slot="confirm">Share</svelte:fragment>
+        </ModalConfirm>
         <ModalConfirm initialFocus={forkInput} on:confirm={() => forkForm.requestSubmit()}>
           <button type="button" title="Fork it" slot="trigger">
             <ForkIcon class="h-5 w-5 text-gray-500 hover:text-green-500 duration-200" />

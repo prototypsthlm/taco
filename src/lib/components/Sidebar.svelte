@@ -37,6 +37,7 @@
             name={chat.name || 'New Chat'}
             updatedAt={chat.updatedAt}
             roleContent={chat.roleContent}
+            {user}
           />
         {/each}
       </ul>

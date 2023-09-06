@@ -122,7 +122,15 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => 
       },
       activeUserTeam: {
         include: {
-          team: true,
+          team: {
+            include: {
+              teamUsers: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
           chats: { orderBy: { updatedAt: 'desc' } },
         },
       },
