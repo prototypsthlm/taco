@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
+  import AvatarGroup from '$lib/components/AvatarGroup.svelte'
   import ForkIcon from '$lib/components/icons/ForkIcon.svelte'
   import ModalConfirm from '$lib/components/ModalConfirm.svelte'
   import Typeahead from '$lib/components/Typeahead.svelte'
@@ -9,15 +10,13 @@
   import { getTimeSince } from '$lib/utils/timeConverter'
   import { ChatBubbleLeftIcon, TrashIcon, ShareIcon } from '@babeard/svelte-heroicons/solid'
 
-  export let chatId: number
-  export let name: string
-  export let roleContent: string
-  export let updatedAt: Date
+  export let chat: UserWithUserTeamsActiveTeamAndChats['activeUserTeam']['chats'][number]
+  const name = chat.name || 'New Chat'
   export let user: UserWithUserTeamsActiveTeamAndChats
 
-  $: updatedAtShorthand = getTimeSince(updatedAt)
-  $: href = `/app/chat/${chatId}`
-  $: isLinkActive = $page.data.chatId === chatId
+  $: updatedAtShorthand = getTimeSince(chat.updatedAt)
+  $: href = `/app/chat/${chat.id}`
+  $: isLinkActive = $page.data.chatId === chat.id
 
   let deleteForm: HTMLFormElement
   let forkForm: HTMLFormElement
@@ -41,7 +40,7 @@
     <div class="flex items-center gap-x-3">
       <ChatBubbleLeftIcon class="h-6 w-6 text-white flex-none" />
       <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-white">{name}</h3>
-      <time datetime={updatedAt.toISOString()} class="flex-none text-xs text-gray-600"
+      <time datetime={chat.updatedAt.toISOString()} class="flex-none text-xs text-gray-600"
         >{updatedAtShorthand}</time
       >
     </div>
@@ -52,17 +51,18 @@
         on:keyup|stopPropagation
       >
         <p class="truncate text-sm text-gray-500">
-          {roleContent}
+          {chat.roleContent}
         </p>
+        <AvatarGroup emails={chat.sharedWith.map((x) => x.user.email)} />
         <ModalConfirm initialFocus={shareInput} on:confirm={() => shareForm.requestSubmit()}>
-          <button type="button" title="Share" slot="trigger">
+          <button class="block" type="button" title="Share" slot="trigger">
             <ShareIcon class="h-5 w-5 text-gray-500 hover:text-blue-500 duration-200" />
           </button>
           <svelte:fragment slot="title">Do you want to share the chat?</svelte:fragment>
           <svelte:fragment slot="body">
             <form
               method="post"
-              action="/app/chat/{chatId}?/shareForm"
+              action="/app/chat/{chat.id}?/shareChat"
               bind:this={shareForm}
               use:enhance
               class="w-full"
@@ -76,20 +76,20 @@
                   <Typeahead bind:input={shareInput} name="emails" suggestions={teamMates} />
                 </div>
               </div>
-              <input type="hidden" name="chatId" value={chatId} />
+              <input type="hidden" name="chatId" value={chat.id} />
             </form>
           </svelte:fragment>
           <svelte:fragment slot="confirm">Share</svelte:fragment>
         </ModalConfirm>
         <ModalConfirm initialFocus={forkInput} on:confirm={() => forkForm.requestSubmit()}>
-          <button type="button" title="Fork it" slot="trigger">
+          <button class="block" type="button" title="Fork it" slot="trigger">
             <ForkIcon class="h-5 w-5 text-gray-500 hover:text-green-500 duration-200" />
           </button>
           <svelte:fragment slot="title">Do you want to fork the chat?</svelte:fragment>
           <svelte:fragment slot="body">
             <form
               method="post"
-              action="/app/chat/{chatId}?/forkChat"
+              action="/app/chat/{chat.id}?/forkChat"
               bind:this={forkForm}
               use:enhance
               class="w-full"
@@ -111,7 +111,7 @@
                   />
                 </div>
               </div>
-              <input type="hidden" name="chatId" value={chatId} />
+              <input type="hidden" name="chatId" value={chat.id} />
             </form>
           </svelte:fragment>
           <svelte:fragment slot="confirm">Fork</svelte:fragment>
@@ -119,11 +119,11 @@
         <form
           bind:this={deleteForm}
           method="post"
-          action="/app/chat/{chatId}?/deleteChat"
+          action="/app/chat/{chat.id}?/deleteChat"
           use:enhance
         >
           <ModalConfirm type="warning" on:confirm={() => deleteForm.requestSubmit()}>
-            <button type="button" title="Delete it" slot="trigger">
+            <button class="block" type="button" title="Delete it" slot="trigger">
               <TrashIcon class="h-5 w-5 text-gray-500 hover:text-red-500 duration-200" />
             </button>
             <svelte:fragment slot="body">
@@ -131,7 +131,7 @@
             </svelte:fragment>
             <svelte:fragment slot="confirm">Delete</svelte:fragment>
           </ModalConfirm>
-          <input type="hidden" name="chatId" value={chatId} />
+          <input type="hidden" name="chatId" value={chat.id} />
         </form>
       </div>
     {/if}

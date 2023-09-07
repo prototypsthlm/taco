@@ -1,4 +1,9 @@
-import { deleteChat, forkChat, getChatWithRelationsById } from '$lib/server/entities/chat'
+import {
+  deleteChat,
+  forkChat,
+  getChatWithRelationsById,
+  shareChatWithUsers,
+} from '$lib/server/entities/chat'
 import { isUserOwningChat } from '$lib/server/utils/database'
 import { fail, redirect, type Actions } from '@sveltejs/kit'
 import { z } from 'zod'
@@ -50,6 +55,57 @@ export const actions: Actions = {
         schema.data.newName
       )
       throw redirect(303, `/app/chat/${newChat.id}`)
+    }
+
+    if (schema.error.errors.length) {
+      return fail(422, {
+        fields,
+        errors: schema.error.flatten().fieldErrors,
+      })
+    }
+
+    return fail(500, {
+      fields,
+      error: `${schema.error}`,
+    })
+  },
+  shareChat: async ({ locals: { currentUser }, request }) => {
+    const fields = Object.fromEntries(await request.formData())
+
+    // Preprocess the comma-separated string of emails into an array
+    const preprocessEmails = (str: unknown) =>
+      String(str)
+        .split(',')
+        .map((email) => email.trim())
+
+    const schema = z
+      .object({
+        chatId: z.preprocess(Number, z.number()),
+        emails: z.preprocess(
+          String,
+          z.preprocess(preprocessEmails, z.array(z.string().email()).min(1))
+        ),
+      })
+      .safeParse(fields)
+
+    if (!currentUser.activeUserTeamId) {
+      return fail(422, {
+        error: `User needs an active team`,
+      })
+    }
+
+    if (schema.success) {
+      // Perform the sharing logic here
+      const shared = await shareChatWithUsers(schema.data.chatId, schema.data.emails)
+
+      if (shared) {
+        return { status: 200, body: { message: 'Chat shared successfully' } }
+      } else {
+        return fail(500, {
+          fields,
+          error: 'Failed to share chat',
+        })
+      }
     }
 
     if (schema.error.errors.length) {

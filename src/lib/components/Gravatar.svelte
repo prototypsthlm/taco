@@ -6,6 +6,7 @@
 
 <img
   class={$$restProps.class || ''}
+  title={$$restProps.title || ''}
   src={`https://www.gravatar.com/avatar/${md5(value)}?d=identicon`}
-  alt=""
+  alt={$$restProps.alt || ''}
 />

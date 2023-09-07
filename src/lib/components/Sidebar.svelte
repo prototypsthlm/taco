@@ -32,13 +32,7 @@
       </a>
       <ul class="overflow-scroll grow flex flex-col gap-2 pt-4">
         {#each user.activeUserTeam.chats as chat}
-          <ChatLink
-            chatId={chat.id}
-            name={chat.name || 'New Chat'}
-            updatedAt={chat.updatedAt}
-            roleContent={chat.roleContent}
-            {user}
-          />
+          <ChatLink {chat} {user} />
         {/each}
       </ul>
     {/if}

@@ -131,7 +131,16 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => 
               },
             },
           },
-          chats: { orderBy: { updatedAt: 'desc' } },
+          chats: {
+            include: {
+              sharedWith: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+            orderBy: { updatedAt: 'desc' },
+          },
         },
       },
     },
