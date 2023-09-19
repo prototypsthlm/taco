@@ -25,6 +25,13 @@
               >Teams</a
             >
           </li>
+          <li>
+            <a
+              href="/app/settings/customization"
+              class={classNames({ 'text-indigo-400': $page?.url?.pathname?.includes('customization') })}
+              >Customization</a
+            >
+          </li>
         </ul>
       </nav>
     </header>

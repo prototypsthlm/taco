@@ -14,7 +14,7 @@
 </script>
 
 <div class="p-4 md:p-8 flex justify-center">
-  <div class="max-w-screen-md w-full flex gap-4 md:gap-8">
+  <div class="max-w-screen-lg w-full flex gap-4 md:gap-8">
     <div class="flex-shrink-0 h-10 w-10 text-accent bg-blue-600 rounded-xl overflow-hidden flex">
       <Gravatar value={message.author?.email || chat?.owner.user.email} />
     </div>
@@ -29,7 +29,7 @@
   </div>
 </div>
 <div class="p-4 md:p-8 bg-accent bg-opacity-10 flex justify-center">
-  <div class="max-w-screen-md w-full flex gap-4 md:gap-8">
+  <div class="max-w-screen-lg w-full flex gap-4 md:gap-8">
     <div
       class="flex-shrink-0 h-10 w-10 text-accent bg-[#19c37c] rounded-xl flex items-center justify-center"
     >

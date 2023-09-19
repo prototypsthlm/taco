@@ -1,6 +1,14 @@
+import { getLlmPersonalitiesByUserId } from '$lib/server/entities/llmPersonalities'
 import { changeActiveUserTeam, getUserWithUserTeamsById } from '$lib/server/entities/user'
 import { fail, redirect } from '@sveltejs/kit'
-import type { Actions } from './$types'
+import type { Actions, PageServerLoad } from './$types'
+
+export const load: PageServerLoad = async ({ locals: { currentUser } }) => {
+  const llmPersonalities = await getLlmPersonalitiesByUserId(currentUser.id)
+
+  if (llmPersonalities.length === 0) return { llmPersonalities: null }
+  return { llmPersonalities }
+}
 
 export const actions: Actions = {
   selectTeam: async ({ request, locals }) => {
