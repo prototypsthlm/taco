@@ -1,7 +1,7 @@
-import type { UserBySessionId } from '$lib/server/entities/user'
 import { prisma } from '$lib/server/prisma'
+import type { Prisma } from '.prisma/client'
 
-export type ChatWithRelations = Awaited<ReturnType<typeof getChatWithRelationsById>>
+export type ChatWithRelations = Prisma.PromiseReturnType<typeof getChatWithRelationsById>
 
 export const getChatWithRelationsById = (id: number) => {
   return prisma.chat.findUniqueOrThrow({
