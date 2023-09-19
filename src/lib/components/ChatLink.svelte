@@ -24,8 +24,9 @@
   let shareForm: HTMLFormElement
   let shareInput: HTMLInputElement
 
-  const teamMates = user?.activeUserTeam?.team?.teamUsers
+  $: teamMates = user?.activeUserTeam?.team?.teamUsers
     ?.filter((x) => x.user.id !== user.id)
+    ?.filter((x) => !chat.sharedWith.map((x) => x.user.id).includes(x.user.id))
     .map((x) => ({
       email: x?.user.email,
       name: x?.user.name,
@@ -34,7 +35,7 @@
 
 <a href={isLinkActive ? null : href} title={name} on:click={() => isSidebarOpen.set(false)}>
   <li
-    class="px-1 py-3 sm:px-4 lg:px-4 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl"
+    class="px-1 py-3 sm:px-4 lg:px-4 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl flex flex-col gap-4"
     class:bg-accent={isLinkActive}
   >
     <div class="flex items-center gap-x-3">
@@ -53,7 +54,6 @@
         <p class="truncate text-sm text-gray-500">
           {chat.roleContent}
         </p>
-        <AvatarGroup emails={chat.sharedWith.map((x) => x.user.email)} />
         <ModalConfirm initialFocus={shareInput} on:confirm={() => shareForm.requestSubmit()}>
           <button class="block" type="button" title="Share" slot="trigger">
             <ShareIcon class="h-5 w-5 text-gray-500 hover:text-blue-500 duration-200" />
@@ -134,6 +134,7 @@
           <input type="hidden" name="chatId" value={chat.id} />
         </form>
       </div>
+      <AvatarGroup emails={chat.sharedWith.map((x) => x.user.email)} />
     {/if}
   </li>
 </a>
