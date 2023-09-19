@@ -8,9 +8,14 @@
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
   import { getTimeSince } from '$lib/utils/timeConverter'
-  import { ChatBubbleLeftIcon, TrashIcon, ShareIcon } from '@babeard/svelte-heroicons/solid'
+  import {
+    ChatBubbleLeftIcon,
+    ShareIcon,
+    TrashIcon,
+    UserGroupIcon,
+  } from '@babeard/svelte-heroicons/solid'
 
-  export let chat: UserWithUserTeamsActiveTeamAndChats['activeUserTeam']['chats'][number]
+  export let chat: UserWithUserTeamsActiveTeamAndChats['sharedChats'][number]['chat']
   const name = chat.name || 'New Chat'
   export let user: UserWithUserTeamsActiveTeamAndChats
 
@@ -39,7 +44,13 @@
     class:bg-accent={isLinkActive}
   >
     <div class="flex items-center gap-x-3">
-      <ChatBubbleLeftIcon class="h-6 w-6 text-white flex-none" />
+      {#if chat.sharedWith.length}
+        <div title="Shared">
+          <UserGroupIcon class="h-6 w-6 text-white" />
+        </div>
+      {:else}
+        <ChatBubbleLeftIcon class="h-6 w-6 text-white" />
+      {/if}
       <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-white">{name}</h3>
       <time datetime={chat.updatedAt.toISOString()} class="flex-none text-xs text-gray-600"
         >{updatedAtShorthand}</time

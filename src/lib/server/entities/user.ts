@@ -134,6 +134,7 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => 
           },
           chats: {
             include: {
+              owner: true,
               sharedWith: {
                 include: {
                   user: true,
@@ -141,6 +142,21 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => 
               },
             },
             orderBy: { updatedAt: 'desc' },
+          },
+        },
+      },
+      sharedChats: {
+        include: {
+          user: true,
+          chat: {
+            include: {
+              owner: true,
+              sharedWith: {
+                include: {
+                  user: true,
+                },
+              },
+            },
           },
         },
       },

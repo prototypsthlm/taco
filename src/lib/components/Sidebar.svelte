@@ -6,6 +6,12 @@
   import { ChevronRightIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
+  $: chats = [
+    ...(user?.sharedChats
+      .filter((x) => x.chat.owner.teamId == user.activeUserTeam?.teamId)
+      .map((x) => x.chat) || []),
+    ...(user.activeUserTeam?.chats || []),
+  ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
 </script>
 
 <aside class="flex flex-col grow overflow-hidden h-full">
@@ -20,7 +26,7 @@
       </div>
       <ChevronRightIcon class="h-4 w-4 text-white" />
     </a>
-    {#if user?.activeUserTeam?.chats?.length}
+    {#if user?.activeUserTeam}
       <a
         href="/app"
         class="mb-2 px-2 py-4 sm:px-4 lg:px-6 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-lg border-2 border-white border-opacity-20 flex items-center gap-x-3"
@@ -29,11 +35,13 @@
         <PlusIcon class="h-6 w-6 text-white flex-none" />
         <h3 class="flex-auto truncate text-lg font-semibold leading-6 text-white">New Chat</h3>
       </a>
-      <ul class="overflow-scroll grow flex flex-col gap-2 pt-4">
-        {#each user.activeUserTeam.chats as chat}
-          <ChatLink {chat} {user} />
-        {/each}
-      </ul>
+      {#if chats.length}
+        <ul class="overflow-scroll grow flex flex-col gap-2 pt-4">
+          {#each chats as chat}
+            <ChatLink {chat} {user} />
+          {/each}
+        </ul>
+      {/if}
     {/if}
   {:else}
     <p class="text-white mt-4 text-opacity-60 text-center">No team selected</p>
