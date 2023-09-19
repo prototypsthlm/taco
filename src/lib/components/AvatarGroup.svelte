@@ -15,7 +15,8 @@
           value={email}
         />
         <span
-          class="absolute bottom-0 left-0 block h-1 w-1 rounded-full bg-red-400 ring-1 ring-white"
+          title="Connected!"
+          class="absolute bottom-0 left-0.5 block h-1.5 w-1.5 rounded-full bg-red-400 ring-1 ring-white"
         />
       </div>
     {/each}
