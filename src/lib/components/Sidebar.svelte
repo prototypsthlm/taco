@@ -3,8 +3,7 @@
   import Gravatar from '$lib/components/Gravatar.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
-  import { PlusIcon } from '@babeard/svelte-heroicons/solid'
-  import ChevronRight from '@babeard/svelte-heroicons/solid/ChevronRight'
+  import { ChevronRightIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
 </script>
@@ -19,7 +18,7 @@
           <p class="text-white">{user.activeUserTeam.team?.name}</p>
         </div>
       </div>
-      <ChevronRight class="h-4 w-4 text-white" />
+      <ChevronRightIcon class="h-4 w-4 text-white" />
     </a>
     {#if user?.activeUserTeam?.chats?.length}
       <a
