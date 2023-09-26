@@ -1,4 +1,3 @@
-// socketIoHandler.js
 import { Server } from 'socket.io'
 
 export default function injectSocketIO(server) {
@@ -8,42 +7,34 @@ export default function injectSocketIO(server) {
   const usersTyping = {}
 
   io.on('connection', (socket) => {
-    console.log('connection in')
-
     socket.on('join-chat', ({ userId, chatId }) => {
-      console.log('on.join-chat', { userId, chatId })
+      socket.join(chatId)
 
       chatUsers[chatId] = [...new Set([...(chatUsers[chatId] || []), userId])]
 
-      socket.emit('connected-users-changed', chatUsers)
-      console.log(`socket.emit('connected-users-changed', ${JSON.stringify(chatUsers)})`)
+      io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
     })
 
     socket.on('start-typing', ({ userId, chatId }) => {
-      console.log('on.start-typing', { userId, chatId })
       usersTyping[chatId] = [...new Set([...(usersTyping[chatId] || []), userId])]
-      socket.emit('users-typing-changed', usersTyping)
-      console.log(`socket.emit('users-typing-changed', ${JSON.stringify(usersTyping)})`)
+
+      io.to(chatId).emit('users-typing-changed', usersTyping[chatId])
     })
 
     socket.on('stop-typing', ({ userId, chatId }) => {
-      console.log('on.stop-typing', { userId, chatId })
       usersTyping[chatId] = (usersTyping[chatId] || []).filter((x) => x !== userId)
-      socket.emit('users-typing-changed', usersTyping)
-      console.log(`socket.emit('users-typing-changed', ${JSON.stringify(usersTyping)})`)
+
+      io.to(chatId).emit('users-typing-changed', usersTyping[chatId])
     })
 
     socket.on('leave-chat', ({ userId, chatId }) => {
-      console.log('on.leave-chat', { userId, chatId })
-
       chatUsers[chatId] = (chatUsers[chatId] || []).filter((x) => x !== userId)
-      socket.emit('connected-users-changed', chatUsers)
+      socket.leave(chatId) // Make user leave the chat room
 
-      console.log(`socket.emit('connected-users-changed', ${JSON.stringify(chatUsers)})`)
+      io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
     })
 
     socket.on('disconnect', () => {
-      console.log('on.disconnect and removeAllListeners')
       socket.removeAllListeners('connection')
       socket.removeAllListeners('join-chat')
       socket.removeAllListeners('start-typing')

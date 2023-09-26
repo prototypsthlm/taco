@@ -5,4 +5,4 @@
   export let data: PageData
 </script>
 
-<ChatRoom customPersonalities={data.llmPersonalities || null} />
+<ChatRoom customPersonalities={data.llmPersonalities || null} user={data.user} />

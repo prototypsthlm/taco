@@ -5,6 +5,7 @@
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
+  import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import type { LlmPersonality } from '@prisma/client'
   import ioClient from 'socket.io-client'
   import { SSE } from 'sse.js'
@@ -12,6 +13,7 @@
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
 
+  export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: ChatWithRelations | undefined = undefined
   export let customPersonalities: LlmPersonality[] | null = null
 
@@ -20,29 +22,57 @@
   let element: HTMLElement
   let eventSource: SSE | undefined
   const io = ioClient()
-  let socketUser: string
 
   let usersTyping: string[] = []
+  let connectedUsers: string[] = []
+  let prevChatId: number | undefined
+
+  function joinChat(userId: number, chatId: number) {
+    if (!io.connected) {
+      io.connect()
+    }
+
+    io.emit('join-chat', { userId, chatId })
+
+    io.on('connected-users-changed', (updatedConnectedUsers) => {
+      connectedUsers = updatedConnectedUsers
+    })
+
+    io.on('users-typing-changed', (updatedUsersTyping) => {
+      usersTyping = updatedUsersTyping
+    })
+  }
+
+  function leaveChat(userId: number, chatId: number) {
+    io.off('connected-users-changed')
+    io.off('users-typing-changed')
+    io.emit('stopped-typing', { userId, chatId })
+    io.emit('leave-chat', { userId, chatId })
+  }
 
   onMount(() => {
     scrollToBottom()
-
-    io.on('typing', (user) => {
-      usersTyping = [...usersTyping, user]
-    })
-
-    io.on('stopped-typing', (user) => {
-      usersTyping = usersTyping.filter((x) => x !== user)
-    })
-
-    io.on('user', (value) => {
-      socketUser = value
-    })
+    if (chat?.id) {
+      joinChat(user.id, chat.id)
+    }
   })
 
   onDestroy(() => {
+    if (chat?.id) {
+      leaveChat(user.id, chat.id)
+    }
     eventSource?.close()
+    io.disconnect()
   })
+
+  $: if (chat?.id && chat?.id !== prevChatId) {
+    // Leave the previous chat if it existed
+    if (prevChatId) {
+      leaveChat(user.id, prevChatId)
+    }
+    joinChat(user.id, chat.id) // Join the new chat
+    prevChatId = chat.id
+  }
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -111,13 +141,9 @@
 </script>
 
 <div class="text-white">
-  <h1>SOCKET USER {socketUser}</h1>
-  <h2>TYPING:</h2>
-  <ul>
-    {#each usersTyping as userTyping}
-      <li>{userTyping} is typing</li>
-    {/each}
-  </ul>
+  <h1>SOCKET USER {user.id}</h1>
+  <h2>JOINED: {JSON.stringify(connectedUsers)}</h2>
+  <h2>TYPING: {JSON.stringify(usersTyping)}</h2>
 </div>
 
 <div class="flex flex-col justify-between items-center h-full w-full">
@@ -154,10 +180,12 @@
       {loading}
       on:message={handleSubmit}
       on:focus={() => {
-        io.emit('typing')
+        io.emit('join-chat', { userId: user.id, chatId: chat?.id })
+        io.emit('start-typing', { userId: user.id, chatId: chat?.id })
       }}
       on:blur={() => {
-        io.emit('stopped-typing')
+        io.emit('join-chat', { userId: user.id, chatId: chat?.id })
+        io.emit('stop-typing', { userId: user.id, chatId: chat?.id })
       }}
     />
   </div>
