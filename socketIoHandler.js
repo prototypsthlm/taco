@@ -13,33 +13,33 @@ export default function injectSocketIO(server) {
       chatUsers[chatId] = [...new Set([...(chatUsers[chatId] || []), userId])]
 
       io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
-    })
 
-    socket.on('start-typing', ({ userId, chatId }) => {
-      usersTyping[chatId] = [...new Set([...(usersTyping[chatId] || []), userId])]
+      socket.on('start-typing', () => {
+        usersTyping[chatId] = [...new Set([...(usersTyping[chatId] || []), userId])]
 
-      io.to(chatId).emit('users-typing-changed', usersTyping[chatId])
-    })
+        io.to(chatId).emit('users-typing-changed', usersTyping[chatId])
+      })
 
-    socket.on('stop-typing', ({ userId, chatId }) => {
-      usersTyping[chatId] = (usersTyping[chatId] || []).filter((x) => x !== userId)
+      socket.on('stop-typing', () => {
+        usersTyping[chatId] = (usersTyping[chatId] || []).filter((x) => x !== userId)
 
-      io.to(chatId).emit('users-typing-changed', usersTyping[chatId])
-    })
+        io.to(chatId).emit('users-typing-changed', usersTyping[chatId])
+      })
 
-    socket.on('leave-chat', ({ userId, chatId }) => {
-      chatUsers[chatId] = (chatUsers[chatId] || []).filter((x) => x !== userId)
-      socket.leave(chatId) // Make user leave the chat room
+      socket.on('leave-chat', () => {
+        chatUsers[chatId] = (chatUsers[chatId] || []).filter((x) => x !== userId)
+        socket.leave(chatId)
 
-      io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
-    })
+        io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
+      })
 
-    socket.on('disconnect', () => {
-      socket.removeAllListeners('connection')
-      socket.removeAllListeners('join-chat')
-      socket.removeAllListeners('start-typing')
-      socket.removeAllListeners('stop-typing')
-      socket.removeAllListeners('leave-chat')
+      socket.on('disconnect', () => {
+        socket.removeAllListeners('connection')
+        socket.removeAllListeners('join-chat')
+        socket.removeAllListeners('start-typing')
+        socket.removeAllListeners('stop-typing')
+        socket.removeAllListeners('leave-chat')
+      })
     })
   })
 }

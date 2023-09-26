@@ -25,14 +25,13 @@
 
   let usersTyping: string[] = []
   let connectedUsers: string[] = []
-  let prevChatId: number | undefined
 
-  function joinChat(userId: number, chatId: number) {
+  function joinChat() {
     if (!io.connected) {
       io.connect()
     }
 
-    io.emit('join-chat', { userId, chatId })
+    io.emit('join-chat', { userId: user.id, chatId: chat?.id })
 
     io.on('connected-users-changed', (updatedConnectedUsers) => {
       connectedUsers = updatedConnectedUsers
@@ -43,35 +42,27 @@
     })
   }
 
-  function leaveChat(userId: number, chatId: number) {
+  function leaveChat() {
     io.off('connected-users-changed')
     io.off('users-typing-changed')
-    io.emit('stopped-typing', { userId, chatId })
-    io.emit('leave-chat', { userId, chatId })
+    io.emit('stopped-typing')
+    io.emit('leave-chat')
   }
 
   onMount(() => {
     scrollToBottom()
-    if (chat?.id) {
-      joinChat(user.id, chat.id)
-    }
+    joinChat()
   })
 
   onDestroy(() => {
-    if (chat?.id) {
-      leaveChat(user.id, chat.id)
-    }
+    leaveChat()
     eventSource?.close()
     io.disconnect()
   })
 
-  $: if (chat?.id && chat?.id !== prevChatId) {
-    // Leave the previous chat if it existed
-    if (prevChatId) {
-      leaveChat(user.id, prevChatId)
-    }
-    joinChat(user.id, chat.id) // Join the new chat
-    prevChatId = chat.id
+  $: if (chat?.id) {
+    leaveChat()
+    joinChat()
   }
 
   const scrollToBottom = () => {
@@ -180,12 +171,12 @@
       {loading}
       on:message={handleSubmit}
       on:focus={() => {
-        io.emit('join-chat', { userId: user.id, chatId: chat?.id })
-        io.emit('start-typing', { userId: user.id, chatId: chat?.id })
+        io.emit('join-chat', { userId: user.id, chatId: chat?.id }) // necessary for when there's a user in multiple devices and one the devices leave
+        io.emit('start-typing')
       }}
       on:blur={() => {
         io.emit('join-chat', { userId: user.id, chatId: chat?.id })
-        io.emit('stop-typing', { userId: user.id, chatId: chat?.id })
+        io.emit('stop-typing')
       }}
     />
   </div>
