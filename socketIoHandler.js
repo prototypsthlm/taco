@@ -17,40 +17,31 @@ export default function injectSocketIO(server) {
       chatUsers[chatId] = unique([...chatUsers[chatId], userId])
 
       io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
-    })
 
-    socket.on('start-typing', ({ userId, chatId }) => {
-      chatUsers[chatId] ||= []
-      usersTyping[chatId] ||= []
+      socket.on('start-typing', () => {
+        chatUsers[chatId] = unique([...chatUsers[chatId], userId])
+        usersTyping[chatId] = unique([...usersTyping[chatId], userId])
 
-      chatUsers[chatId] = unique([...chatUsers[chatId], userId])
-      usersTyping[chatId] = unique([...usersTyping[chatId], userId])
+        io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
+        io.to(chatId).emit('users-typing-changed', usersTyping[chatId])
+      })
 
-      io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
-      io.to(chatId).emit('users-typing-changed', usersTyping[chatId])
-    })
+      socket.on('stop-typing', () => {
+        chatUsers[chatId] = unique([...chatUsers[chatId], userId])
+        usersTyping[chatId] = usersTyping[chatId].filter((x) => x !== userId)
 
-    socket.on('stop-typing', ({ userId, chatId }) => {
-      chatUsers[chatId] ||= []
-      usersTyping[chatId] ||= []
+        io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
+        io.to(chatId).emit('users-typing-changed', usersTyping[chatId])
+      })
 
-      chatUsers[chatId] = unique([...chatUsers[chatId], userId])
-      usersTyping[chatId] = usersTyping[chatId].filter((x) => x !== userId)
+      socket.on('leave-chat', () => {
+        chatUsers[chatId] = chatUsers[chatId].filter((x) => x !== userId)
+        socket.leave(chatId)
 
-      io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
-      io.to(chatId).emit('users-typing-changed', usersTyping[chatId])
-    })
+        console.log('leave-chat', JSON.stringify({ userId, chatId, chatUsers: chatUsers[chatId] }))
 
-    socket.on('leave-chat', ({ userId, chatId }) => {
-      chatUsers[chatId] ||= []
-      usersTyping[chatId] ||= []
-
-      chatUsers[chatId] = chatUsers[chatId].filter((x) => x !== userId)
-      socket.leave(chatId)
-
-      console.log('leave-chat', JSON.stringify({ userId, chatId, chatUsers: chatUsers[chatId] }))
-
-      io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
+        io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
+      })
     })
 
     socket.on('disconnect', () => {

@@ -25,14 +25,14 @@
 
   let usersTyping: string[] = []
   let connectedUsers: string[] = []
-  let prevChatId: number | undefined
 
-  function joinChat(userId: number, chatId: number) {
+  function joinChat() {
+    console.log('joinChat')
     if (!io.connected) {
       io.connect()
     }
 
-    io.emit('join-chat', { userId, chatId })
+    io.emit('join-chat', { userId: user.id, chatId: chat?.id })
 
     io.on('connected-users-changed', (updatedConnectedUsers) => {
       connectedUsers = updatedConnectedUsers
@@ -43,38 +43,30 @@
     })
   }
 
-  function leaveChat(userId: number, chatId: number) {
+  function leaveChat() {
+    console.log('leaveChat')
     io.off('connected-users-changed')
     io.off('users-typing-changed')
-    io.emit('stopped-typing', { userId, chatId })
-    io.emit('leave-chat', { userId, chatId })
+    io.emit('stopped-typing')
+    io.emit('leave-chat')
   }
 
   onMount(() => {
     console.log('onmount')
     scrollToBottom()
-    if (chat?.id) {
-      joinChat(user.id, chat.id)
-    }
+    joinChat()
   })
 
   onDestroy(() => {
-    if (chat?.id) {
-      leaveChat(user.id, chat.id)
-    }
+    console.log('onmount')
+    leaveChat()
     eventSource?.close()
     io.disconnect()
   })
 
-  $: if (chat?.id && chat?.id !== prevChatId) {
-    if (prevChatId) {
-      console.log('leaveChat YES', { chatId: chat.id, prevChatId })
-      leaveChat(user.id, prevChatId)
-    } else {
-      console.log('leaveChat NO', { chatId: chat.id, prevChatId })
-    }
-    joinChat(user.id, chat.id)
-    prevChatId = chat.id
+  $: if (chat?.id) {
+    leaveChat()
+    joinChat()
   }
 
   const scrollToBottom = () => {
@@ -183,10 +175,10 @@
       {loading}
       on:message={handleSubmit}
       on:focus={() => {
-        io.emit('start-typing', { userId: user.id, chatId: chat?.id })
+        io.emit('start-typing')
       }}
       on:blur={() => {
-        io.emit('stop-typing', { userId: user.id, chatId: chat?.id })
+        io.emit('stop-typing')
       }}
     />
   </div>
