@@ -10,7 +10,7 @@
   import { buildSocketUsers } from '$lib/utils/socket'
   import { updateSocketUsers } from '$lib/utils/socket.js'
   import type { LlmPersonality } from '@prisma/client'
-  import ioClient from 'socket.io-client'
+  import { io } from 'socket.io-client'
   import { SSE } from 'sse.js'
   import { onDestroy, onMount } from 'svelte'
   import { flip } from 'svelte/animate'
@@ -24,25 +24,24 @@
   let selectedPersonalityContext: string | null = 'You are a helpful assistant.'
   let element: HTMLElement
   let eventSource: SSE | undefined
-  const io = ioClient()
+  const socket = io()
 
   const socketUsers = buildSocketUsers(user, chat)
 
   function joinChat() {
-    console.log('joinChat')
-    if (!io.connected) {
-      io.connect()
+    if (!socket.connected) {
+      socket.connect()
     }
 
-    io.emit('join-chat', { userId: user.id, chatId: chat?.id })
+    socket.emit('join-chat', { userId: user.id, chatId: chat?.id })
 
-    io.on('connected-users-changed', (connectedUserIds: number[]) => {
+    socket.on('connected-users-changed', (connectedUserIds: number[]) => {
       const updatedConnectedUsers = updateSocketUsers(socketUsers, { connectedUserIds })
 
       socketUsersStore.set(updatedConnectedUsers)
     })
 
-    io.on('users-typing-changed', (typingUserIds: number[]) => {
+    socket.on('users-typing-changed', (typingUserIds: number[]) => {
       const updatedConnectedUsers = updateSocketUsers(socketUsers, { typingUserIds })
 
       socketUsersStore.set(updatedConnectedUsers)
@@ -50,10 +49,10 @@
   }
 
   function leaveChat() {
-    io.off('connected-users-changed')
-    io.off('users-typing-changed')
-    io.emit('stopped-typing')
-    io.emit('leave-chat')
+    socket.off('connected-users-changed')
+    socket.off('users-typing-changed')
+    socket.emit('stopped-typing')
+    socket.emit('leave-chat')
   }
 
   onMount(() => {
@@ -64,7 +63,7 @@
   onDestroy(() => {
     leaveChat()
     eventSource?.close()
-    io.disconnect()
+    socket.disconnect()
   })
 
   $: if (chat?.id) {
@@ -172,10 +171,10 @@
       {loading}
       on:message={handleSubmit}
       on:focus={() => {
-        io.emit('start-typing')
+        socket.emit('start-typing')
       }}
       on:blur={() => {
-        io.emit('stop-typing')
+        socket.emit('stop-typing')
       }}
     />
   </div>
