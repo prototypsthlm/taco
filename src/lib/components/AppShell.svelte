@@ -97,7 +97,7 @@
       >
         <Gravatar class="h-8 w-8 rounded-full bg-gray-800" value={user.email} />
         <span class="sr-only">Your profile</span>
-        <span aria-hidden="true">{user.name}</span>
+        <span title={user.name} class="truncate" aria-hidden="true">{user.name}</span>
       </a>
     </nav>
   </div>

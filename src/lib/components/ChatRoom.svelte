@@ -6,13 +6,15 @@
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
+  import { connectedUsersStore, usersTypingStore } from '$lib/stores/chatSockets'
+  import { findOrFail, unique } from '$lib/utils/array'
+  import { filterUndefinedOrNull } from '$lib/utils/array.js'
   import type { LlmPersonality } from '@prisma/client'
   import ioClient from 'socket.io-client'
   import { SSE } from 'sse.js'
   import { onDestroy, onMount } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
-  import { usersTypingStore, connectedUsersStore } from '$lib/stores/chatSockets'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: ChatWithRelations | undefined = undefined
@@ -24,6 +26,10 @@
   let eventSource: SSE | undefined
   const io = ioClient()
 
+  const allChatUsers = filterUndefinedOrNull(
+    unique([...(chat?.sharedWith.map((x) => x.user) || []), chat?.owner.user, user])
+  )
+
   function joinChat() {
     console.log('joinChat')
     if (!io.connected) {
@@ -32,11 +38,19 @@
 
     io.emit('join-chat', { userId: user.id, chatId: chat?.id })
 
-    io.on('connected-users-changed', (updatedConnectedUsers) => {
+    io.on('connected-users-changed', (updatedConnectedUsersIds: number[]) => {
+      const updatedConnectedUsers = updatedConnectedUsersIds
+        .filter((x) => x !== user.id)
+        .map((x) => findOrFail(allChatUsers, (y) => y.id === x))
+
       connectedUsersStore.set(updatedConnectedUsers)
     })
 
-    io.on('users-typing-changed', (updatedUsersTyping) => {
+    io.on('users-typing-changed', (updatedUsersIdsTyping: number[]) => {
+      const updatedUsersTyping = updatedUsersIdsTyping
+        .filter((x) => x !== user.id)
+        .map((x) => findOrFail(allChatUsers, (y) => y.id === x))
+
       usersTypingStore.set(updatedUsersTyping)
     })
   }

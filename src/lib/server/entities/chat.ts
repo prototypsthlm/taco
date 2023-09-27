@@ -19,6 +19,11 @@ export const getChatWithRelationsById = (id: number) => {
         },
         orderBy: { createdAt: 'asc' },
       },
+      sharedWith: {
+        include: {
+          user: true,
+        },
+      },
     },
   })
 }
