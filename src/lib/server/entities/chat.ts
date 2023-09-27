@@ -47,6 +47,11 @@ export const createChat = (userTeamId: number, role: string | undefined) => {
         },
         orderBy: { createdAt: 'asc' },
       },
+      sharedWith: {
+        include: {
+          user: true,
+        },
+      },
     },
   })
 }
@@ -74,6 +79,11 @@ export const addQuestionToChat = (id: number, question: string, userId: number) 
           author: true,
         },
         orderBy: { createdAt: 'asc' },
+      },
+      sharedWith: {
+        include: {
+          user: true,
+        },
       },
     },
   })
