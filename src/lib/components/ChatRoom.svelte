@@ -42,7 +42,6 @@
   }
 
   function leaveChat() {
-    console.log('leaveChat')
     io.off('connected-users-changed')
     io.off('users-typing-changed')
     io.emit('stopped-typing')
@@ -50,13 +49,11 @@
   }
 
   onMount(() => {
-    console.log('onmount')
     scrollToBottom()
     joinChat()
   })
 
   onDestroy(() => {
-    console.log('onmount')
     leaveChat()
     eventSource?.close()
     io.disconnect()
