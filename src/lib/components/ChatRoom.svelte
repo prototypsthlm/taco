@@ -25,13 +25,14 @@
 
   let usersTyping: string[] = []
   let connectedUsers: string[] = []
+  let prevChatId: number | undefined
 
-  function joinChat() {
+  function joinChat(userId: number, chatId: number) {
     if (!io.connected) {
       io.connect()
     }
 
-    io.emit('join-chat', { userId: user.id, chatId: chat?.id })
+    io.emit('join-chat', { userId, chatId })
 
     io.on('connected-users-changed', (updatedConnectedUsers) => {
       connectedUsers = updatedConnectedUsers
@@ -42,27 +43,38 @@
     })
   }
 
-  function leaveChat() {
+  function leaveChat(userId: number, chatId: number) {
     io.off('connected-users-changed')
     io.off('users-typing-changed')
-    io.emit('stopped-typing')
-    io.emit('leave-chat')
+    io.emit('stopped-typing', { userId, chatId })
+    io.emit('leave-chat', { userId, chatId })
   }
 
   onMount(() => {
+    console.log('onmount')
     scrollToBottom()
-    joinChat()
+    if (chat?.id) {
+      joinChat(user.id, chat.id)
+    }
   })
 
   onDestroy(() => {
-    leaveChat()
+    if (chat?.id) {
+      leaveChat(user.id, chat.id)
+    }
     eventSource?.close()
     io.disconnect()
   })
 
-  $: if (chat?.id) {
-    leaveChat()
-    joinChat()
+  $: if (chat?.id && chat?.id !== prevChatId) {
+    if (prevChatId) {
+      console.log('leaveChat YES', { chatId: chat.id, prevChatId })
+      leaveChat(user.id, prevChatId)
+    } else {
+      console.log('leaveChat NO', { chatId: chat.id, prevChatId })
+    }
+    joinChat(user.id, chat.id)
+    prevChatId = chat.id
   }
 
   const scrollToBottom = () => {
@@ -171,12 +183,10 @@
       {loading}
       on:message={handleSubmit}
       on:focus={() => {
-        io.emit('join-chat', { userId: user.id, chatId: chat?.id }) // necessary for when there's a user in multiple devices and one the devices leave
-        io.emit('start-typing')
+        io.emit('start-typing', { userId: user.id, chatId: chat?.id })
       }}
       on:blur={() => {
-        io.emit('join-chat', { userId: user.id, chatId: chat?.id })
-        io.emit('stop-typing')
+        io.emit('stop-typing', { userId: user.id, chatId: chat?.id })
       }}
     />
   </div>
