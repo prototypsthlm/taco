@@ -6,9 +6,9 @@
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
+  import type { SocketUser } from '$lib/stores/socket'
   import { socketUsersStore } from '$lib/stores/socket'
-  import { buildSocketUsers } from '$lib/utils/socket'
-  import { updateSocketUsers } from '$lib/utils/socket.js'
+  import { buildSocketUsers, updateSocketUsers } from '$lib/utils/socket'
   import type { LlmPersonality } from '@prisma/client'
   import { io } from 'socket.io-client'
   import { SSE } from 'sse.js'
@@ -26,9 +26,10 @@
   let eventSource: SSE | undefined
   const socket = io()
 
-  const socketUsers = buildSocketUsers(user, chat)
+  let socketUsers: SocketUser[] = []
 
   function joinChat() {
+    socketUsers = buildSocketUsers(user, chat)
     if (!socket.connected) {
       socket.connect()
     }
@@ -49,6 +50,7 @@
   }
 
   function leaveChat() {
+    socketUsers = []
     socket.off('connected-users-changed')
     socket.off('users-typing-changed')
     socket.emit('stopped-typing')
