@@ -12,6 +12,7 @@
   import { onDestroy, onMount } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
+  import { usersTypingStore, connectedUsersStore } from '$lib/stores/chatSockets'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: ChatWithRelations | undefined = undefined
@@ -23,9 +24,6 @@
   let eventSource: SSE | undefined
   const io = ioClient()
 
-  let usersTyping: string[] = []
-  let connectedUsers: string[] = []
-
   function joinChat() {
     console.log('joinChat')
     if (!io.connected) {
@@ -35,11 +33,11 @@
     io.emit('join-chat', { userId: user.id, chatId: chat?.id })
 
     io.on('connected-users-changed', (updatedConnectedUsers) => {
-      connectedUsers = updatedConnectedUsers
+      connectedUsersStore.set(updatedConnectedUsers)
     })
 
     io.on('users-typing-changed', (updatedUsersTyping) => {
-      usersTyping = updatedUsersTyping
+      usersTypingStore.set(updatedUsersTyping)
     })
   }
 
@@ -134,12 +132,6 @@
     console.error(err)
   }
 </script>
-
-<div class="text-white">
-  <h1>SOCKET USER {user.id}</h1>
-  <h2>JOINED: {JSON.stringify(connectedUsers)}</h2>
-  <h2>TYPING: {JSON.stringify(usersTyping)}</h2>
-</div>
 
 <div class="flex flex-col justify-between items-center h-full w-full">
   {#if !chat?.messages?.length}
