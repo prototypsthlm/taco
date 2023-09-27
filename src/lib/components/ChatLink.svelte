@@ -37,10 +37,6 @@
       email: x?.user.email,
       name: x?.user.name,
     }))
-
-  const allOtherChatUsers = filterUndefinedOrNull(
-    unique([...(chat?.sharedWith.map((x) => x.user) || []), chat?.owner.user])
-  ).filter((x) => x.id !== user.id)
 </script>
 
 <a href={isLinkActive ? null : href} title={name} on:click={() => isSidebarOpen.set(false)}>
@@ -150,7 +146,7 @@
           <input type="hidden" name="chatId" value={chat.id} />
         </form>
       </div>
-      <AvatarGroup users={allOtherChatUsers} />
+      <AvatarGroup />
     {/if}
   </li>
 </a>

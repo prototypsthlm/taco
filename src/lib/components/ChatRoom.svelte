@@ -6,9 +6,9 @@
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
-  import { connectedUsersStore, usersTypingStore } from '$lib/stores/chatSockets'
-  import { findOrFail, unique } from '$lib/utils/array'
-  import { filterUndefinedOrNull } from '$lib/utils/array.js'
+  import { socketUsersStore } from '$lib/stores/socket'
+  import { buildSocketUsers } from '$lib/utils/socket'
+  import { updateSocketUsers } from '$lib/utils/socket.js'
   import type { LlmPersonality } from '@prisma/client'
   import ioClient from 'socket.io-client'
   import { SSE } from 'sse.js'
@@ -26,9 +26,7 @@
   let eventSource: SSE | undefined
   const io = ioClient()
 
-  const allChatUsers = filterUndefinedOrNull(
-    unique([...(chat?.sharedWith.map((x) => x.user) || []), chat?.owner.user, user])
-  )
+  const socketUsers = buildSocketUsers(user, chat)
 
   function joinChat() {
     console.log('joinChat')
@@ -38,20 +36,16 @@
 
     io.emit('join-chat', { userId: user.id, chatId: chat?.id })
 
-    io.on('connected-users-changed', (updatedConnectedUsersIds: number[]) => {
-      const updatedConnectedUsers = updatedConnectedUsersIds
-        .filter((x) => x !== user.id)
-        .map((x) => findOrFail(allChatUsers, (y) => y.id === x))
+    io.on('connected-users-changed', (connectedUserIds: number[]) => {
+      const updatedConnectedUsers = updateSocketUsers(socketUsers, { connectedUserIds })
 
-      connectedUsersStore.set(updatedConnectedUsers)
+      socketUsersStore.set(updatedConnectedUsers)
     })
 
-    io.on('users-typing-changed', (updatedUsersIdsTyping: number[]) => {
-      const updatedUsersTyping = updatedUsersIdsTyping
-        .filter((x) => x !== user.id)
-        .map((x) => findOrFail(allChatUsers, (y) => y.id === x))
+    io.on('users-typing-changed', (typingUserIds: number[]) => {
+      const updatedConnectedUsers = updateSocketUsers(socketUsers, { typingUserIds })
 
-      usersTypingStore.set(updatedUsersTyping)
+      socketUsersStore.set(updatedConnectedUsers)
     })
   }
 
