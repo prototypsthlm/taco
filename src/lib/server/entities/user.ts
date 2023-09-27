@@ -168,7 +168,11 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => 
           user: true,
           chat: {
             include: {
-              owner: true,
+              owner: {
+                include: {
+                  user: true,
+                },
+              },
               sharedWith: {
                 include: {
                   user: true,

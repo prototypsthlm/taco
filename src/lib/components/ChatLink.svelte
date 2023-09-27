@@ -7,6 +7,7 @@
   import Typeahead from '$lib/components/Typeahead.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
+  import { filterUndefinedOrNull, unique } from '$lib/utils/array'
   import { getTimeSince } from '$lib/utils/timeConverter'
   import {
     ChatBubbleLeftIcon,
@@ -36,6 +37,10 @@
       email: x?.user.email,
       name: x?.user.name,
     }))
+
+  const allOtherChatUsers = filterUndefinedOrNull(
+    unique([...(chat?.sharedWith.map((x) => x.user) || []), chat?.owner.user])
+  ).filter((x) => x.id !== user.id)
 </script>
 
 <a href={isLinkActive ? null : href} title={name} on:click={() => isSidebarOpen.set(false)}>
@@ -145,7 +150,7 @@
           <input type="hidden" name="chatId" value={chat.id} />
         </form>
       </div>
-      <AvatarGroup emails={chat.sharedWith.map((x) => x.user.email)} />
+      <AvatarGroup users={allOtherChatUsers} />
     {/if}
   </li>
 </a>
