@@ -68,9 +68,12 @@
     socket.disconnect()
   })
 
-  $: if (chat?.id) {
+  let prevChatId: number | undefined
+
+  $: if (chat?.id !== prevChatId) {
     leaveChat()
     joinChat()
+    prevChatId = chat?.id
   }
 
   const scrollToBottom = () => {
