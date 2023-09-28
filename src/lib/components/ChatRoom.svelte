@@ -6,7 +6,7 @@
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
-  import type { SocketUser } from '$lib/stores/socket'
+  import type { BaseSocketUser, SocketUser } from '$lib/stores/socket'
   import { socketUsersStore } from '$lib/stores/socket'
   import { buildSocketUsers, updateSocketUsers } from '$lib/utils/socket'
   import type { LlmPersonality } from '@prisma/client'
@@ -38,14 +38,8 @@
 
     socket.emit('join-chat', { userId: user.id, chatId: chat?.id })
 
-    socket.on('connected-users-changed', (connectedUserIds: number[]) => {
-      const updatedConnectedUsers = updateSocketUsers(socketUsers, { connectedUserIds })
-
-      socketUsersStore.set(updatedConnectedUsers)
-    })
-
-    socket.on('users-typing-changed', (typingUserIds: number[]) => {
-      const updatedConnectedUsers = updateSocketUsers(socketUsers, { typingUserIds })
+    socket.on('users-changed', (connectedUserIds: BaseSocketUser[]) => {
+      const updatedConnectedUsers = updateSocketUsers(socketUsers, connectedUserIds)
 
       socketUsersStore.set(updatedConnectedUsers)
     })

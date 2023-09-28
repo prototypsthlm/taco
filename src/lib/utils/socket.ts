@@ -1,5 +1,5 @@
 import type { ChatWithRelations } from '$lib/server/entities/chat'
-import type { SocketUser } from '$lib/stores/socket'
+import type { BaseSocketUser, SocketUser } from '$lib/stores/socket'
 import { filterUndefinedOrNull, unique } from '$lib/utils/array'
 import type { User } from '@prisma/client'
 
@@ -23,20 +23,18 @@ export const buildSocketUsers = (user: User, chat?: ChatWithRelations): SocketUs
  * Updates the connection and typing status for an array of SocketUser objects.
  *
  * @param socketUsers - The current array of SocketUser objects.
- * @param connectedUserIds - An array of user IDs representing users who are currently connected.
- * @param typingUserIds - An array of user IDs representing users who are currently typing.
+ * @param updatedSocketUsers An array of updated socket users
  * @returns An updated array of SocketUser objects.
  */
 export const updateSocketUsers = (
   socketUsers: SocketUser[],
-  {
-    connectedUserIds = [],
-    typingUserIds = [],
-  }: { connectedUserIds?: number[]; typingUserIds?: number[] } = {}
+  updatedSocketUsers: BaseSocketUser[]
 ): SocketUser[] => {
   return socketUsers.map((user) => {
-    const isConnected = connectedUserIds ? connectedUserIds.includes(user.id) : user.connected
-    const isTyping = typingUserIds ? typingUserIds.includes(user.id) : user.typing
+    const matchingUser = updatedSocketUsers.find((uu) => uu.id === user.id)
+
+    const isConnected = !!(matchingUser && matchingUser.connected)
+    const isTyping = !!(matchingUser && matchingUser.typing)
 
     return {
       ...user,
