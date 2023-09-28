@@ -1,12 +1,14 @@
 import { PrismaClient, Role } from '@prisma/client'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import bcrypt from 'bcryptjs'
 import { encrypt } from '../src/lib/server/utils/crypto'
 
 const prisma = new PrismaClient()
 
 async function seed() {
+  if (process.env.DEPLOYMENT_ENV !== 'staging' && process.env.DEPLOYMENT_ENV !== 'development') {
+    return
+  }
+
   const email = 'user@prototyp.se'
   const teamName = 'Prototyp'
 
