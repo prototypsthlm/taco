@@ -76,6 +76,7 @@
     prevChatId = chat?.id
   }
 
+  // that should be only if it was already at the bottom
   const scrollToBottom = () => {
     setTimeout(() => {
       element?.scroll({ top: element.scrollHeight, behavior: 'smooth' })
@@ -111,28 +112,36 @@
     eventSource.addEventListener('error', handleError)
 
     eventSource.addEventListener('message', async (e) => {
-      try {
-        if (e.data.includes('[DONE]')) {
-          loading = false
-          if ($page.url.pathname !== `/app/chat/${chat?.id}`) {
-            await goto(`/app/chat/${chat?.id}`)
-          }
-          await invalidateAll()
-          scrollToBottom()
-          eventSource?.close()
-          return
-        }
+      scrollToBottom()
 
+      try {
         const data = JSON.parse(e.data)
 
-        if (data.chat) {
+        if (data.initial && data.chat) {
           chat = data.chat
-          scrollToBottom()
+        }
+
+        if (chat && data.during && data.delta) {
+          const lastMessage = chat.messages[chat.messages.length - 1]
+          lastMessage.answer += data.delta
+          chat.messages[chat.messages.length - 1] = lastMessage
+        }
+
+        if (chat && data.final) {
+          loading = false
+          if ($page.url.pathname !== `/app/chat/${chat.id}`) {
+            await goto(`/app/chat/${chat.id}`)
+          }
+          await invalidateAll()
+          eventSource?.close()
         }
       } catch (err) {
         handleError(err)
       }
+
+      scrollToBottom()
     })
+
     eventSource.stream()
   }
 

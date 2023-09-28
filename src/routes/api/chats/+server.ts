@@ -46,29 +46,33 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     chat = await createChat(currentUser.activeUserTeamId, schema.data.role)
   }
 
-  const chatRequest = transformChatToCompletionRequest(chat, schema.data.question, true)
-  const chatResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+  const chatRequestBody = transformChatToCompletionRequest(chat, schema.data.question, true)
+  const chatRequest = fetch('https://api.openai.com/v1/chat/completions', {
     headers: {
       Authorization: `Bearer ${getApiKey(chat)}`,
       'Content-Type': 'application/json',
     },
     method: 'POST',
-    body: JSON.stringify(chatRequest),
+    body: JSON.stringify(chatRequestBody),
   })
-
-  if (!chatResponse.ok || !chatResponse.body) {
-    const err = await chatResponse.json()
-    throw error(500, JSON.stringify({ error: `OpenAI API Error: ${err.error.message}` }))
-  }
 
   const stream = new ReadableStream({
     async start(controller) {
-      controller.enqueue(encodeChunkData([JSON.stringify({ chat })]))
-
-      const chatResponseReader = chatResponse.body?.getReader()
       chat = await addQuestionToChat(chat.id, schema.data.question, currentUser.id)
       const lastMessage = chat.messages[chat.messages.length - 1]
       lastMessage.answer = ''
+
+      controller.enqueue(encodeChunkData([JSON.stringify({ initial: true, chat })]))
+
+      const chatResponse = await chatRequest
+
+      if (!chatResponse.ok || !chatResponse.body) {
+        const err = await chatResponse.json()
+        throw error(500, JSON.stringify({ error: `OpenAI API Error: ${err.error.message}` }))
+      }
+
+      const chatResponseReader = chatResponse.body?.getReader()
+
       const readAndEnqueue = async () => {
         if (!chatResponseReader) return
 
@@ -88,13 +92,14 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
                 if (lastMessage?.answer) {
                   await storeAnswer(lastMessage.id, lastMessage.answer)
                 }
-                return `[DONE] ${JSON.stringify({ chat })}`
+                return `${JSON.stringify({ final: true })}`
               }
 
               const parsedData = JSON.parse(data)
-              lastMessage.answer! += extractDelta(parsedData)
+              const delta = extractDelta(parsedData)
+              lastMessage.answer! += delta
 
-              return JSON.stringify({ chat })
+              return JSON.stringify({ during: true, delta })
             })
           )
 
