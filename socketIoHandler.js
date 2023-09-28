@@ -8,7 +8,6 @@ export default function injectSocketIO(server) {
 
   io.on('connection', (socket) => {
     socket.on('join-chat', ({ userId, chatId }) => {
-      console.log('join-chat', JSON.stringify({ userId, chatId, chatUsers: chatUsers }))
       socket.join(chatId)
 
       chatUsers[chatId] ||= []
@@ -34,11 +33,17 @@ export default function injectSocketIO(server) {
         io.to(chatId).emit('users-typing-changed', usersTyping[chatId])
       })
 
+      socket.on('stream-response', (data) => {
+        chatUsers[chatId] = unique([...chatUsers[chatId], userId])
+
+        io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
+
+        socket.to(chatId).emit('streaming-response', data)
+      })
+
       socket.on('leave-chat', () => {
         chatUsers[chatId] = chatUsers[chatId].filter((x) => x !== userId)
         socket.leave(chatId)
-
-        console.log('leave-chat', JSON.stringify({ userId, chatId, chatUsers: chatUsers[chatId] }))
 
         io.to(chatId).emit('connected-users-changed', chatUsers[chatId])
       })

@@ -12,7 +12,7 @@
   import type { LlmPersonality } from '@prisma/client'
   import { io } from 'socket.io-client'
   import { SSE } from 'sse.js'
-  import { onDestroy, onMount } from 'svelte'
+  import { onDestroy } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
 
@@ -29,6 +29,8 @@
   let socketUsers: SocketUser[] = []
 
   function joinChat() {
+    if (!chat) return
+    scrollToBottom()
     socketUsers = buildSocketUsers(user, chat)
     if (!socket.connected) {
       socket.connect()
@@ -47,6 +49,28 @@
 
       socketUsersStore.set(updatedConnectedUsers)
     })
+
+    socket.on('streaming-response', (data) => {
+      scrollToBottom()
+
+      if (data.initial && data.chat) {
+        loading = true
+        chat = data.chat
+      }
+
+      if (chat && data.during && data.delta) {
+        const lastMessage = chat.messages[chat.messages.length - 1]
+        lastMessage.answer += data.delta
+        chat.messages[chat.messages.length - 1] = lastMessage
+      }
+
+      if (chat && data.final) {
+        loading = false
+        invalidateAll()
+        eventSource?.close()
+      }
+      scrollToBottom()
+    })
   }
 
   function leaveChat() {
@@ -56,11 +80,6 @@
     socket.emit('stopped-typing')
     socket.emit('leave-chat')
   }
-
-  onMount(() => {
-    scrollToBottom()
-    joinChat()
-  })
 
   onDestroy(() => {
     leaveChat()
@@ -116,6 +135,7 @@
 
       try {
         const data = JSON.parse(e.data)
+        socket.emit('stream-response', data)
 
         if (data.initial && data.chat) {
           chat = data.chat
