@@ -183,7 +183,6 @@
       {#each chat?.messages as message (message.id)}
         <div out:slide animate:flip={{ duration: (d) => d * 1.2 }}>
           <ChatMessage
-            {chat}
             {message}
             on:delete={() => {
               deleteMessage(message.id)

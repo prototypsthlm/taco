@@ -43,3 +43,14 @@ export const updateSocketUsers = (
     }
   })
 }
+
+/**
+ * Retrieves the corresponding SocketUser for a given User.
+ *
+ * @param user - The user object.
+ * @param socketUsers - The array of SocketUser objects.
+ * @returns The matching SocketUser or null.
+ */
+export const getSocketUserForUser = (user: User, socketUsers: SocketUser[]): SocketUser | null => {
+  return socketUsers.find((su) => su.id === user.id) || null
+}
