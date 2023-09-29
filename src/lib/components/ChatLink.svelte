@@ -32,6 +32,7 @@
 
   $: teamMates = user?.activeUserTeam?.team?.teamUsers
     ?.filter((x) => x.user.id !== user.id)
+    ?.filter((x) => x.user.id !== chat.owner.userId)
     ?.filter((x) => !chat.sharedWith.map((x) => x.user.id).includes(x.user.id))
     .map((x) => ({
       email: x?.user.email,
