@@ -11,7 +11,6 @@
         <Avatar
           {user}
           class="w-5 rounded-full ring-2 ring-[#262e3c]"
-          dotClass=""
           dotConnectedClass="absolute -bottom-0.5 left-0.5 h-1.5 w-1.5 bg-green-400 ring-2 ring-[#262e3c]"
           dotDisconnectedClass="bottom-0 left-[.25rem] h-[.2rem] w-[.2rem] bg-[#262e3c] ring-[1.5px] ring-[#262e3c] ring-offset-[1.5px] ring-offset-gray-400"
         />
