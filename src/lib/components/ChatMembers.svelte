@@ -10,7 +10,7 @@
   import { XMarkIcon } from '@babeard/svelte-heroicons/solid'
   import type { User } from '@prisma/client'
 
-  import { fade } from 'svelte/transition'
+  import { fade, slide } from 'svelte/transition'
 
   export let chat: UserWithUserTeamsActiveTeamAndChats['sharedChats'][number]['chat']
   export let members: User[]
@@ -53,7 +53,7 @@
   <div transition:fade class="{$$props.class} border-b border-gray-200">
     <ul role="list" class="divide-y divide-gray-200">
       {#each members as member (member.id)}
-        <li class="flex py-4">
+        <li transition:slide class="flex py-4">
           <Avatar
             user={member}
             class="inline-block h-10 w-10 rounded-full"
