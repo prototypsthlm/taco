@@ -1,10 +1,12 @@
 <script lang="ts">
-  import { enhance } from '$app/forms'
   import { invalidateAll } from '$app/navigation'
   import Alert from '$lib/components/Alert.svelte'
   import Avatar from '$lib/components/Avatar.svelte'
   import Badge from '$lib/components/Badge.svelte'
+  import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
+  import { socketUsersStore } from '$lib/stores/socket'
+  import { refreshUsersFromChat } from '$lib/utils/socket'
   import { XMarkIcon } from '@babeard/svelte-heroicons/solid'
   import type { User } from '@prisma/client'
 
@@ -15,7 +17,6 @@
   export let user: User
 
   let error: string | undefined
-  let errors: Record<string, string[]> = {}
 
   async function handleUnshare(event: SubmitEvent, memberId: number) {
     event.preventDefault()
@@ -33,6 +34,13 @@
         error = data?.error
       } else {
         await invalidateAll()
+        const updatedConnectedUsers = refreshUsersFromChat(
+          user,
+          chat as ChatWithRelations,
+          $socketUsersStore
+        )
+
+        socketUsersStore.set(updatedConnectedUsers)
       }
     } catch (e) {
       console.error('Error:', e)

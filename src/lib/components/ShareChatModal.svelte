@@ -4,9 +4,13 @@
   import ChatMembers from '$lib/components/ChatMembers.svelte'
   import ModalConfirm from '$lib/components/ModalConfirm.svelte'
   import Typeahead from '$lib/components/Typeahead.svelte'
+  import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { ShareIcon } from '@babeard/svelte-heroicons/solid'
   import type { User } from '@prisma/client'
+  import type { SocketUser } from '$lib/stores/socket'
+  import { socketUsersStore } from '$lib/stores/socket'
+  import { refreshUsersFromChat } from '$lib/utils/socket'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: UserWithUserTeamsActiveTeamAndChats['sharedChats'][number]['chat']
@@ -55,6 +59,13 @@
       } else {
         shareInput.value = ''
         await invalidateAll()
+        const updatedConnectedUsers = refreshUsersFromChat(
+          user,
+          chat as ChatWithRelations,
+          $socketUsersStore
+        )
+
+        socketUsersStore.set(updatedConnectedUsers)
       }
 
       // Handle success, e.g. display a success message or update the UI

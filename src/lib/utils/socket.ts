@@ -54,3 +54,23 @@ export const updateSocketUsers = (
 export const getSocketUserForUser = (user: User, socketUsers: SocketUser[]): SocketUser | null => {
   return socketUsers.find((su) => su.id === user.id) || null
 }
+
+/**
+ * Refreshes the socket users based on the chat and the current socket users.
+ *
+ * @param chat - The chat object with relations.
+ * @param currentUser - The current user for whom the SocketUser array is being created.
+ * @param socketUsers - The current array of SocketUser objects.
+ * @returns An updated array of SocketUser objects.
+ */
+export const refreshUsersFromChat = (
+  currentUser: User,
+  chat: ChatWithRelations,
+  socketUsers: SocketUser[]
+): SocketUser[] => {
+  // 1. Build the new SocketUser list from the chat
+  const newSocketUsers = buildSocketUsers(currentUser, chat)
+
+  // 2. Update the connection and typing status of the new SocketUser list using the existing socketUsers
+  return updateSocketUsers(newSocketUsers, socketUsers)
+}
