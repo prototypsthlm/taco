@@ -155,4 +155,6 @@ model ChatUser {
 
   chat   Chat @relation(fields: [chatId], references: [id])
   chatId Int
+
+  @@unique([userId, chatId])
 }
