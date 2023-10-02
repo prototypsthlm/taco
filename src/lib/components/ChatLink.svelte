@@ -21,7 +21,7 @@
   export let user: UserWithUserTeamsActiveTeamAndChats
 
   $: updatedAtShorthand = getTimeSince(chat.updatedAt)
-  $: href = `/app/chat/${chat.id}`
+  $: href = `/app/chats/${chat.id}`
   $: isLinkActive = $page.data.chatId === chat.id
 
   let deleteForm: HTMLFormElement
@@ -102,7 +102,7 @@
           <svelte:fragment slot="body">
             <form
               method="post"
-              action="/app/chat/{chat.id}?/forkChat"
+              action="/app/chats/{chat.id}?/forkChat"
               bind:this={forkForm}
               use:enhance
               class="w-full"
@@ -132,7 +132,7 @@
         <form
           bind:this={deleteForm}
           method="post"
-          action="/app/chat/{chat.id}?/deleteChat"
+          action="/app/chats/{chat.id}?/deleteChat"
           use:enhance
         >
           <ModalConfirm type="warning" on:confirm={() => deleteForm.requestSubmit()}>

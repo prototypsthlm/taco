@@ -143,8 +143,8 @@
 
         if (chat && data.final) {
           loading = false
-          if ($page.url.pathname !== `/app/chat/${chat.id}`) {
-            await goto(`/app/chat/${chat.id}`)
+          if ($page.url.pathname !== `/app/chats/${chat.id}`) {
+            await goto(`/app/chats/${chat.id}`)
           }
           await invalidateAll()
           eventSource?.close()
