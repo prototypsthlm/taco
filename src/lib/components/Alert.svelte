@@ -7,7 +7,7 @@
     XCircleIcon,
   } from '@babeard/svelte-heroicons/solid'
   export let message: string
-  export let type = 'info'
+  export let type: 'success' | 'warning' | 'error' | 'info' = 'info'
 
   const typeMap = {
     success: {
