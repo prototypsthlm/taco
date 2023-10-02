@@ -12,7 +12,6 @@
   export let autocomplete = 'off'
   export let value = ''
   export let disabled = false
-  export let input: HTMLInputElement | undefined
   export let noLabel = false
 
   const dispatch = createEventDispatcher()
@@ -26,7 +25,6 @@
   {/if}
   <div class="relative shadow-sm">
     <input
-      bind:this={input}
       {id}
       {name}
       {type}

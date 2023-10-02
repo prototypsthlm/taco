@@ -8,14 +8,13 @@
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { ShareIcon } from '@babeard/svelte-heroicons/solid'
   import type { User } from '@prisma/client'
-  import type { SocketUser } from '$lib/stores/socket'
   import { socketUsersStore } from '$lib/stores/socket'
   import { refreshUsersFromChat } from '$lib/utils/socket'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: UserWithUserTeamsActiveTeamAndChats['sharedChats'][number]['chat']
 
-  let shareInput: HTMLInputElement
+  let shareInputValue = ''
 
   $: teamMates = user?.activeUserTeam?.team?.teamUsers
     ?.filter((x) => x.user.id !== user.id)
@@ -49,15 +48,12 @@
         },
       })
 
-      console.log({ response })
-
       if (!response.ok) {
         const data = await response.json()
-        console.log({ data })
         errors = data?.errors
         error = data?.error
       } else {
-        shareInput.value = ''
+        shareInputValue = ''
         await invalidateAll()
         const updatedConnectedUsers = refreshUsersFromChat(
           user,
@@ -67,10 +63,7 @@
 
         socketUsersStore.set(updatedConnectedUsers)
       }
-
-      // Handle success, e.g. display a success message or update the UI
     } catch (e) {
-      // Handle the error, e.g. display an error message to the user
       console.error('Error:', e)
       error = `${e}`
     }
@@ -97,7 +90,7 @@
             <div class="flex-grow">
               <Typeahead
                 ariaDescribedby="add-team-members-helper"
-                bind:input={shareInput}
+                bind:value={shareInputValue}
                 id="add-team-members"
                 name="email"
                 placeholder="Search team members"
