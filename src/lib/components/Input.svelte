@@ -1,18 +1,21 @@
 <script lang="ts">
   import classNames from 'classnames'
   import { ExclamationCircleIcon } from '@babeard/svelte-heroicons/solid'
+  import { createEventDispatcher } from 'svelte'
 
   export let name: string
-  export let id: string | undefined
-  export let errors: string[] | undefined
-  export let label: string | undefined
-  export let placeholder: string | undefined
+  export let id = name
+  export let errors: string[] = []
+  export let label = name
+  export let placeholder = label
   export let type = 'text'
   export let autocomplete = 'off'
-  export let value: string | undefined
-  export let disabled: boolean | undefined
+  export let value = ''
+  export let disabled = false
   export let input: HTMLInputElement | undefined
   export let noLabel = false
+
+  const dispatch = createEventDispatcher()
 </script>
 
 <div class={$$props.class}>
@@ -45,7 +48,19 @@
       {autocomplete}
       aria-invalid={!!errors?.length}
       aria-describedby={`${name}-error`}
-      on:keydown={() => (errors = undefined)}
+      on:input={(e) => {
+        dispatch('input', e)
+      }}
+      on:keydown={(e) => {
+        errors = []
+        dispatch('keydown', e)
+      }}
+      on:focus={(e) => {
+        dispatch('focus', e)
+      }}
+      on:blur={(e) => {
+        dispatch('blur', e)
+      }}
     />
     {#if errors?.length}
       <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">

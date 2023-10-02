@@ -23,6 +23,7 @@ export const getChatWithRelationsById = (id: number) => {
         include: {
           user: true,
         },
+        orderBy: { createdAt: 'asc' },
       },
     },
   })
@@ -180,7 +181,6 @@ export const getAllTeamChats = async (id: number) => {
 }
 
 export const shareChatWithUsers = async (id: number, emails: string[]) => {
-  // First, find users by their emails
   const usersToShareWith = await prisma.user.findMany({
     where: {
       email: {
@@ -189,13 +189,15 @@ export const shareChatWithUsers = async (id: number, emails: string[]) => {
     },
   })
 
-  // Prepare data for the ChatUser table (or however you associate chats with users)
+  if (!usersToShareWith.length) {
+    return false
+  }
+
   const sharedWithUsers = usersToShareWith.map((user) => ({
     chatId: id,
     userId: user.id,
   }))
 
-  // Update the 'shared' field of the Chat model to true
   await prisma.chat.update({
     where: {
       id,
@@ -205,10 +207,35 @@ export const shareChatWithUsers = async (id: number, emails: string[]) => {
     },
   })
 
-  // Create new records in ChatUser table (or however you associate chats with users)
   await prisma.chatUser.createMany({
     data: sharedWithUsers,
   })
 
   return true
+}
+
+export const unshareChatWithUsers = async (id: number, usersIds: number[]) => {
+  await prisma.chatUser.deleteMany({
+    where: {
+      chatId: id,
+      userId: { in: usersIds },
+    },
+  })
+
+  const remainingAssociations = await prisma.chatUser.findMany({
+    where: {
+      chatId: id,
+    },
+  })
+
+  if (!remainingAssociations.length) {
+    await prisma.chat.update({
+      where: {
+        id,
+      },
+      data: {
+        shared: false,
+      },
+    })
+  }
 }

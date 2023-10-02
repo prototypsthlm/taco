@@ -33,7 +33,7 @@
 </script>
 
 <div class={$$props.class}>
-  <TransitionRoot {show}>
+  <TransitionRoot {show} unmount={false} appear={true}>
     <Dialog as="div" class="relative z-50" {initialFocus} on:close={cancel}>
       <TransitionChild
         enter="ease-out duration-300"

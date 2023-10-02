@@ -4,17 +4,11 @@
   import AvatarGroup from '$lib/components/AvatarGroup.svelte'
   import ForkIcon from '$lib/components/icons/ForkIcon.svelte'
   import ModalConfirm from '$lib/components/ModalConfirm.svelte'
-  import Typeahead from '$lib/components/Typeahead.svelte'
+  import ShareChatModal from '$lib/components/ShareChatModal.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
-  import { filterUndefinedOrNull, unique } from '$lib/utils/array'
   import { getTimeSince } from '$lib/utils/timeConverter'
-  import {
-    ChatBubbleLeftIcon,
-    ShareIcon,
-    TrashIcon,
-    UserGroupIcon,
-  } from '@babeard/svelte-heroicons/solid'
+  import { ChatBubbleLeftIcon, TrashIcon, UserGroupIcon } from '@babeard/svelte-heroicons/solid'
 
   export let chat: UserWithUserTeamsActiveTeamAndChats['sharedChats'][number]['chat']
   const name = chat.name || 'New Chat'
@@ -27,17 +21,6 @@
   let deleteForm: HTMLFormElement
   let forkForm: HTMLFormElement
   let forkInput: HTMLInputElement
-  let shareForm: HTMLFormElement
-  let shareInput: HTMLInputElement
-
-  $: teamMates = user?.activeUserTeam?.team?.teamUsers
-    ?.filter((x) => x.user.id !== user.id)
-    ?.filter((x) => x.user.id !== chat.owner.userId)
-    ?.filter((x) => !chat.sharedWith.map((x) => x.user.id).includes(x.user.id))
-    .map((x) => ({
-      email: x?.user.email,
-      name: x?.user.name,
-    }))
 </script>
 
 <a href={isLinkActive ? null : href} title={name} on:click={() => isSidebarOpen.set(false)}>
@@ -67,33 +50,7 @@
         <p class="truncate text-sm text-gray-500">
           {chat.roleContent}
         </p>
-        <ModalConfirm initialFocus={shareInput} on:confirm={() => shareForm.requestSubmit()}>
-          <button class="block" type="button" title="Share" slot="trigger">
-            <ShareIcon class="h-5 w-5 text-gray-500 hover:text-blue-500 duration-200" />
-          </button>
-          <svelte:fragment slot="title">Do you want to share the chat?</svelte:fragment>
-          <svelte:fragment slot="body">
-            <form
-              method="post"
-              action="/app/chat/{chat.id}?/shareChat"
-              bind:this={shareForm}
-              use:enhance
-              class="w-full"
-            >
-              <div class="mt-2 max-w-xl text-sm text-gray-500">
-                <p>Select the persons to share it with.</p>
-              </div>
-              <div class="mt-5 sm:flex sm:items-center">
-                <div class="w-full sm:max-w-xl flex">
-                  <label class="sr-only" for="emails">Emails</label>
-                  <Typeahead bind:input={shareInput} name="emails" suggestions={teamMates} />
-                </div>
-              </div>
-              <input type="hidden" name="chatId" value={chat.id} />
-            </form>
-          </svelte:fragment>
-          <svelte:fragment slot="confirm">Share</svelte:fragment>
-        </ModalConfirm>
+        <ShareChatModal {user} {chat} />
         <ModalConfirm initialFocus={forkInput} on:confirm={() => forkForm.requestSubmit()}>
           <button class="block" type="button" title="Fork it" slot="trigger">
             <ForkIcon class="h-5 w-5 text-gray-500 hover:text-green-500 duration-200" />
