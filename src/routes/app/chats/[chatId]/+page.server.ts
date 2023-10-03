@@ -45,10 +45,11 @@ export const actions: Actions = {
     if (schema.success) {
       const newChat = await forkChat(
         schema.data.chatId,
+        currentUser.id,
         currentUser.activeUserTeamId,
         schema.data.newName
       )
-      throw redirect(303, `/app/chat/${newChat.id}`)
+      throw redirect(303, `/app/chats/${newChat.id}`)
     }
 
     if (schema.error.errors.length) {

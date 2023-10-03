@@ -7,7 +7,7 @@
     "postinstall": "node initialize.js",
     "dev": "vite dev",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "node server.js",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --plugin-search-dir . --check . && eslint .",
@@ -17,13 +17,14 @@
     "test:unit": "vitest",
     "m:gen": "prisma migrate dev --create-only",
     "m:apply:dev": "prisma migrate dev",
-    "m:apply:prod": "prisma migrate deploy"
+    "m:apply:prod": "prisma migrate deploy",
+    "seed": "prisma db seed"
   },
   "dependencies": {
     "@babeard/svelte-heroicons": "^2.0.0-rc.0",
     "@faker-js/faker": "^8.0.2",
     "@playwright/test": "^1.35.1",
-    "@prisma/client": "^5.1.1",
+    "@prisma/client": "^5.2.0",
     "@rgossiaux/svelte-headlessui": "^2.0.0",
     "@sveltejs/adapter-auto": "^2.0.0",
     "@sveltejs/adapter-node": "^1.2.4",
@@ -43,14 +44,17 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-svelte": "^2.26.0",
+    "express": "^4.18.2",
     "openai": "^3.3.0",
     "postcss": "^8.4.24",
     "postmark": "^3.0.19",
     "prettier": "^2.8.8",
     "prettier-plugin-svelte": "^2.8.1",
-    "prisma": "^5.1.1",
+    "prisma": "^5.2.0",
     "remark": "^14.0.3",
     "remark-html": "^15.0.2",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
     "sse.js": "^0.6.1",
     "svelte": "^3.54.0",
     "svelte-autosize": "^1.1.0",
@@ -65,5 +69,8 @@
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17"
   }
 }

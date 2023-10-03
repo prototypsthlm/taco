@@ -1,6 +1,7 @@
 <script lang="ts">
+  import UsersTyping from '$lib/components/UsersTyping.svelte'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
-  import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher, onMount } from 'svelte'
   import autosize from 'svelte-autosize'
 
   let question = ''
@@ -17,9 +18,6 @@
 
   let textarea: HTMLTextAreaElement
   onMount(() => {
-    textarea.focus()
-  })
-  afterUpdate(() => {
     textarea.focus()
   })
 </script>
@@ -49,6 +47,12 @@
           placeholder="Type your message"
           class="no-border w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white max-h-96"
           use:autosize
+          on:focus={() => {
+            dispatch('focus')
+          }}
+          on:blur={() => {
+            dispatch('blur')
+          }}
         />
       </div>
       <button
@@ -66,7 +70,9 @@
       </button>
     </div>
   </div>
-  <p class="text-accent text-opacity-50">Press <strong> Shift + Enter </strong> for a new line</p>
+  <div class="w-5/6 max-w-5xl flex justify-between gap-4 text-accent text-opacity-50 text-xs">
+    <UsersTyping />
+  </div>
 </div>
 
 <style>

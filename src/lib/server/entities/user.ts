@@ -1,5 +1,6 @@
 import { prisma } from '$lib/server/prisma'
 import { generateSessionId } from '$lib/server/utils/crypto'
+import type { Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { escapeUserSecrets } from '../utils/database'
 
@@ -18,7 +19,7 @@ export const getUserWithRelationsById = async (id: number) => {
   return user
 }
 
-export type UserBySessionId = Awaited<ReturnType<typeof getUserBySessionId>>
+export type UserBySessionId = Prisma.PromiseReturnType<typeof getUserBySessionId>
 
 export const getUserBySessionId = (sessionId: string) =>
   prisma.user.findFirstOrThrow({
@@ -126,8 +127,8 @@ export const changeActiveUserTeam = (userId: number, userTeamId: number) =>
     data: { activeUserTeamId: userTeamId },
   })
 
-export type UserWithUserTeamsActiveTeamAndChats = Awaited<
-  ReturnType<typeof getUserWithUserTeamsActiveTeamAndChatsById>
+export type UserWithUserTeamsActiveTeamAndChats = Prisma.PromiseReturnType<
+  typeof getUserWithUserTeamsActiveTeamAndChatsById
 >
 export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => {
   const user = await prisma.user.findUniqueOrThrow({
@@ -140,8 +141,49 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => 
       },
       activeUserTeam: {
         include: {
-          team: true,
-          chats: { orderBy: { updatedAt: 'desc' } },
+          team: {
+            include: {
+              teamUsers: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
+          chats: {
+            include: {
+              owner: {
+                include: {
+                  user: true,
+                },
+              },
+              sharedWith: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+            orderBy: { updatedAt: 'desc' },
+          },
+        },
+      },
+      sharedChats: {
+        include: {
+          user: true,
+          chat: {
+            include: {
+              owner: {
+                include: {
+                  user: true,
+                },
+              },
+              sharedWith: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
         },
       },
     },

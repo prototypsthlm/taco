@@ -33,7 +33,7 @@
 </script>
 
 <div class={$$props.class}>
-  <TransitionRoot {show}>
+  <TransitionRoot {show} unmount={false} appear={true}>
     <Dialog as="div" class="relative z-50" {initialFocus} on:close={cancel}>
       <TransitionChild
         enter="ease-out duration-300"
@@ -62,7 +62,7 @@
             class="w-full max-w-lg"
           >
             <div
-              class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
+              class="relative transform rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
             >
               <div class="sm:flex sm:items-start">
                 <div

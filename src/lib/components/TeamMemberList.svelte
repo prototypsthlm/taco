@@ -1,12 +1,9 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import Alert from '$lib/components/Alert.svelte'
+  import Avatar from '$lib/components/Avatar.svelte'
   import Gravatar from '$lib/components/Gravatar.svelte'
-  import {
-    ArrowDownIcon,
-    ChevronUpIcon,
-    TrashIcon,
-  } from '@babeard/svelte-heroicons/solid'
+  import { ArrowDownIcon, ChevronUpIcon, TrashIcon } from '@babeard/svelte-heroicons/solid'
 
   const formatDate = (date: Date) =>
     date.toLocaleString('sv-SE', {
@@ -40,9 +37,11 @@
       {#each team.teamUsers as teamUser}
         <li class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-6 py-5">
           <div class="flex gap-x-4">
-            <Gravatar
-              class="h-12 w-12 flex-none rounded-full bg-gray-800"
-              value={teamUser.user.email}
+            <Avatar
+              class="w-10 rounded-full"
+              dotConnectedClass="-bottom-0.5 -left-0.5 h-2.5 w-2.5 bg-green-400 ring ring-[#111827]"
+              dotDisconnectedClass="bottom-0 left-0 h-1.5 w-1.5 bg-[#111827] ring-[2.5px] ring-[#111827] ring-offset-2 ring-offset-gray-400"
+              user={teamUser.user}
             />
             <div class="min-w-0 flex-auto">
               <p class="text-sm font-semibold leading-6 text-white">

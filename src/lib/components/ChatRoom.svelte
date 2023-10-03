@@ -5,12 +5,18 @@
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
+  import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
+  import type { BaseSocketUser, SocketUser } from '$lib/stores/socket'
+  import { socketUsersStore } from '$lib/stores/socket'
+  import { buildSocketUsers, updateSocketUsers } from '$lib/utils/socket'
   import type { LlmPersonality } from '@prisma/client'
+  import { io } from 'socket.io-client'
   import { SSE } from 'sse.js'
-  import { onDestroy, onMount } from 'svelte'
+  import { onDestroy } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
 
+  export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: ChatWithRelations | undefined = undefined
   export let customPersonalities: LlmPersonality[] | null = null
 
@@ -18,15 +24,72 @@
   let selectedPersonalityContext: string | null = 'You are a helpful assistant.'
   let element: HTMLElement
   let eventSource: SSE | undefined
+  const socket = io()
 
-  onMount(() => {
+  let socketUsers: SocketUser[] = []
+
+  function joinChat() {
+    if (!chat) return
     scrollToBottom()
-  })
+    socketUsers = buildSocketUsers(user, chat)
+    if (!socket.connected) {
+      socket.connect()
+    }
+
+    socket.emit('join-chat', { userId: user.id, chatId: chat?.id })
+
+    socket.on('users-changed', (connectedUserIds: BaseSocketUser[]) => {
+      const updatedConnectedUsers = updateSocketUsers(socketUsers, connectedUserIds)
+
+      socketUsersStore.set(updatedConnectedUsers)
+    })
+
+    socket.on('streaming-response', (data) => {
+      scrollToBottom()
+
+      if (data.initial && data.chat) {
+        loading = true
+        chat = data.chat
+      }
+
+      if (chat && data.during && data.delta) {
+        const lastMessage = chat.messages[chat.messages.length - 1]
+        lastMessage.answer += data.delta
+        chat.messages[chat.messages.length - 1] = lastMessage
+      }
+
+      if (chat && data.final) {
+        loading = false
+        invalidateAll()
+        eventSource?.close()
+      }
+      scrollToBottom()
+    })
+  }
+
+  function leaveChat() {
+    socketUsers = []
+    socket.off('connected-users-changed')
+    socket.off('users-typing-changed')
+    socket.emit('stopped-typing')
+    socket.emit('leave-chat')
+  }
 
   onDestroy(() => {
+    leaveChat()
     eventSource?.close()
+    socket.disconnect()
   })
 
+  let prevChatId: number | undefined
+
+  $: if (chat?.id !== prevChatId) {
+    leaveChat()
+    joinChat()
+    prevChatId = chat?.id
+  }
+
+  // that should be only if it was already at the bottom
   const scrollToBottom = () => {
     setTimeout(() => {
       element?.scroll({ top: element.scrollHeight, behavior: 'smooth' })
@@ -62,28 +125,37 @@
     eventSource.addEventListener('error', handleError)
 
     eventSource.addEventListener('message', async (e) => {
+      scrollToBottom()
+
       try {
-        if (e.data.includes('[DONE]')) {
-          loading = false
-          if ($page.url.pathname !== `/app/chat/${chat?.id}`) {
-            await goto(`/app/chat/${chat?.id}`)
-          }
-          await invalidateAll()
-          scrollToBottom()
-          eventSource?.close()
-          return
+        const data = JSON.parse(e.data)
+        socket.emit('stream-response', data)
+
+        if (data.initial && data.chat) {
+          chat = data.chat
         }
 
-        const data = JSON.parse(e.data)
+        if (chat && data.during && data.delta) {
+          const lastMessage = chat.messages[chat.messages.length - 1]
+          lastMessage.answer += data.delta
+          chat.messages[chat.messages.length - 1] = lastMessage
+        }
 
-        if (data.chat) {
-          chat = data.chat
-          scrollToBottom()
+        if (chat && data.final) {
+          loading = false
+          if ($page.url.pathname !== `/app/chats/${chat.id}`) {
+            await goto(`/app/chats/${chat.id}`)
+          }
+          await invalidateAll()
+          eventSource?.close()
         }
       } catch (err) {
         handleError(err)
       }
+
+      scrollToBottom()
     })
+
     eventSource.stream()
   }
 
@@ -111,7 +183,6 @@
       {#each chat?.messages as message (message.id)}
         <div out:slide animate:flip={{ duration: (d) => d * 1.2 }}>
           <ChatMessage
-            {chat}
             {message}
             on:delete={() => {
               deleteMessage(message.id)
@@ -123,6 +194,15 @@
   {/if}
 
   <div class="self-end py-3 md:py-6 w-full bg-gray-900">
-    <ChatInput {loading} on:message={handleSubmit} />
+    <ChatInput
+      {loading}
+      on:message={handleSubmit}
+      on:focus={() => {
+        socket.emit('start-typing')
+      }}
+      on:blur={() => {
+        socket.emit('stop-typing')
+      }}
+    />
   </div>
 </div>
