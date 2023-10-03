@@ -2,13 +2,14 @@
   import { enhance } from '$app/forms'
   import { page } from '$app/stores'
   import AvatarGroup from '$lib/components/AvatarGroup.svelte'
+  import DeleteChatModal from '$lib/components/DeleteChatModal.svelte'
   import ForkIcon from '$lib/components/icons/ForkIcon.svelte'
   import ModalConfirm from '$lib/components/ModalConfirm.svelte'
   import ShareChatModal from '$lib/components/ShareChatModal.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
   import { getTimeSince } from '$lib/utils/timeConverter'
-  import { ChatBubbleLeftIcon, TrashIcon, UserGroupIcon } from '@babeard/svelte-heroicons/solid'
+  import { ChatBubbleLeftIcon, UserGroupIcon } from '@babeard/svelte-heroicons/solid'
 
   export let chat: UserWithUserTeamsActiveTeamAndChats['sharedChats'][number]['chat']
   const name = chat.name || 'New Chat'
@@ -18,7 +19,6 @@
   $: href = `/app/chats/${chat.id}`
   $: isLinkActive = $page.data.chatId === chat.id
 
-  let deleteForm: HTMLFormElement
   let forkForm: HTMLFormElement
   let forkInput: HTMLInputElement
 </script>
@@ -31,10 +31,10 @@
     <div class="flex items-center gap-x-3">
       {#if chat.sharedWith.length}
         <div title="Shared">
-          <UserGroupIcon class="h-6 w-6 text-white" />
+          <UserGroupIcon class="h-6 w-6 text-white flex-shrink-0" />
         </div>
       {:else}
-        <ChatBubbleLeftIcon class="h-6 w-6 text-white" />
+        <ChatBubbleLeftIcon class="h-6 w-6 text-white flex-shrink-0" />
       {/if}
       <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-white">{name}</h3>
       <time datetime={chat.updatedAt.toISOString()} class="flex-none text-xs text-gray-600"
@@ -86,23 +86,7 @@
           </svelte:fragment>
           <svelte:fragment slot="confirm">Fork</svelte:fragment>
         </ModalConfirm>
-        <form
-          bind:this={deleteForm}
-          method="post"
-          action="/app/chats/{chat.id}?/deleteChat"
-          use:enhance
-        >
-          <ModalConfirm type="warning" on:confirm={() => deleteForm.requestSubmit()}>
-            <button class="block" type="button" title="Delete it" slot="trigger">
-              <TrashIcon class="h-5 w-5 text-gray-500 hover:text-red-500 duration-200" />
-            </button>
-            <svelte:fragment slot="body">
-              Are you sure you want to delete the chat {name}
-            </svelte:fragment>
-            <svelte:fragment slot="confirm">Delete</svelte:fragment>
-          </ModalConfirm>
-          <input type="hidden" name="chatId" value={chat.id} />
-        </form>
+        <DeleteChatModal chatId={chat.id} />
       </div>
       <AvatarGroup />
     {/if}

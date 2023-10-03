@@ -69,6 +69,11 @@
       await invalidateAll()
       scrollToBottom()
     })
+
+    $socketStore.on('chat-deleted', async () => {
+      await invalidateAll()
+      await goto(`/app`)
+    })
   }
 
   function leaveChat() {
