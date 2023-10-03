@@ -3,7 +3,7 @@ import type { RequestHandler } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import { json } from '@sveltejs/kit'
 
-export const DELETE: RequestHandler = async ({ request, params }) => {
+export const DELETE: RequestHandler = async ({ params }) => {
   try {
     const schema = await z
       .object({

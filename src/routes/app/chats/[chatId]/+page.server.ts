@@ -1,6 +1,5 @@
-import { deleteChat, forkChat, getChatWithRelationsById } from '$lib/server/entities/chat'
-import { isUserOwningChat } from '$lib/server/utils/database'
-import { fail, redirect, type Actions } from '@sveltejs/kit'
+import { forkChat, getChatWithRelationsById } from '$lib/server/entities/chat'
+import { type Actions, fail, redirect } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { PageServerLoad } from './$types'
 
@@ -14,18 +13,6 @@ export const load: PageServerLoad = async ({ params }) => {
 }
 
 export const actions: Actions = {
-  deleteChat: async ({ locals: { currentUser }, request }) => {
-    const data = Object.fromEntries(await request.formData())
-    const chatId = Number(data.chatId)
-
-    if (!(await isUserOwningChat(chatId, currentUser.id))) {
-      return fail(401, { message: `You don't own the chat ${chatId}` })
-    }
-
-    await deleteChat(chatId)
-
-    throw redirect(303, '/app')
-  },
   forkChat: async ({ locals: { currentUser }, request }) => {
     const fields = Object.fromEntries(await request.formData())
 

@@ -10,7 +10,7 @@
   import { socketUsersStore } from '$lib/stores/socket'
   import { buildSocketUsers, updateSocketUsers } from '$lib/utils/socket'
   import type { LlmPersonality } from '@prisma/client'
-  import { io } from 'socket.io-client'
+  import { socketStore } from '$lib/stores/socket'
   import { SSE } from 'sse.js'
   import { onDestroy } from 'svelte'
   import { flip } from 'svelte/animate'
@@ -24,7 +24,6 @@
   let selectedPersonalityContext: string | null = 'You are a helpful assistant.'
   let element: HTMLElement
   let eventSource: SSE | undefined
-  const socket = io()
 
   let socketUsers: SocketUser[] = []
 
@@ -32,19 +31,19 @@
     if (!chat) return
     scrollToBottom()
     socketUsers = buildSocketUsers(user, chat)
-    if (!socket.connected) {
-      socket.connect()
+    if (!$socketStore.connected) {
+      $socketStore.connect()
     }
 
-    socket.emit('join-chat', { userId: user.id, chatId: chat?.id })
+    $socketStore.emit('join-chat', { userId: user.id, chatId: chat?.id })
 
-    socket.on('users-changed', (connectedUserIds: BaseSocketUser[]) => {
+    $socketStore.on('users-changed', (connectedUserIds: BaseSocketUser[]) => {
       const updatedConnectedUsers = updateSocketUsers(socketUsers, connectedUserIds)
 
       socketUsersStore.set(updatedConnectedUsers)
     })
 
-    socket.on('streaming-response', (data) => {
+    $socketStore.on('streaming-response', (data) => {
       scrollToBottom()
 
       if (data.initial && data.chat) {
@@ -65,20 +64,33 @@
       }
       scrollToBottom()
     })
+
+    $socketStore.on('message-deleted', async () => {
+      await invalidateAll()
+      scrollToBottom()
+    })
+
+    $socketStore.on('chat-deleted', async () => {
+      await invalidateAll()
+      await goto(`/app`)
+    })
   }
 
   function leaveChat() {
     socketUsers = []
-    socket.off('connected-users-changed')
-    socket.off('users-typing-changed')
-    socket.emit('stopped-typing')
-    socket.emit('leave-chat')
+    $socketStore.off('connected-users-changed')
+    $socketStore.off('users-typing-changed')
+    $socketStore.off('streaming-response')
+    $socketStore.off('message-deleted')
+    $socketStore.off('chat-deleted')
+    $socketStore.emit('stopped-typing')
+    $socketStore.emit('leave-chat')
   }
 
   onDestroy(() => {
     leaveChat()
     eventSource?.close()
-    socket.disconnect()
+    $socketStore.disconnect()
   })
 
   let prevChatId: number | undefined
@@ -102,6 +114,7 @@
     const json = await res.json()
     if (json?.success && chat?.messages) {
       chat.messages = chat.messages.filter((x) => x.id !== id)
+      $socketStore.emit('delete-message')
     } else {
       console.error(json?.error)
     }
@@ -129,7 +142,7 @@
 
       try {
         const data = JSON.parse(e.data)
-        socket.emit('stream-response', data)
+        $socketStore.emit('stream-response', data)
 
         if (data.initial && data.chat) {
           chat = data.chat
@@ -198,10 +211,10 @@
       {loading}
       on:message={handleSubmit}
       on:focus={() => {
-        socket.emit('start-typing')
+        $socketStore.emit('start-typing')
       }}
       on:blur={() => {
-        socket.emit('stop-typing')
+        $socketStore.emit('stop-typing')
       }}
     />
   </div>

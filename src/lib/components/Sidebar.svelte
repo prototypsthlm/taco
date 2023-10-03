@@ -37,7 +37,7 @@
       </a>
       {#if chats.length}
         <ul class="overflow-scroll grow flex flex-col gap-2 pt-4">
-          {#each chats as chat}
+          {#each chats as chat (chat.id)}
             <ChatLink {chat} {user} />
           {/each}
         </ul>

@@ -56,6 +56,20 @@ export default function injectSocketIO(server) {
         socket.to(chatId).emit('streaming-response', data)
       })
 
+      socket.on('delete-message', (data) => {
+        connectUser(userId, chatId)
+        io.to(chatId).emit('users-changed', users[chatId])
+
+        socket.to(chatId).emit('message-deleted', data)
+      })
+
+      socket.on('delete-chat', (data) => {
+        connectUser(userId, chatId)
+        io.to(chatId).emit('users-changed', users[chatId])
+
+        socket.to(chatId).emit('chat-deleted', data)
+      })
+
       socket.on('leave-chat', () => {
         disconnectUser(userId, chatId)
         socket.leave(chatId)

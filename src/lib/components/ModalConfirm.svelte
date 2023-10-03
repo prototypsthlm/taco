@@ -10,16 +10,23 @@
   import classNames from 'classnames'
 
   export let type: 'warning' | 'info' = 'info'
+  export let isOpen: boolean | undefined = undefined
 
   let show = false
   const dispatch = createEventDispatcher()
+
+  $: if (isOpen !== undefined) {
+    show = isOpen
+  }
 
   function open() {
     show = true
   }
 
   function confirm() {
-    show = false
+    if (isOpen === undefined) {
+      show = false
+    }
     dispatch('confirm')
   }
 

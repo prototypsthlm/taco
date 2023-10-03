@@ -21,7 +21,7 @@
     }
   }
 
-  const filterSuggestions = (e) => {
+  const filterSuggestions = (e: CustomEvent) => {
     value = e.detail.target.value
   }
 
