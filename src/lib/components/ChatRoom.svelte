@@ -65,12 +65,19 @@
       }
       scrollToBottom()
     })
+
+    socket.on('message-deleted', () => {
+      invalidateAll()
+      scrollToBottom()
+    })
   }
 
   function leaveChat() {
     socketUsers = []
     socket.off('connected-users-changed')
     socket.off('users-typing-changed')
+    socket.off('streaming-response')
+    socket.off('message-deleted')
     socket.emit('stopped-typing')
     socket.emit('leave-chat')
   }
@@ -102,6 +109,7 @@
     const json = await res.json()
     if (json?.success && chat?.messages) {
       chat.messages = chat.messages.filter((x) => x.id !== id)
+      socket.emit('delete-message')
     } else {
       console.error(json?.error)
     }
