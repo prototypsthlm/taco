@@ -1,5 +1,5 @@
 import { deleteChat } from '$lib/server/entities/chat'
-import { isUserOwningChat } from '$lib/server/utils/database'
+import { isUserOwningChat } from '$lib/server/entities/user'
 import type { RequestHandler } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import { json } from '@sveltejs/kit'

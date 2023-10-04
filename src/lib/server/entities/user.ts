@@ -1,23 +1,16 @@
 import { prisma } from '$lib/server/prisma'
 import { generateSessionId } from '$lib/server/utils/crypto'
 import type { Prisma } from '@prisma/client'
+import { Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import { escapeUserSecrets } from '../utils/database'
 
-export const getUserWithRelationsById = async (id: number) => {
-  const user = await prisma.user.findUniqueOrThrow({
+export const getUserWithPasswordById = async (id: number) =>
+  prisma.user.findUniqueOrThrow({
     where: { id },
     include: {
-      userTeams: {
-        include: {
-          team: true,
-        },
-      },
+      password: true,
     },
   })
-  escapeUserSecrets(user)
-  return user
-}
 
 export type UserBySessionId = Prisma.PromiseReturnType<typeof getUserBySessionId>
 
@@ -41,49 +34,58 @@ export const getUserByEmail = (email: string) =>
   })
 
 export const getUserByResetToken = (resetToken: string) =>
-  prisma.user.findUnique({
-    where: { resetToken },
+  prisma.user.findFirst({
+    where: {
+      password: {
+        resetToken,
+      },
+    },
   })
 
 export const updateResetTokenToUser = (userId: number, resetToken: string | null) =>
   prisma.user.update({
     where: { id: userId },
     data: {
-      resetToken,
+      password: {
+        update: {
+          resetToken,
+        },
+      },
     },
   })
 
-export const getUserIfCredentialsMatch = async (email: string, password: string) => {
-  const user = await prisma.user.findUnique({ where: { email } })
+export const doesCredentialsMatch = async (email: string, password: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+    include: {
+      password: true,
+    },
+  })
 
   if (!user?.password) {
-    return null
+    return false
   }
 
-  const isPasswordMatching = await bcrypt.compare(password, user.password)
-
-  if (!isPasswordMatching) {
-    return null
-  }
-
-  escapeUserSecrets(user)
-  return user
+  return bcrypt.compare(password, user.password.hash)
 }
 
-export const createUser = async (name: string, email: string, password: string) => {
-  const user = await prisma.user.create({
+export const createUser = async (name: string, email: string, password: string) =>
+  prisma.user.create({
     data: {
       email,
       name,
-      password: await bcrypt.hash(password, 10),
+      password: {
+        create: {
+          hash: await bcrypt.hash(password, 10),
+        },
+      },
     },
     include: {
       userSessions: true,
     },
   })
-  escapeUserSecrets(user)
-  return user
-}
 
 export const createUserSession = (userId: number) =>
   prisma.userSession.create({
@@ -106,20 +108,21 @@ export const updatePassword = async (id: number, password: string) =>
   prisma.user.update({
     where: { id },
     data: {
-      password: await bcrypt.hash(password, 10),
+      password: {
+        update: {
+          hash: await bcrypt.hash(password, 10),
+        },
+      },
     },
   })
 
 export const deleteUser = (id: number) => prisma.user.delete({ where: { id } })
 
-export const getUserWithUserTeamsById = async (id: number) => {
-  const user = await prisma.user.findUniqueOrThrow({
+export const getUserWithUserTeamsById = async (id: number) =>
+  prisma.user.findUniqueOrThrow({
     where: { id },
     include: { userTeams: true },
   })
-  escapeUserSecrets(user)
-  return user
-}
 
 export const changeActiveUserTeam = (userId: number, userTeamId: number) =>
   prisma.user.update({
@@ -130,8 +133,8 @@ export const changeActiveUserTeam = (userId: number, userTeamId: number) =>
 export type UserWithUserTeamsActiveTeamAndChats = Prisma.PromiseReturnType<
   typeof getUserWithUserTeamsActiveTeamAndChatsById
 >
-export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => {
-  const user = await prisma.user.findUniqueOrThrow({
+export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) =>
+  prisma.user.findUniqueOrThrow({
     where: { id },
     include: {
       userTeams: {
@@ -188,21 +191,43 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => 
       },
     },
   })
-  escapeUserSecrets(user)
-  return user
+
+export const isUserAdmin = async (teamId: number, userId: number) => {
+  const userTeam = await prisma.userTeam.findUnique({
+    where: {
+      userId_teamId: {
+        userId: userId,
+        teamId: teamId,
+      },
+      OR: [{ role: Role.ADMIN }, { role: Role.OWNER }],
+    },
+  })
+  return !!userTeam
 }
 
-export const getUserWithChatsById = async (id: number) => {
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id },
-    include: {
-      activeUserTeam: {
-        include: {
-          chats: { orderBy: { updatedAt: 'desc' } },
-        },
+export const isUserInTeam = async (teamId: number, userId: number) => {
+  const userTeam = await prisma.userTeam.findUnique({
+    where: {
+      userId_teamId: {
+        userId: userId,
+        teamId: teamId,
       },
     },
   })
-  escapeUserSecrets(user)
-  return user
+  return !!userTeam
+}
+
+export const isUserOwningChat = async (chatId: number, userId: number) => {
+  const chat = await prisma.chat.findUnique({
+    where: {
+      id: chatId,
+      owner: {
+        userId,
+      },
+    },
+    include: {
+      owner: true,
+    },
+  })
+  return !!chat
 }

@@ -1,4 +1,9 @@
-import { deleteUser, updatePassword, updateUserPersonalData } from '$lib/server/entities/user'
+import {
+  deleteUser,
+  getUserWithPasswordById,
+  updatePassword,
+  updateUserPersonalData,
+} from '$lib/server/entities/user'
 import { fail, redirect } from '@sveltejs/kit'
 import bcrypt from 'bcryptjs'
 import { z, ZodError } from 'zod'
@@ -53,18 +58,20 @@ export const actions: Actions = {
         })
         .refine((data) => data.newPassword === data.confirmPassword, {
           message: "Password don't match with new password.",
-          path: ['confirmPassword'], // path of error
+          path: ['confirmPassword'],
         })
         .refine((data) => data.newPassword !== data.currentPassword, {
           message: 'New password must be different from the old one.',
-          path: ['newPassword'], // path of error
+          path: ['newPassword'],
         })
         .refine(
-          async (data) =>
-            await bcrypt.compare(data.currentPassword, locals.currentUser.password || ''),
+          async (data) => {
+            const user = await getUserWithPasswordById(locals.currentUser.id)
+            return await bcrypt.compare(data.currentPassword, user.password?.hash || '')
+          },
           {
             message: 'Current password is not correct.',
-            path: ['currentPassword'], // path of error
+            path: ['currentPassword'],
           }
         )
         .parseAsync(fields)

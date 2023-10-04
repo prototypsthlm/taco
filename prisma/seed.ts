@@ -13,7 +13,11 @@ async function seed() {
   const teamName = 'Prototyp'
 
   const tables: { tablename: string }[] = await prisma.$queryRawUnsafe(
-    `SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND tablename != '_prisma_migrations';`
+    `SELECT tablename
+     FROM pg_catalog.pg_tables
+     WHERE schemaname != 'pg_catalog'
+       AND schemaname != 'information_schema'
+       AND tablename != '_prisma_migrations';`
   )
 
   for (const { tablename } of tables) {
@@ -33,8 +37,12 @@ async function seed() {
   const user = await prisma.user.create({
     data: {
       email,
-      name: 'Prototyp User',
-      password: await bcrypt.hash('password', 10),
+      name: 'user1',
+      password: {
+        create: {
+          hash: await bcrypt.hash('password', 10),
+        },
+      },
       userTeams: {
         create: {
           teamId: team1.id,
@@ -50,20 +58,16 @@ async function seed() {
   const userToShare = await prisma.user.create({
     data: {
       email: 'user2@prototyp.se',
-      name: 'Prototyp User 2',
-      password: await bcrypt.hash('password', 10),
+      name: 'user2',
+      password: {
+        create: {
+          hash: await bcrypt.hash('password', 10),
+        },
+      },
       userTeams: {
         create: {
+          teamId: team1.id,
           role: Role.OWNER,
-          team: {
-            create: {
-              name: 'Prototyp 2',
-              openAiApiKey:
-                process.env.OPENAI_API_KEY && process.env.SECRET_KEY
-                  ? encrypt(process.env.OPENAI_API_KEY, process.env.SECRET_KEY)
-                  : null,
-            },
-          },
         },
       },
     },
@@ -72,35 +76,27 @@ async function seed() {
     },
   })
 
-  // Bulk insert users
-  await prisma.user.createMany({
-    data: Array.from({ length: 10 }, (_, i) => ({
-      email: `bulk-user${i + 3}@prototyp.se`,
-      name: `Prototyp User ${i + 3}`,
-      password: bcrypt.hashSync('password', 10), // Note: Synchronously hashing password for simplicity
-    })),
-  })
-
-  // Then connect them to a team
-  const createdUsers = await prisma.user.findMany({
-    where: {
-      email: {
-        startsWith: 'bulk-user',
-      },
-    },
-  })
-
-  for (const user of createdUsers) {
-    await prisma.userTeam.create({
+  for (let i = 3; i < 23; ++i) {
+    await prisma.user.create({
       data: {
-        userId: user.id,
-        teamId: team1.id,
-        role: Role.MEMBER,
+        email: `user${i}@prototyp.se`,
+        name: `user${i}`,
+        password: {
+          create: {
+            hash: bcrypt.hashSync('password', 10), // Note: Synchronously hashing password for simplicity
+          },
+        },
+        userTeams: {
+          create: {
+            teamId: team1.id,
+            role: Role.MEMBER,
+          },
+        },
       },
     })
   }
 
-  const chat = await prisma.chat.create({
+  await prisma.chat.create({
     data: {
       name: 'Test Chat',
       ownerId: user.userTeams[0].id,
@@ -126,11 +122,13 @@ async function seed() {
         createMany: {
           data: [
             {
+              model: 'gpt-3.5-turbo',
               question: 'Are you a helpful assistant?',
               authorId: user.id,
               answer: 'Yes of course.',
             },
             {
+              model: 'gpt-3.5-turbo',
               question: 'Are you Sure about that??',
               authorId: userToShare.id,
               answer: 'No doubt.',
@@ -138,13 +136,12 @@ async function seed() {
           ],
         },
       },
-    },
-  })
-
-  await prisma.chatUser.create({
-    data: {
-      chatId: sharedChat.id,
-      userId: userToShare.id,
+      shared: true,
+      sharedWith: {
+        create: {
+          userId: userToShare.id,
+        },
+      },
     },
   })
 }
