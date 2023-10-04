@@ -36,7 +36,7 @@
         <h3 class="flex-auto truncate text-lg font-semibold leading-6 text-white">New Chat</h3>
       </a>
       {#if chats.length}
-        <ul class="overflow-scroll grow flex flex-col gap-2 pt-4">
+        <ul class="overflow-auto grow flex flex-col gap-2 pt-4">
           {#each chats as chat (chat.id)}
             <ChatLink {chat} {user} />
           {/each}
