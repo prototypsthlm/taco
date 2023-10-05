@@ -1,10 +1,11 @@
-import { sequence } from '@sveltejs/kit/hooks'
+import { PUBLIC_SENTRY_DSN } from '$env/static/public'
+import { getUserBySessionId, type UserBySessionId } from '$lib/server/entities/user'
 import * as Sentry from '@sentry/sveltekit'
-import { type UserBySessionId, getUserBySessionId } from '$lib/server/entities/user'
 import { type Handle, redirect } from '@sveltejs/kit'
+import { sequence } from '@sveltejs/kit/hooks'
 
 Sentry.init({
-  dsn: 'https://b7b5dfa64d0464afacce38d0100f8572@o4505998171635712.ingest.sentry.io/4505998175567872',
+  dsn: PUBLIC_SENTRY_DSN,
   tracesSampleRate: 1,
 })
 
