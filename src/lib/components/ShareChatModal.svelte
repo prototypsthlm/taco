@@ -52,6 +52,10 @@
         const data = await response.json()
         errors = data?.errors
         error = data?.error
+        setTimeout(() => {
+          error = undefined
+          errors = {}
+        }, 5000)
       } else {
         shareInputValue = ''
         await invalidateAll()
@@ -64,8 +68,10 @@
         socketUsersStore.set(updatedConnectedUsers)
       }
     } catch (e) {
-      console.error('Error:', e)
       error = `${e}`
+      setTimeout(() => {
+        error = undefined
+      }, 5000)
     }
   }
 </script>
@@ -77,9 +83,6 @@
   <svelte:fragment slot="title">Share Chat</svelte:fragment>
   <svelte:fragment slot="body">
     <div class="space-y-2">
-      {#if error}
-        <Alert type="error" message={error} />
-      {/if}
       <form on:submit={handleShare}>
         <div class="space-y-2">
           <label for="add-team-members" class="block text-sm font-medium leading-6 text-gray-900"

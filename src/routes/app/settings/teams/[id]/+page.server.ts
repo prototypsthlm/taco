@@ -6,10 +6,9 @@ import {
   getInvitationsByTeamId,
 } from '$lib/server/entities/invitation'
 import { getTeamByIdWithMembers, getTeamByName, updateTeam } from '$lib/server/entities/team'
-import { getUserWithUserTeamsById } from '$lib/server/entities/user'
+import { getUserWithUserTeamsById, isUserAdmin, isUserInTeam } from '$lib/server/entities/user'
 import { getUserTeamById, removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
 import { decrypt } from '$lib/server/utils/crypto'
-import { isUserAdmin, isUserInTeam } from '$lib/server/utils/database'
 import { calcTokenCount } from '$lib/server/utils/tokens'
 import { Role } from '@prisma/client'
 import { error, fail } from '@sveltejs/kit'

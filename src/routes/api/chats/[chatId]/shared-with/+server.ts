@@ -15,7 +15,7 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
 
     const success = await shareChatWithUsers(Number(params.chatId), [schema.email])
     if (!success) {
-      return json({ fields, errors: { email: 'User not found' } }, { status: 422 })
+      return json({ fields, error: 'User not found' }, { status: 422 })
     }
 
     return json({ message: 'Chat shared successfully' })

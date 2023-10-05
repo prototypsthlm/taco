@@ -18,7 +18,7 @@ export const actions: Actions = {
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: "Passwords don't match",
-          path: ['confirmPassword'], // path of error
+          path: ['confirmPassword'],
         })
         .parse(fields)
 

@@ -122,7 +122,7 @@
     </a>
   </div>
 
-  <main class="lg:ml-72 grow overflow-scroll">
+  <main class="lg:ml-72 grow overflow-auto">
     <slot name="main" />
   </main>
 </div>
