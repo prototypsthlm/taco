@@ -1,7 +1,7 @@
 import { shareChatWithUsers } from '$lib/server/entities/chat'
-import type { RequestHandler } from '@sveltejs/kit'
 import { json } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
+import type { RequestHandler } from './$types'
 
 export const PATCH: RequestHandler = async ({ request, params }) => {
   const fields = Object.fromEntries(await request.formData())

@@ -3,7 +3,6 @@
   import Alert from '$lib/components/Alert.svelte'
   import { CheckIcon, PlusIcon, TrashIcon } from '@babeard/svelte-heroicons/solid'
   import type { Invitation } from '@prisma/client'
-  import ClipboardDocument from '@babeard/svelte-heroicons/solid/ClipboardDocument'
   import { page } from '$app/stores'
 
   const formatDate = (date: Date) =>
