@@ -3,14 +3,14 @@ import {
   getApiKey,
   transformChatToCompletionRequest,
 } from '$lib/server/api/openai'
-import type { ChatWithRelations } from '$lib/server/entities/chat'
 import {
   addQuestionToChat,
+  type ChatWithRelations,
   createChat,
   getChatWithRelationsById,
   storeAnswer,
 } from '$lib/server/entities/chat'
-import { decodeChunkData, encodeChunkData, extractDelta } from '$lib/utils/stream'
+import { decodeChunkData, type Delta, encodeChunkData } from '$lib/utils/stream'
 import { error } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { RequestHandler } from './$types'
@@ -83,31 +83,26 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
           return
         }
 
-        try {
-          const dataArray = decodeChunkData(value)
+        const dataArray = decodeChunkData(value)
 
-          const modifiedDataArray = await Promise.all(
-            dataArray.map(async (data) => {
-              if (data === '[DONE]') {
-                if (lastMessage?.answer) {
-                  await storeAnswer(lastMessage.id, lastMessage.answer)
-                }
-                return `${JSON.stringify({ final: true })}`
+        const modifiedDataArray = await Promise.all(
+          dataArray.map(async (data) => {
+            if (data === '[DONE]') {
+              if (lastMessage?.answer) {
+                await storeAnswer(lastMessage.id, lastMessage.answer)
               }
+              return `${JSON.stringify({ final: true })}`
+            }
 
-              const parsedData = JSON.parse(data)
-              const delta = extractDelta(parsedData)
-              lastMessage.answer! += delta
+            const parsedData = JSON.parse(data) as Delta
+            const delta = parsedData.choices[0].delta.content
+            lastMessage.answer! += delta
 
-              return JSON.stringify({ during: true, delta })
-            })
-          )
+            return JSON.stringify({ during: true, delta })
+          })
+        )
 
-          controller.enqueue(encodeChunkData(modifiedDataArray))
-        } catch (e) {
-          console.error(`Streaming Error: ${e}`)
-          controller.enqueue(value)
-        }
+        controller.enqueue(encodeChunkData(modifiedDataArray))
 
         // controller.enqueue(value)
         await readAndEnqueue()

@@ -1,12 +1,17 @@
-import type { UserBySessionId } from '$lib/server/entities/user'
-import { getUserBySessionId } from '$lib/server/entities/user'
-import type { Handle } from '@sveltejs/kit'
-import { redirect } from '@sveltejs/kit'
+import { sequence } from '@sveltejs/kit/hooks'
+import * as Sentry from '@sentry/sveltekit'
+import { type UserBySessionId, getUserBySessionId } from '$lib/server/entities/user'
+import { type Handle, redirect } from '@sveltejs/kit'
+
+Sentry.init({
+  dsn: 'https://b7b5dfa64d0464afacce38d0100f8572@o4505998171635712.ingest.sentry.io/4505998175567872',
+  tracesSampleRate: 1,
+})
 
 const protectedRoutes = ['/app']
 const authRoutes = ['/signin', '/signup']
 
-export const handle: Handle = async ({ event, resolve }) => {
+export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, resolve }) => {
   const targetRoute = event.url.pathname
 
   // sign-out route
@@ -51,4 +56,5 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   return resolve(event)
-}
+})
+export const handleError = Sentry.handleErrorWithSentry()

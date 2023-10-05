@@ -22,16 +22,7 @@ export type Delta = {
 }
 
 export const extractDelta = (data: Delta) => {
-  try {
-    const [{ delta }] = data.choices
+  const [{ delta }] = data.choices
 
-    if (delta?.content) {
-      return delta.content
-    }
-
-    return ''
-  } catch (e) {
-    console.error('extractDelta.e', e)
-    return data
-  }
+  return delta.content
 }
