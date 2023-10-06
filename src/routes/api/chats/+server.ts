@@ -95,7 +95,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
             }
 
             const parsedData = JSON.parse(data) as Delta
-            const delta = parsedData.choices[0].delta.content
+            const delta = parsedData.choices[0].delta.content || ''
             lastMessage.answer! += delta
 
             return JSON.stringify({ during: true, delta })
