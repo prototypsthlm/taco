@@ -1,7 +1,6 @@
 import type { User } from '@prisma/client'
 import { io } from 'socket.io-client'
-import type { Writable } from 'svelte/store'
-import { writable } from 'svelte/store'
+import { type Writable, writable } from 'svelte/store'
 
 export type BaseSocketUser = {
   id: number

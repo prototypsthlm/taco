@@ -3,14 +3,15 @@ import {
   getApiKey,
   transformChatToCompletionRequest,
 } from '$lib/server/api/openai'
-import type { ChatWithRelations } from '$lib/server/entities/chat'
 import {
   addQuestionToChat,
+  type ChatWithRelations,
   createChat,
   getChatWithRelationsById,
   storeAnswer,
 } from '$lib/server/entities/chat'
 import { decodeChunkData, encodeChunkData, extractDelta } from '$lib/utils/stream'
+import * as Sentry from '@sentry/sveltekit'
 import { error } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { RequestHandler } from './$types'
@@ -35,7 +36,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   if (schema.data.id) {
     try {
       chat = await getChatWithRelationsById(schema.data.id)
-      generateChatName(chat)
+      await generateChatName(chat)
     } catch (e) {
       throw error(500, JSON.stringify({ error: `Error getting chat ${e}` }))
     }
@@ -92,7 +93,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
                 if (lastMessage?.answer) {
                   await storeAnswer(lastMessage.id, lastMessage.answer)
                 }
-                return `${JSON.stringify({ final: true })}`
+                return JSON.stringify({ final: true })
               }
 
               const parsedData = JSON.parse(data)
@@ -105,7 +106,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
 
           controller.enqueue(encodeChunkData(modifiedDataArray))
         } catch (e) {
-          console.error(`Streaming Error: ${e}`)
+          Sentry.captureException(error)
           controller.enqueue(value)
         }
 

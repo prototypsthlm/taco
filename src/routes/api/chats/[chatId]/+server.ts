@@ -1,8 +1,8 @@
 import { deleteChat } from '$lib/server/entities/chat'
 import { isUserOwningChat } from '$lib/server/entities/user'
-import type { RequestHandler } from '@sveltejs/kit'
-import { z, ZodError } from 'zod'
 import { json } from '@sveltejs/kit'
+import { z, ZodError } from 'zod'
+import type { RequestHandler } from './$types'
 
 export const DELETE: RequestHandler = async ({ locals: { currentUser }, params }) => {
   try {

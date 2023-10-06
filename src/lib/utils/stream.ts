@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/sveltekit'
+
 export const decodeChunkData = (chunk: Uint8Array) => {
   const chunkString = new TextDecoder().decode(chunk)
 
@@ -25,13 +27,9 @@ export const extractDelta = (data: Delta) => {
   try {
     const [{ delta }] = data.choices
 
-    if (delta?.content) {
-      return delta.content
-    }
-
-    return ''
+    return delta?.content || ''
   } catch (e) {
-    console.error('extractDelta.e', e)
-    return data
+    Sentry.captureException(e)
+    return ''
   }
 }

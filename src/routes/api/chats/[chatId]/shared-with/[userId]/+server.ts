@@ -1,7 +1,7 @@
 import { getChatWithRelationsById, unshareChatWithUsers } from '$lib/server/entities/chat'
-import type { RequestHandler } from '@sveltejs/kit'
-import { z, ZodError } from 'zod'
 import { json } from '@sveltejs/kit'
+import { z, ZodError } from 'zod'
+import type { RequestHandler } from './$types'
 
 export const DELETE: RequestHandler = async ({ params }) => {
   try {
