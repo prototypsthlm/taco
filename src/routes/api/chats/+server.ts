@@ -10,7 +10,8 @@ import {
   getChatWithRelationsById,
   storeAnswer,
 } from '$lib/server/entities/chat'
-import { decodeChunkData, type Delta, encodeChunkData } from '$lib/utils/stream'
+import { decodeChunkData, encodeChunkData, extractDelta } from '$lib/utils/stream'
+import * as Sentry from '@sentry/sveltekit'
 import { error } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { RequestHandler } from './$types'
@@ -35,7 +36,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   if (schema.data.id) {
     try {
       chat = await getChatWithRelationsById(schema.data.id)
-      generateChatName(chat)
+      await generateChatName(chat)
     } catch (e) {
       throw error(500, JSON.stringify({ error: `Error getting chat ${e}` }))
     }
@@ -83,26 +84,31 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
           return
         }
 
-        const dataArray = decodeChunkData(value)
+        try {
+          const dataArray = decodeChunkData(value)
 
-        const modifiedDataArray = await Promise.all(
-          dataArray.map(async (data) => {
-            if (data === '[DONE]') {
-              if (lastMessage?.answer) {
-                await storeAnswer(lastMessage.id, lastMessage.answer)
+          const modifiedDataArray = await Promise.all(
+            dataArray.map(async (data) => {
+              if (data === '[DONE]') {
+                if (lastMessage?.answer) {
+                  await storeAnswer(lastMessage.id, lastMessage.answer)
+                }
+                return JSON.stringify({ final: true })
               }
-              return `${JSON.stringify({ final: true })}`
-            }
 
-            const parsedData = JSON.parse(data) as Delta
-            const delta = parsedData.choices[0].delta.content || ''
-            lastMessage.answer! += delta
+              const parsedData = JSON.parse(data)
+              const delta = extractDelta(parsedData)
+              lastMessage.answer! += delta
 
-            return JSON.stringify({ during: true, delta })
-          })
-        )
+              return JSON.stringify({ during: true, delta })
+            })
+          )
 
-        controller.enqueue(encodeChunkData(modifiedDataArray))
+          controller.enqueue(encodeChunkData(modifiedDataArray))
+        } catch (e) {
+          Sentry.captureException(error)
+          controller.enqueue(value)
+        }
 
         // controller.enqueue(value)
         await readAndEnqueue()
