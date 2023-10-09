@@ -189,6 +189,11 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) =>
           },
         },
       },
+      notifications: {
+        where: {
+          read: false,
+        },
+      },
     },
   })
 
