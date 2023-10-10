@@ -54,46 +54,32 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     chat = await createChat(currentUser.activeUserTeamId, schema.data.role)
   }
 
-  let chatRequest: any;
-  let chatResponse: any;
-
-  if (givenModel.includes("gpt")) {
-    // Using ChatGPT (OpenAI API).
-
-    chatRequest = transformChatToCompletionRequest(chat, givenModel, schema.data.question, true) // This is the final request that will be sent to the openAI API.
-    chatResponse = await fetch('https://api.openai.com/v1/chat/completions', { // This is the actual query to the openAI API.
-      headers: {
-        Authorization: `Bearer ${getApiKey(chat)}`,
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-      body: JSON.stringify(chatRequest),
-    })
-
-    if (!chatResponse.ok || !chatResponse.body) {
-      const err = await chatResponse.json()
-      throw error(500, JSON.stringify({ error: `OpenAI API Error: ${err.error.message}` }))
-    }
-  }
-
-  // TO DO: If no model from givenModel could be found, return an error.
+  const chatRequestBody = transformChatToCompletionRequest(chat, givenModel, schema.data.question, true) // This is the request body that will be sent to the openAI API.
+  const chatRequest = fetch('https://api.openai.com/v1/chat/completions', { // This is the final request that will be sent to the openAI API.
+    headers: {
+      Authorization: `Bearer ${getApiKey(chat)}`,
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: JSON.stringify(chatRequestBody),
+  })
 
   const stream = new ReadableStream({
     async start(controller) {
-      controller.enqueue(encodeChunkData([JSON.stringify({ chat })]))
-
-      const chatResponseReader = chatResponse.body?.getReader()
-      console.log("   --->>>   chatResponseReader:\n" + chatResponse);
       chat = await addQuestionToChat(chat.id, givenModel, schema.data.question, currentUser.id) // We save the question (request + response) in the chat.
       const lastMessage = chat.messages[chat.messages.length - 1]
       lastMessage.answer = ''
 
       controller.enqueue(encodeChunkData([JSON.stringify({ initial: true, chat })]))
 
+      const chatResponse = await chatRequest
+
       if (!chatResponse.ok || !chatResponse.body) {
         const err = await chatResponse.json()
         throw error(500, JSON.stringify({ error: `OpenAI API Error: ${err.error.message}` }))
       }
+
+      const chatResponseReader = chatResponse.body?.getReader()
 
       const readAndEnqueue = async () => {
         if (!chatResponseReader) return
