@@ -1,19 +1,37 @@
 <script lang="ts">
-  import UsersTyping from '$lib/components/UsersTyping.svelte'
+  import type { ChatWithRelations } from '$lib/server/entities/chat'
+  import { Models } from '$lib/types/models'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
+  import ListBullet from '@babeard/svelte-heroicons/solid/ListBullet'
+  import UsersTyping from '$lib/components/UsersTyping.svelte'
   import { createEventDispatcher, onMount } from 'svelte'
   import autosize from 'svelte-autosize'
 
+  // Variables got from <ChatInput {chat} {loading} on:message={handleSubmit} />
+  export let chat: ChatWithRelations | undefined = undefined
+  export let loading = false
+
+  let model = chat?.model // Get the last session selected model
   let question = ''
   let isShiftPressed = false
-  export let loading = false
-  const dispatch = createEventDispatcher()
+  const dispatch = createEventDispatcher() // Events created this way are handled by the handleSubmit function in 'ChatRoom.svelte'.
 
   function dispatchMessage() {
+    // Actually dispatch message.
     if (question.trim() && !loading) {
-      dispatch('message', { question })
-      question = ''
+      dispatch('message', { question, model })
+      question = '' // Empty any written text as it has already been sent, we do NOT do so with the model, which remains the same.
     }
+  }
+
+  function chooseMessageSettings() {
+    if (loading) return
+    if (model == Models.gpt3) {
+      model = Models.gpt4
+    } else {
+      model = Models.gpt3
+    }
+    console.log('Selected model: ' + model)
   }
 
   let textarea: HTMLTextAreaElement
@@ -32,6 +50,7 @@
           name="message"
           bind:value={question}
           on:keydown={(e) => {
+            // Keyboard input handling.
             if (e.key === 'Enter' && !isShiftPressed) {
               dispatchMessage()
               e.preventDefault()
@@ -55,6 +74,31 @@
           }}
         />
       </div>
+
+      <!-- Chat-GPT4 toggle. -->
+      <div class="flex flex-col items-center justify-center bg-primary pb-1">
+        <span class="text-white">GPT4</span>
+        <button
+          on:click={chooseMessageSettings}
+          disabled={loading}
+          type="button"
+          class="{model === Models.gpt4
+            ? 'bg-indigo-600'
+            : 'bg-gray-200'} inline-flex h-4 w-9 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+          role="switch"
+          aria-checked="false"
+        >
+          <span class="sr-only">Use setting</span>
+          <span
+            aria-hidden="true"
+            class="{model === Models.gpt4
+              ? 'translate-x-5'
+              : 'translate-x-0'} pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+          />
+        </button>
+      </div>
+
+      <!-- Send message button. -->
       <button
         on:click={dispatchMessage}
         disabled={loading}

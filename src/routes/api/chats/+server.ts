@@ -15,8 +15,10 @@ import * as Sentry from '@sentry/sveltekit'
 import { error } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { RequestHandler } from './$types'
+import { Models } from '$lib/types/models'
 
 export const POST: RequestHandler = async ({ request, fetch, locals: { currentUser } }) => {
+  // This is called from the 'eventSource = new SSE' in the 'handleSubmit' function in 'ChatRoom.svelte'.
   const requestData = await request.json()
 
   const schema = z
@@ -24,6 +26,10 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       id: z.union([z.preprocess(Number, z.number()), z.undefined()]),
       role: z.union([z.string(), z.undefined()]),
       question: z.string(),
+      model: z.union([
+        z.literal(Models.gpt3),
+        z.literal(Models.gpt4),
+      ]),
     })
     .safeParse(requestData)
 
@@ -32,11 +38,12 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   }
 
   let chat: ChatWithRelations
+  const givenModel = schema.data.model;
 
   if (schema.data.id) {
     try {
       chat = await getChatWithRelationsById(schema.data.id)
-      await generateChatName(chat)
+      await generateChatName(chat, givenModel)
     } catch (e) {
       throw error(500, JSON.stringify({ error: `Error getting chat ${e}` }))
     }
@@ -47,8 +54,8 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     chat = await createChat(currentUser.activeUserTeamId, schema.data.role)
   }
 
-  const chatRequestBody = transformChatToCompletionRequest(chat, schema.data.question, true)
-  const chatRequest = fetch('https://api.openai.com/v1/chat/completions', {
+  const chatRequestBody = transformChatToCompletionRequest(chat, givenModel, schema.data.question, true) // This is the request body that will be sent to the openAI API.
+  const chatRequest = fetch('https://api.openai.com/v1/chat/completions', { // This is the final request that will be sent to the openAI API.
     headers: {
       Authorization: `Bearer ${getApiKey(chat)}`,
       'Content-Type': 'application/json',
@@ -59,7 +66,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
 
   const stream = new ReadableStream({
     async start(controller) {
-      chat = await addQuestionToChat(chat.id, schema.data.question, currentUser.id)
+      chat = await addQuestionToChat(chat.id, givenModel, schema.data.question, currentUser.id) // We save the question (request + response) in the chat.
       const lastMessage = chat.messages[chat.messages.length - 1]
       lastMessage.answer = ''
 
