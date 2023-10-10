@@ -1,0 +1,12 @@
+Hi {{username}},
+
+Welcome to TACO! To get started, please verify your email address by following the link below:
+
+{{verificationUrl}}
+
+If you did not sign up for a TACO account, please ignore this email.
+
+Thanks,
+The TACO Team
+
+P.S.: If you’re having trouble with the link above, copy and paste the URL directly into your web browser.

@@ -1,4 +1,5 @@
 import { prisma } from '$lib/server/prisma'
+import { NotificationType } from '@prisma/client'
 
 export const markAsRead = async (id: number) =>
   prisma.notification.update({
@@ -19,4 +20,23 @@ export const doesNotificationBelongToUser = async (id: number, userId: number) =
   })
 
   return !!n
+}
+
+export const createNotification = async (
+  title: string,
+  body: string,
+  userId: number,
+  type: NotificationType
+) => prisma.notification.create({ data: { type, title, body, userId } })
+
+export const markVerifyNotificationAsRead = (userId: number) => {
+  return prisma.notification.updateMany({
+    where: {
+      type: NotificationType.VERIFY_EMAIL,
+      userId,
+    },
+    data: {
+      read: true,
+    },
+  })
 }

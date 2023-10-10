@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 
-export const generateSessionId = () => {
-  return crypto.randomBytes(32).toString('hex')
+export const generateSecureRandomToken = (size = 32) => {
+  return crypto.randomBytes(size).toString('hex')
 }
 
 export const encrypt = (text: string, secretKey: string) => {

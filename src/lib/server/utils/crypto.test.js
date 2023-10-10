@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { generateSessionId, encrypt, decrypt } from '$lib/server/utils/crypto'
+import { generateSecureRandomToken, encrypt, decrypt } from '$lib/server/utils/crypto'
 
 describe('Crypto functions', () => {
-  it('generateSessionId generates a valid session id', () => {
-    const sessionId = generateSessionId()
+  it('generateSecureRandomToken generates a valid secure token', () => {
+    const sessionId = generateSecureRandomToken()
 
     expect(typeof sessionId).toBe('string')
     expect(sessionId).toHaveLength(64) // randomBytes(32) will generate a string of length 64

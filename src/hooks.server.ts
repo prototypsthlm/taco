@@ -47,14 +47,6 @@ export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, re
     }
 
     event.locals.currentUser = currentUser
-
-    if (
-      !currentUser.activeUserTeamId &&
-      !(targetRoute.includes('/app/settings') || targetRoute.includes('/invitation'))
-    ) {
-      // no active team -> force team selection
-      throw redirect(303, '/app/settings/teams')
-    }
   }
 
   return resolve(event)
