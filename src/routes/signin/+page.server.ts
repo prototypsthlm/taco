@@ -1,5 +1,5 @@
 import { dev } from '$app/environment'
-import { getUserIfCredentialsMatch, createUserSession } from '$lib/server/entities/user'
+import { createUserSession, doesCredentialsMatch, getUserByEmail } from '$lib/server/entities/user'
 import { fail, redirect } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
@@ -8,24 +8,28 @@ export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
     const fields = Object.fromEntries(await request.formData())
     try {
-      const schema = z
+      const schema = await z
         .object({
           email: z.string().email(),
           password: z.string().min(1),
           remember: z.preprocess((value) => value === 'on', z.boolean()),
         })
-        .parse(fields)
+        .refine(async (data) => doesCredentialsMatch(data.email, data.password), {
+          message: 'Wrong credentials',
+          path: ['password'],
+        })
+        .parseAsync(fields)
 
-      const maybeUser = await getUserIfCredentialsMatch(schema.email, schema.password)
+      const user = await getUserByEmail(schema.email)
 
-      if (!maybeUser) {
+      if (!user) {
         return fail(401, {
           fields,
-          error: 'Wrong credentials',
+          error: 'There is no user with that email address',
         })
       }
 
-      const { sessionId } = await createUserSession(maybeUser.id)
+      const { sessionId } = await createUserSession(user.id)
 
       cookies.set('session_id', sessionId, {
         path: '/',

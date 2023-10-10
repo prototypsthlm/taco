@@ -1,6 +1,7 @@
 import { prisma } from '$lib/server/prisma'
+import type { Prisma } from '.prisma/client'
 
-export type ChatWithRelations = Awaited<ReturnType<typeof getChatWithRelationsById>>
+export type ChatWithRelations = Prisma.PromiseReturnType<typeof getChatWithRelationsById>
 
 export const getChatWithRelationsById = (id: number) => {
   return prisma.chat.findUniqueOrThrow({
@@ -15,6 +16,12 @@ export const getChatWithRelationsById = (id: number) => {
       messages: {
         include: {
           author: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      },
+      sharedWith: {
+        include: {
+          user: true,
         },
         orderBy: { createdAt: 'asc' },
       },
@@ -41,11 +48,16 @@ export const createChat = (userTeamId: number, role: string | undefined) => {
         },
         orderBy: { createdAt: 'asc' },
       },
+      sharedWith: {
+        include: {
+          user: true,
+        },
+      },
     },
   })
 }
 
-export const addQuestionToChat = (id: number, model: string, question: string) => {
+export const addQuestionToChat = (id: number, model: string, question: string, userId: number) => {
   return prisma.chat.update({
     // Filtres:
     where: { id },
@@ -56,6 +68,7 @@ export const addQuestionToChat = (id: number, model: string, question: string) =
         create: {
           question,
           model,
+          authorId: userId,
         },
       },
     },
@@ -72,6 +85,11 @@ export const addQuestionToChat = (id: number, model: string, question: string) =
           author: true,
         },
         orderBy: { createdAt: 'asc' },
+      },
+      sharedWith: {
+        include: {
+          user: true,
+        },
       },
     },
   })
@@ -117,7 +135,12 @@ export const deleteChat = (id: number) => {
   })
 }
 
-export const forkChat = async (chatId: number, ownerId: number, name: string) => {
+export const forkChat = async (
+  chatId: number,
+  userId: number,
+  activeUserTeamId: number,
+  name: string
+) => {
   const chat = await getChatWithRelationsById(chatId)
 
   return prisma.chat.create({
@@ -131,9 +154,10 @@ export const forkChat = async (chatId: number, ownerId: number, name: string) =>
         create: chat.messages.map((x) => ({
           question: x.question,
           answer: x.answer,
+          authorId: userId,
         })),
       },
-      ownerId,
+      ownerId: activeUserTeamId,
     },
   })
 }
@@ -159,4 +183,64 @@ export const getAllTeamChats = async (id: number) => {
       messages: true,
     },
   })
+}
+
+export const shareChatWithUsers = async (id: number, emails: string[]) => {
+  const usersToShareWith = await prisma.user.findMany({
+    where: {
+      email: {
+        in: emails,
+      },
+    },
+  })
+
+  if (!usersToShareWith.length) {
+    return false
+  }
+
+  const sharedWithUsers = usersToShareWith.map((user) => ({
+    chatId: id,
+    userId: user.id,
+  }))
+
+  await prisma.chat.update({
+    where: {
+      id,
+    },
+    data: {
+      shared: true,
+    },
+  })
+
+  await prisma.chatUser.createMany({
+    data: sharedWithUsers,
+  })
+
+  return true
+}
+
+export const unshareChatWithUsers = async (id: number, usersIds: number[]) => {
+  await prisma.chatUser.deleteMany({
+    where: {
+      chatId: id,
+      userId: { in: usersIds },
+    },
+  })
+
+  const remainingAssociations = await prisma.chatUser.findMany({
+    where: {
+      chatId: id,
+    },
+  })
+
+  if (!remainingAssociations.length) {
+    await prisma.chat.update({
+      where: {
+        id,
+      },
+      data: {
+        shared: false,
+      },
+    })
+  }
 }

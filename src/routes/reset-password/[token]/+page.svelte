@@ -28,14 +28,11 @@
   </div>
 
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-    {#if form?.success}
-      <Alert type="success" message="Your password has been updated!" />
-    {:else if data.isTokenValid}
+    {#if data.isTokenValid}
       <div class="bg-white dark:bg-gray-900 px-6 py-12 shadow sm:px-12">
-        <Alert
-          type={(form?.error && 'error') || (form?.success && 'success')}
-          message={form?.error || form?.success}
-        />
+        {#if form?.error}
+          <Alert type="error" message={form?.error} />
+        {/if}
 
         <form
           class="space-y-6 mt-4"
@@ -46,7 +43,6 @@
           }}
         >
           <Input
-            value={form?.fields?.password}
             errors={form?.errors?.password}
             label="Password"
             id="password"
@@ -55,7 +51,6 @@
             autocomplete="password"
           />
           <Input
-            value={form?.fields?.confirmPassword}
             errors={form?.errors?.confirmPassword}
             label="Confirm Password"
             id="confirmPassword"

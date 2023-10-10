@@ -13,10 +13,8 @@ datasource db {
 model User {
   id Int @id @default(autoincrement())
 
-  email      String  @unique
-  name       String
-  password   String?
-  resetToken String? @unique
+  email String @unique
+  name  String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -28,6 +26,23 @@ model User {
 
   activeUserTeamId Int?      @unique
   activeUserTeam   UserTeam? @relation("ActiveUserTeam", fields: [activeUserTeamId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  sharedChats ChatUser[]
+
+  password Password?
+}
+
+model Password {
+  id Int @id @default(autoincrement())
+
+  hash       String
+  resetToken String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model UserSession {
@@ -51,8 +66,8 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  teamUsers  UserTeam[]
-  Invitation Invitation[]
+  teamUsers   UserTeam[]
+  invitations Invitation[]
 }
 
 model UserTeam {
@@ -71,7 +86,9 @@ model UserTeam {
 
   chats Chat[]
 
-  userActivatedBy User? @relation("ActiveUserTeam")
+  activatedBy User? @relation("ActiveUserTeam")
+
+  @@unique([userId, teamId])
 }
 
 model Chat {
@@ -90,6 +107,8 @@ model Chat {
 
   owner   UserTeam @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   ownerId Int
+
+  sharedWith ChatUser[]
 }
 
 model Message {
@@ -106,8 +125,8 @@ model Message {
   chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   chatId Int
 
-  author   User? @relation(fields: [authorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  authorId Int?
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  authorId Int
 }
 
 model Invitation {
@@ -138,4 +157,19 @@ enum Role {
   MEMBER
   ADMIN
   OWNER
+}
+
+model ChatUser {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId Int
+
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  chatId Int
+
+  @@unique([userId, chatId])
 }

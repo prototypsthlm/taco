@@ -1,35 +1,52 @@
 import { PrismaClient, Role } from '@prisma/client'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import bcrypt from 'bcryptjs'
+import { encrypt } from '../src/lib/server/utils/crypto'
 
 const prisma = new PrismaClient()
 
 async function seed() {
+  if (process.env.DEPLOYMENT_ENV !== 'staging' && process.env.DEPLOYMENT_ENV !== 'development') {
+    return
+  }
+
   const email = 'user@prototyp.se'
   const teamName = 'Prototyp'
 
-  // cleanup the existing database
-  await prisma.user.delete({ where: { email } }).catch(() => {
-    // no worries if it doesn't exist yet
-  })
-  await prisma.team.delete({ where: { name: teamName } }).catch(() => {
-    // no worries if it doesn't exist yet
+  const tables: { tablename: string }[] = await prisma.$queryRawUnsafe(
+    `SELECT tablename
+     FROM pg_catalog.pg_tables
+     WHERE schemaname != 'pg_catalog'
+       AND schemaname != 'information_schema'
+       AND tablename != '_prisma_migrations';`
+  )
+
+  for (const { tablename } of tables) {
+    await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${tablename}" RESTART IDENTITY CASCADE;`)
+  }
+
+  const team1 = await prisma.team.create({
+    data: {
+      name: teamName,
+      openAiApiKey:
+        process.env.OPENAI_API_KEY && process.env.SECRET_KEY
+          ? encrypt(process.env.OPENAI_API_KEY, process.env.SECRET_KEY)
+          : null,
+    },
   })
 
   const user = await prisma.user.create({
     data: {
       email,
-      name: 'Prototyp User',
-      password: await bcrypt.hash('password', 10),
+      name: 'user1',
+      password: {
+        create: {
+          hash: await bcrypt.hash('password', 10),
+        },
+      },
       userTeams: {
         create: {
-          role: Role.ADMIN,
-          team: {
-            create: {
-              name: 'Prototyp',
-            },
-          },
+          teamId: team1.id,
+          role: Role.OWNER,
         },
       },
     },
@@ -37,6 +54,47 @@ async function seed() {
       userTeams: true,
     },
   })
+
+  const userToShare = await prisma.user.create({
+    data: {
+      email: 'user2@prototyp.se',
+      name: 'user2',
+      password: {
+        create: {
+          hash: await bcrypt.hash('password', 10),
+        },
+      },
+      userTeams: {
+        create: {
+          teamId: team1.id,
+          role: Role.OWNER,
+        },
+      },
+    },
+    include: {
+      userTeams: true,
+    },
+  })
+
+  for (let i = 3; i < 23; ++i) {
+    await prisma.user.create({
+      data: {
+        email: `user${i}@prototyp.se`,
+        name: `user${i}`,
+        password: {
+          create: {
+            hash: bcrypt.hashSync('password', 10), // Note: Synchronously hashing password for simplicity
+          },
+        },
+        userTeams: {
+          create: {
+            teamId: team1.id,
+            role: Role.MEMBER,
+          },
+        },
+      },
+    })
+  }
 
   await prisma.chat.create({
     data: {
@@ -48,8 +106,40 @@ async function seed() {
             {
               question: 'Are you a helpful assistant?',
               authorId: user.id,
+              answer: 'Yes I am.',
             },
           ],
+        },
+      },
+    },
+  })
+
+  const sharedChat = await prisma.chat.create({
+    data: {
+      name: 'Test Shared Chat',
+      ownerId: user.userTeams[0].id,
+      messages: {
+        createMany: {
+          data: [
+            {
+              model: 'gpt-3.5-turbo',
+              question: 'Are you a helpful assistant?',
+              authorId: user.id,
+              answer: 'Yes of course.',
+            },
+            {
+              model: 'gpt-3.5-turbo',
+              question: 'Are you Sure about that??',
+              authorId: userToShare.id,
+              answer: 'No doubt.',
+            },
+          ],
+        },
+      },
+      shared: true,
+      sharedWith: {
+        create: {
+          userId: userToShare.id,
         },
       },
     },

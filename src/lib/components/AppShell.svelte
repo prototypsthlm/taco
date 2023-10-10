@@ -3,7 +3,6 @@
   import { isSidebarOpen } from '$lib/stores/general'
   import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
   import { TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
-  import { onMount } from 'svelte'
   import Gravatar from './Gravatar.svelte'
   import TacoIcon from './icons/TacoIcon.svelte'
 
@@ -98,7 +97,7 @@
       >
         <Gravatar class="h-8 w-8 rounded-full bg-gray-800" value={user.email} />
         <span class="sr-only">Your profile</span>
-        <span aria-hidden="true">{user.name}</span>
+        <span title={user.name} class="truncate" aria-hidden="true">{user.name}</span>
       </a>
     </nav>
   </div>
@@ -123,7 +122,7 @@
     </a>
   </div>
 
-  <main class="lg:ml-72 grow overflow-scroll">
+  <main class="lg:ml-72 grow overflow-auto">
     <slot name="main" />
   </main>
 </div>

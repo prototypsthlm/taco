@@ -3,14 +3,15 @@ import {
   getApiKey,
   transformChatToCompletionRequest,
 } from '$lib/server/api/openai'
-import type { ChatWithRelations } from '$lib/server/entities/chat'
 import {
   addQuestionToChat,
+  type ChatWithRelations,
   createChat,
   getChatWithRelationsById,
   storeAnswer,
 } from '$lib/server/entities/chat'
 import { decodeChunkData, encodeChunkData, extractDelta } from '$lib/utils/stream'
+import * as Sentry from '@sentry/sveltekit'
 import { error } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { RequestHandler } from './$types'
@@ -42,7 +43,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   if (schema.data.id) {
     try {
       chat = await getChatWithRelationsById(schema.data.id)
-      generateChatName(chat, givenModel)
+      await generateChatName(chat, givenModel)
     } catch (e) {
       throw error(500, JSON.stringify({ error: `Error getting chat ${e}` }))
     }
@@ -86,6 +87,18 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       chat = await addQuestionToChat(chat.id, givenModel, schema.data.question) // We save the question (request + response) in the chat.
       const lastMessage = chat.messages[chat.messages.length - 1]
       lastMessage.answer = ''
+
+      controller.enqueue(encodeChunkData([JSON.stringify({ initial: true, chat })]))
+
+      const chatResponse = await chatRequest
+
+      if (!chatResponse.ok || !chatResponse.body) {
+        const err = await chatResponse.json()
+        throw error(500, JSON.stringify({ error: `OpenAI API Error: ${err.error.message}` }))
+      }
+
+      const chatResponseReader = chatResponse.body?.getReader()
+
       const readAndEnqueue = async () => {
         if (!chatResponseReader) return
 
@@ -105,19 +118,20 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
                 if (lastMessage?.answer) {
                   await storeAnswer(lastMessage.id, lastMessage.answer)
                 }
-                return `[DONE] ${JSON.stringify({ chat })}`
+                return JSON.stringify({ final: true })
               }
 
               const parsedData = JSON.parse(data)
-              lastMessage.answer! += extractDelta(parsedData)
+              const delta = extractDelta(parsedData)
+              lastMessage.answer! += delta
 
-              return JSON.stringify({ chat })
+              return JSON.stringify({ during: true, delta })
             })
           )
 
           controller.enqueue(encodeChunkData(modifiedDataArray))
         } catch (e) {
-          console.error(`Streaming Error: ${e}`)
+          Sentry.captureException(error)
           controller.enqueue(value)
         }
 

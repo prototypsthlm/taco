@@ -1,22 +1,24 @@
+import { dev } from '$app/environment'
 import {
+  createUserSession,
   getUserByResetToken,
   updatePassword,
   updateResetTokenToUser,
 } from '$lib/server/entities/user'
-import { fail } from '@sveltejs/kit'
+import { fail, redirect } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions, PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ params }) => {
-  const token = params.token
-  const user = await getUserByResetToken(token)
+  const user = await getUserByResetToken(params.token)
 
-  if (user) return { isTokenValid: true }
-  else return { isTokenValid: false }
+  return {
+    isTokenValid: !!user,
+  }
 }
 
 export const actions: Actions = {
-  default: async ({ request, params }) => {
+  default: async ({ request, cookies, params }) => {
     const token = params.token
     const user = await getUserByResetToken(token)
     if (!user) return fail(401, { error: 'Invalid token' })
@@ -36,6 +38,15 @@ export const actions: Actions = {
 
       await updatePassword(user.id, schema.password)
       await updateResetTokenToUser(user.id, null)
+      const { sessionId } = await createUserSession(user.id)
+
+      cookies.set('session_id', sessionId, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: !dev,
+        maxAge: 60 * 60 * 24 * 7,
+      })
     } catch (error) {
       if (error instanceof ZodError) {
         const errors = error.flatten().fieldErrors
@@ -52,8 +63,6 @@ export const actions: Actions = {
       })
     }
 
-    return {
-      success: true,
-    }
+    throw redirect(303, '/app')
   },
 }

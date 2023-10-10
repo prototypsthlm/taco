@@ -1,13 +1,15 @@
 <script lang="ts">
-  import classNames from 'classnames'
   import {
     CheckCircleIcon,
     ExclamationTriangleIcon,
     InformationCircleIcon,
     XCircleIcon,
   } from '@babeard/svelte-heroicons/solid'
+  import classNames from 'classnames'
+  import { slide } from 'svelte/transition'
+
   export let message: string
-  export let type = 'info'
+  export let type: 'success' | 'warning' | 'error' | 'info' = 'info'
 
   const typeMap = {
     success: {
@@ -38,7 +40,7 @@
 </script>
 
 {#if message}
-  <div class={classNames('rounded-md p-4', typeMap[type].bg, $$props.class)}>
+  <div transition:slide class={classNames('rounded-md p-4', typeMap[type].bg, $$props.class)}>
     <div class="flex">
       <div class="flex-shrink-0">
         <svelte:component

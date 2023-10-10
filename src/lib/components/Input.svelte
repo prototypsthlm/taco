@@ -1,6 +1,7 @@
 <script lang="ts">
   import classNames from 'classnames'
   import { ExclamationCircleIcon } from '@babeard/svelte-heroicons/solid'
+  import { createEventDispatcher } from 'svelte'
 
   export let name: string
   export let id = name
@@ -11,13 +12,18 @@
   export let autocomplete = 'off'
   export let value = ''
   export let disabled = false
+  export let noLabel = false
+
+  const dispatch = createEventDispatcher()
 </script>
 
 <div class={$$props.class}>
-  <label for={id} class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
-    >{label}</label
-  >
-  <div class="relative mt-2 shadow-sm">
+  {#if !noLabel}
+    <label for={id} class="mb-2 block text-sm font-medium leading-6 text-gray-900 dark:text-white"
+      >{label}</label
+    >
+  {/if}
+  <div class="relative shadow-sm">
     <input
       {id}
       {name}
@@ -40,7 +46,19 @@
       {autocomplete}
       aria-invalid={!!errors?.length}
       aria-describedby={`${name}-error`}
-      on:keydown={() => (errors = [])}
+      on:input={(e) => {
+        dispatch('input', e)
+      }}
+      on:keydown={(e) => {
+        errors = []
+        dispatch('keydown', e)
+      }}
+      on:focus={(e) => {
+        dispatch('focus', e)
+      }}
+      on:blur={(e) => {
+        dispatch('blur', e)
+      }}
     />
     {#if errors?.length}
       <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -50,7 +68,7 @@
   </div>
   {#if errors?.length}
     {#each errors as error}
-      <p class="mt-2 text-sm text-red-600" id="email-error">{error}</p>
+      <p class="mt-2 text-sm text-red-600" id={`${name}-error`}>{error}</p>
     {/each}
   {/if}
 </div>
