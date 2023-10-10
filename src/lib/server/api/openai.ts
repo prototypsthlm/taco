@@ -22,7 +22,7 @@ export const getClient = (chat: ChatWithRelations) => {
   return new OpenAIApi(configuration)
 }
 
-export const generateChatName = async (chat: ChatWithRelations) => {
+export const generateChatName = async (chat: ChatWithRelations, newModel: string) => {
   if (chat.messages.every((x) => !x.answer)) {
     console.error(
       'API Error: At least one message completed (question and answer) is needed to generate a title.'
@@ -33,7 +33,7 @@ export const generateChatName = async (chat: ChatWithRelations) => {
   const client = getClient(chat)
 
   const res = await client.createChatCompletion(
-    transformChatToCompletionRequest(chat, 'Main topic of the conversation in no more than 5 words')
+    transformChatToCompletionRequest(chat, newModel, 'Main topic of the conversation in no more than 5 words')
   )
 
   if (!res.data.choices[0].message?.content) {
@@ -52,6 +52,7 @@ export const generateChatName = async (chat: ChatWithRelations) => {
 
 export const transformChatToCompletionRequest = (
   chat: ChatWithRelations,
+  newModel: string,
   newMessage?: string,
   stream = false
 ): CreateChatCompletionRequest => {
@@ -67,15 +68,15 @@ export const transformChatToCompletionRequest = (
 
   const newMessageAsArray = newMessage
     ? [
-        {
-          role: ChatCompletionRequestMessageRoleEnum.User,
-          content: newMessage,
-        },
-      ]
+      {
+        role: ChatCompletionRequestMessageRoleEnum.User,
+        content: newMessage,
+      },
+    ]
     : []
 
   return {
-    model: chat.model,
+    model: newModel, // A given model choosen for each message is used.
     messages: [
       { role: ChatCompletionRequestMessageRoleEnum.System, content: chat.roleContent },
       ...messages,
