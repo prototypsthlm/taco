@@ -57,17 +57,22 @@ export const createChat = (userTeamId: number, role: string | undefined) => {
   })
 }
 
-export const addQuestionToChat = (id: number, question: string, userId: number) => {
+export const addQuestionToChat = (id: number, model: string, question: string, userId: number) => {
   return prisma.chat.update({
+    // Filtres:
     where: { id },
+    // Given data:
     data: {
+      model, // Save the model in the chat so we get the last session selected model if connecting from elsewhere
       messages: {
         create: {
           question,
+          model,
           authorId: userId,
         },
       },
     },
+    // Data that is expected to receive in return:
     include: {
       owner: {
         include: {

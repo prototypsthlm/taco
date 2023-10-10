@@ -119,10 +119,11 @@
     }
   }
 
-  async function handleSubmit(event: CustomEvent<{ question: string }>) {
-    const { question } = event.detail
+  async function handleSubmit(event: CustomEvent<{ question: string; model: string }>) {
+    const { question, model } = event.detail
     loading = true
 
+    // The following event will be handled by the 'POST: RequestHandler' function in 'server.ts'.
     eventSource = new SSE('/api/chats', {
       headers: {
         'Content-Type': 'application/json',
@@ -131,6 +132,7 @@
         id: chat?.id,
         role: selectedPersonalityContext,
         question,
+        model,
       }),
     })
 
