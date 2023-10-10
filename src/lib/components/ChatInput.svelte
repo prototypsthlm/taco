@@ -3,9 +3,7 @@
   import { Models } from '$lib/types/models'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
   import ListBullet from '@babeard/svelte-heroicons/solid/ListBullet'
-  import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
   import UsersTyping from '$lib/components/UsersTyping.svelte'
-  import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
   import { createEventDispatcher, onMount } from 'svelte'
   import autosize from 'svelte-autosize'
 
@@ -78,15 +76,15 @@
       </div>
 
       <!-- Chat-GPT4 toggle. -->
-      <div class="flex flex-col items-center p-3 pr-14 w-0 bg-primary">
-        <span class="pr-2 ml-3 text-white">GPT4</span>
+      <div class="flex flex-col items-center justify-center bg-primary pb-1">
+        <span class="text-white">GPT4</span>
         <button
           on:click={chooseMessageSettings}
           disabled={loading}
           type="button"
           class="{model === Models.gpt4
             ? 'bg-indigo-600'
-            : 'bg-gray-200'} inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+            : 'bg-gray-200'} inline-flex h-4 w-9 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
           role="switch"
           aria-checked="false"
         >
@@ -95,7 +93,7 @@
             aria-hidden="true"
             class="{model === Models.gpt4
               ? 'translate-x-5'
-              : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+              : 'translate-x-0'} pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
           />
         </button>
       </div>

@@ -84,20 +84,16 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
 
       const chatResponseReader = chatResponse.body?.getReader()
       console.log("   --->>>   chatResponseReader:\n" + chatResponse);
-      chat = await addQuestionToChat(chat.id, givenModel, schema.data.question) // We save the question (request + response) in the chat.
+      chat = await addQuestionToChat(chat.id, givenModel, schema.data.question, currentUser.id) // We save the question (request + response) in the chat.
       const lastMessage = chat.messages[chat.messages.length - 1]
       lastMessage.answer = ''
 
       controller.enqueue(encodeChunkData([JSON.stringify({ initial: true, chat })]))
 
-      const chatResponse = await chatRequest
-
       if (!chatResponse.ok || !chatResponse.body) {
         const err = await chatResponse.json()
         throw error(500, JSON.stringify({ error: `OpenAI API Error: ${err.error.message}` }))
       }
-
-      const chatResponseReader = chatResponse.body?.getReader()
 
       const readAndEnqueue = async () => {
         if (!chatResponseReader) return
