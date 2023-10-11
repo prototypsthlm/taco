@@ -1,16 +1,21 @@
 <script lang="ts">
-  import { notificationStore } from '$lib/stores/notification'
+  import { type NotificationExtended, notificationStore } from '$lib/stores/notification'
   import { CheckCircleIcon } from '@babeard/svelte-heroicons/outline'
   import { XMarkIcon } from '@babeard/svelte-heroicons/solid'
   import { fly } from 'svelte/transition'
 
-  async function markAsRead(id: number) {
-    const res = await fetch(`/api/notifications/${id}`, {
-      method: 'PATCH',
-    })
-    if (res.ok) {
-      notificationStore.update((notifications) => notifications.filter((n) => n.id !== id))
+  async function markAsRead(notif: NotificationExtended) {
+    if (notif.type !== 'FLASH') {
+      const res = await fetch(`/api/notifications/${notif.id}`, {
+        method: 'PATCH',
+      })
+
+      if (!res.ok) {
+        console.error('Failed to mark notification as read')
+        return
+      }
     }
+    notificationStore.update((nts) => nts.filter((n) => n.id !== notif.id))
   }
 </script>
 
@@ -40,7 +45,7 @@
                 <button
                   type="button"
                   class="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                  on:click|preventDefault={() => markAsRead(notification.id)}
+                  on:click|preventDefault={() => markAsRead(notification)}
                 >
                   <span class="sr-only">Close</span>
                   <XMarkIcon class="h-5 w-5" aria-hidden="true" />

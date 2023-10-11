@@ -1,4 +1,8 @@
 import { type Writable, writable } from 'svelte/store'
-import type { Notification } from '@prisma/client'
+import type { Notification, NotificationType } from '@prisma/client'
 
-export const notificationStore: Writable<Notification[]> = writable()
+export type NotificationExtended = Omit<Notification, 'type'> & {
+  type: NotificationType | 'FLASH'
+}
+
+export const notificationStore: Writable<NotificationExtended[]> = writable()

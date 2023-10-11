@@ -6,7 +6,6 @@ import {
   getUserByResetToken,
   updatePassword,
   updateResetTokenToUser,
-  userHasNotificationOfTypeAsRead,
 } from '$lib/server/entities/user'
 import { NotificationType } from '@prisma/client'
 import { fail, redirect } from '@sveltejs/kit'
