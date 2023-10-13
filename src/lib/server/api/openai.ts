@@ -98,3 +98,30 @@ export const getApiKey = (chat: ChatWithRelations) => {
 
   return decrypt(chat.owner.team.openAiApiKey, process.env.SECRET_KEY)
 }
+
+export const PRICING = [
+  {
+    model: 'gpt-4',
+    input: 0.03,
+    output: 0.06,
+  },
+  {
+    model: 'gpt-4-32k',
+    input: 0.06,
+    output: 0.12,
+  },
+  {
+    model: 'gpt-3.5-turbo',
+    input: 0.0015,
+    output: 0.002,
+  },
+  {
+    model: 'gpt-3.5-turbo-16k',
+    input: 0.003,
+    output: 0.004,
+  },
+]
+
+export const getPricingForModel = (model: string) => {
+  return PRICING.find((x) => x.model === model)
+}
