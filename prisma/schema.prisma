@@ -94,11 +94,12 @@ model UserTeam {
 model Chat {
   id Int @id @default(autoincrement())
 
-  name        String?
-  shared      Boolean @default(false)
-  model       String  @default("gpt-3.5-turbo")
-  temperature String  @default("0.6")
-  roleContent String  @default("You are a helpful assistant.")
+  name                  String?
+  shared                Boolean @default(false)
+  model                 String  @default("gpt-3.5-turbo")
+  temperature           String  @default("0.6")
+  roleContent           String  @default("You are a helpful assistant.")
+  roleContentTokenCount Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -118,6 +119,7 @@ model Message {
   answer      String?
   model       String? // defaults to chat setting
   temperature String? // defaults to chat setting
+  tokenCount  Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

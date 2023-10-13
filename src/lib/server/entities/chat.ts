@@ -1,4 +1,5 @@
 import { prisma } from '$lib/server/prisma'
+import { countTokens } from '$lib/server/utils/tokenizer'
 import type { Prisma } from '.prisma/client'
 
 export type ChatWithRelations = Prisma.PromiseReturnType<typeof getChatWithRelationsById>
@@ -29,11 +30,12 @@ export const getChatWithRelationsById = (id: number) => {
   })
 }
 
-export const createChat = (userTeamId: number, role: string | undefined) => {
+export const createChat = (userTeamId: number, role = 'You are a helpful assistant.') => {
   return prisma.chat.create({
     data: {
       ownerId: userTeamId,
       roleContent: role,
+      roleContentTokenCount: countTokens(role),
     },
     include: {
       owner: {
@@ -63,12 +65,13 @@ export const addQuestionToChat = (id: number, model: string, question: string, u
     where: { id },
     // Given data:
     data: {
-      model, // Save the model in the chat so we get the last session selected model if connecting from elsewhere
+      model, // Save the model in the chat, so we get the last session selected model if connecting from elsewhere
       messages: {
         create: {
           question,
           model,
           authorId: userId,
+          tokenCount: countTokens(question),
         },
       },
     },
@@ -95,12 +98,15 @@ export const addQuestionToChat = (id: number, model: string, question: string, u
   })
 }
 
-export const storeAnswer = (id: number, answer: string) => {
+export const storeAnswer = (id: number, answer: string, prevTokenCount: number) => {
   return prisma.message.update({
     where: {
       id,
     },
-    data: { answer },
+    data: {
+      answer,
+      tokenCount: prevTokenCount + countTokens(answer),
+    },
   })
 }
 

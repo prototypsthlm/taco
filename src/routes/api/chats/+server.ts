@@ -10,6 +10,7 @@ import {
   getChatWithRelationsById,
   storeAnswer,
 } from '$lib/server/entities/chat'
+import { countTokens } from '$lib/server/utils/tokenizer'
 import { decodeChunkData, encodeChunkData, extractDelta } from '$lib/utils/stream'
 import * as Sentry from '@sentry/sveltekit'
 import { error } from '@sveltejs/kit'
@@ -97,22 +98,31 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
         try {
           const dataArray = decodeChunkData(value)
 
-          const modifiedDataArray = await Promise.all(
-            dataArray.map(async (data) => {
-              if (data === '[DONE]') {
-                if (lastMessage?.answer) {
-                  await storeAnswer(lastMessage.id, lastMessage.answer)
+          const modifiedDataArray = (
+            await Promise.all(
+              dataArray.map(async (data) => {
+                if (data === '[DONE]') {
+                  if (lastMessage?.answer) {
+                    await storeAnswer(
+                      lastMessage.id,
+                      lastMessage.answer,
+                      lastMessage.tokenCount || 0
+                    )
+                  }
+                  return JSON.stringify({ final: true })
                 }
-                return JSON.stringify({ final: true })
-              }
 
-              const parsedData = JSON.parse(data)
-              const delta = extractDelta(parsedData)
-              lastMessage.answer! += delta
+                const parsedData = JSON.parse(data)
+                const delta = extractDelta(parsedData)
+                if (!delta) {
+                  return null
+                }
+                lastMessage.answer! += delta
 
-              return JSON.stringify({ during: true, delta })
-            })
-          )
+                return JSON.stringify({ during: true, delta })
+              })
+            )
+          ).filter((x) => x !== null) as string[]
 
           controller.enqueue(encodeChunkData(modifiedDataArray))
         } catch (e) {
