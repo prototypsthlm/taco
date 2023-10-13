@@ -25,7 +25,11 @@ export const generateChatName = async (chat: ChatWithRelations, newModel: string
   const client = getClient(chat)
 
   const res = await client.createChatCompletion(
-    transformChatToCompletionRequest(chat, newModel, 'Main topic of the conversation in no more than 5 words')
+    transformChatToCompletionRequest(
+      chat,
+      newModel,
+      'Main topic of the conversation in no more than 5 words'
+    )
   )
 
   if (!res.data.choices[0].message?.content) {
@@ -60,15 +64,15 @@ export const transformChatToCompletionRequest = (
 
   const newMessageAsArray = newMessage
     ? [
-      {
-        role: ChatCompletionRequestMessageRoleEnum.User,
-        content: newMessage,
-      },
-    ]
+        {
+          role: ChatCompletionRequestMessageRoleEnum.User,
+          content: newMessage,
+        },
+      ]
     : []
 
   return {
-    model: newModel, // A given model choosen for each message is used.
+    model: newModel, // A given model chosen for each message is used.
     messages: [
       { role: ChatCompletionRequestMessageRoleEnum.System, content: chat.roleContent },
       ...messages,

@@ -26,10 +26,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       id: z.union([z.preprocess(Number, z.number()), z.undefined()]),
       role: z.union([z.string(), z.undefined()]),
       question: z.string(),
-      model: z.union([
-        z.literal(Models.gpt3),
-        z.literal(Models.gpt4),
-      ]),
+      model: z.union([z.literal(Models.gpt3), z.literal(Models.gpt4)]),
     })
     .safeParse(requestData)
 
@@ -38,7 +35,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   }
 
   let chat: ChatWithRelations
-  const givenModel = schema.data.model;
+  const givenModel = schema.data.model
 
   if (schema.data.id) {
     try {
@@ -54,8 +51,14 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     chat = await createChat(currentUser.activeUserTeamId, schema.data.role)
   }
 
-  const chatRequestBody = transformChatToCompletionRequest(chat, givenModel, schema.data.question, true) // This is the request body that will be sent to the openAI API.
-  const chatRequest = fetch('https://api.openai.com/v1/chat/completions', { // This is the final request that will be sent to the openAI API.
+  const chatRequestBody = transformChatToCompletionRequest(
+    chat,
+    givenModel,
+    schema.data.question,
+    true
+  ) // This is the request body that will be sent to the openAI API.
+  const chatRequest = fetch('https://api.openai.com/v1/chat/completions', {
+    // This is the final request that will be sent to the openAI API.
     headers: {
       Authorization: `Bearer ${getApiKey(chat)}`,
       'Content-Type': 'application/json',
