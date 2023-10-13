@@ -1,5 +1,6 @@
 import { PrismaClient, Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { Models } from '../src/lib/types/models'
 import { encrypt } from '../src/lib/server/utils/crypto'
 
 const prisma = new PrismaClient()
@@ -100,6 +101,7 @@ async function seed() {
     data: {
       name: 'Test Chat',
       ownerId: user.userTeams[0].id,
+      model: Models.gpt4,
       messages: {
         createMany: {
           data: [
@@ -107,6 +109,7 @@ async function seed() {
               question: 'Are you a helpful assistant?',
               authorId: user.id,
               answer: 'Yes I am.',
+              model: Models.gpt4,
             },
           ],
         },
@@ -118,17 +121,18 @@ async function seed() {
     data: {
       name: 'Test Shared Chat',
       ownerId: user.userTeams[0].id,
+      model: Models.gpt3,
       messages: {
         createMany: {
           data: [
             {
-              model: 'gpt-3.5-turbo',
+              model: Models.gpt3,
               question: 'Are you a helpful assistant?',
               authorId: user.id,
               answer: 'Yes of course.',
             },
             {
-              model: 'gpt-3.5-turbo',
+              model: Models.gpt4,
               question: 'Are you Sure about that??',
               authorId: userToShare.id,
               answer: 'No doubt.',

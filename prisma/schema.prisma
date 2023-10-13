@@ -115,11 +115,12 @@ model Chat {
 model Message {
   id Int @id @default(autoincrement())
 
-  question    String
-  answer      String?
-  model       String? // defaults to chat setting
-  temperature String? // defaults to chat setting
-  tokenCount  Int?
+  question           String
+  answer             String?
+  model              String? // defaults to chat setting
+  temperature        String? // defaults to chat setting
+  questionTokenCount Int?
+  answerTokenCount   Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
