@@ -23,7 +23,6 @@
     } else {
       model = Models.gpt3
     }
-    console.log('Selected model: ' + model)
   }
 
   function dispatchMessage() {
