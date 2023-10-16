@@ -14,14 +14,14 @@ export const findOrFail = <T>(
   return found
 }
 
-export type AsyncReducer<T, U = T> = (
+export type AsyncReducer<T, U> = (
   accumulator: U,
   currentValue: T,
   index: number,
   array: T[]
 ) => Promise<U>
 
-export const asyncReduce = async <T, U = T>(
+export const asyncReduce = async <T, U>(
   array: T[],
   asyncCallback: AsyncReducer<T, U>,
   initialValue: U
@@ -32,3 +32,8 @@ export const asyncReduce = async <T, U = T>(
     Promise.resolve(initialValue)
   )
 }
+
+type AsyncFunction<T, U> = (item: T) => Promise<U>
+
+export const asyncMap = async <T, U>(arr: T[], fn: AsyncFunction<T, U>): Promise<U[]> =>
+  Promise.all(arr.map(fn))
