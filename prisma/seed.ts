@@ -1,7 +1,8 @@
+import { faker } from '@faker-js/faker'
 import { PrismaClient, Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
-import { Models } from '../src/lib/types/models'
 import { encrypt } from '../src/lib/server/utils/crypto'
+import { Models } from '../src/lib/types/models'
 
 const prisma = new PrismaClient()
 
@@ -148,6 +149,28 @@ async function seed() {
       },
     },
   })
+
+  await Promise.all(
+    Array.from({ length: faker.number.int({ min: 495, max: 505 }) }).map(async () => {
+      await prisma.chat.create({
+        data: {
+          name: `Chat ${faker.lorem.words(3)}`,
+          ownerId: user.userTeams[0].id,
+          model: faker.datatype.boolean() ? Models.gpt3 : Models.gpt4,
+          messages: {
+            createMany: {
+              data: Array.from({ length: faker.number.int({ min: 95, max: 105 }) }, () => ({
+                model: faker.datatype.boolean() ? Models.gpt3 : Models.gpt4,
+                question: faker.lorem.sentence(),
+                authorId: user.id,
+                answer: faker.lorem.sentence(),
+              })),
+            },
+          },
+        },
+      })
+    })
+  )
 }
 
 seed()
