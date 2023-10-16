@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@babeard/svelte-heroicons": "^2.0.0-rc.0",
-    "@faker-js/faker": "^8.0.2",
+    "@faker-js/faker": "^8.1.0",
     "@playwright/test": "^1.35.1",
     "@prisma/client": "^5.4.2",
     "@rgossiaux/svelte-headlessui": "^2.0.0",
