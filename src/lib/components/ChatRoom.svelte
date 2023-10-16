@@ -209,6 +209,7 @@
 
   <div class="self-end py-3 md:py-6 w-full bg-gray-900">
     <ChatInput
+      {chat}
       {loading}
       on:message={handleSubmit}
       on:focus={() => {
