@@ -10,7 +10,6 @@ import {
   getChatWithRelationsById,
   storeAnswer,
 } from '$lib/server/entities/chat'
-import { countTokens } from '$lib/server/utils/tokenizer'
 import { decodeChunkData, encodeChunkData, extractDelta } from '$lib/utils/stream'
 import * as Sentry from '@sentry/sveltekit'
 import { error } from '@sveltejs/kit'
@@ -103,11 +102,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
               dataArray.map(async (data) => {
                 if (data === '[DONE]') {
                   if (lastMessage?.answer) {
-                    await storeAnswer(
-                      lastMessage.id,
-                      lastMessage.answer,
-                      lastMessage.tokenCount || 0
-                    )
+                    await storeAnswer(lastMessage.id, lastMessage.answer)
                   }
                   return JSON.stringify({ final: true })
                 }
@@ -130,11 +125,9 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
           controller.enqueue(value)
         }
 
-        // controller.enqueue(value)
         await readAndEnqueue()
       }
 
-      // Initiate the reading/enqueueing
       await readAndEnqueue()
     },
   })

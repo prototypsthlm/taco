@@ -1,15 +1,19 @@
-import { countTeamChats, getAllTeamChats } from '$lib/server/entities/chat'
+import { countTeamChats } from '$lib/server/entities/chat'
 import {
   createInvitation,
   deleteInvitationById,
   getInvitationById,
   getInvitationsByTeamId,
 } from '$lib/server/entities/invitation'
-import { getTeamByIdWithMembers, getTeamByName, updateTeam } from '$lib/server/entities/team'
+import {
+  calcTeamTokenCosts,
+  getTeamByIdWithMembers,
+  getTeamByName,
+  updateTeam,
+} from '$lib/server/entities/team'
 import { getUserWithUserTeamsById, isUserAdmin, isUserInTeam } from '$lib/server/entities/user'
 import { getUserTeamById, removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
 import { decrypt } from '$lib/server/utils/crypto'
-import { calcTokenCount } from '$lib/server/utils/tokens'
 import { Role } from '@prisma/client'
 import { error, fail } from '@sveltejs/kit'
 import { randomUUID } from 'crypto'
@@ -42,8 +46,9 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
   return {
     userTeam,
     team,
-    chatCount: await countTeamChats(userTeam.teamId),
+    chatCount: countTeamChats(userTeam.teamId),
     invitations,
+    cost: calcTeamTokenCosts(teamId),
   }
 }
 
@@ -232,37 +237,6 @@ export const actions: Actions = {
     return {
       invitationSection: {
         success: `Invitation with id ${invitationId} successfully deleted.`,
-      },
-    }
-  },
-  estimateCost: async ({ params }) => {
-    const teamId = Number(params.id)
-    const chats = await getAllTeamChats(teamId)
-
-    let totalInputTokenCount = 0
-    let totalOutputTokenCount = 0
-
-    chats.forEach((chat) => {
-      totalInputTokenCount += calcTokenCount(chat.roleContent)
-
-      chat.messages.forEach((message) => {
-        totalInputTokenCount += calcTokenCount(message.question)
-        totalOutputTokenCount += calcTokenCount(message.answer || '')
-      })
-    })
-
-    const input1kCost = 0.0015
-    const output1kCost = 0.002
-
-    const totalInputCost = (totalInputTokenCount / 1000) * input1kCost
-    const totalOutputCost = (totalOutputTokenCount / 1000) * output1kCost
-    const totalCost = totalInputCost + totalOutputCost
-
-    return {
-      statsSection: {
-        estimatedCost: String(totalCost).slice(0, 10),
-        inputTokens: totalInputTokenCount,
-        outputTokens: totalOutputTokenCount,
       },
     }
   },
