@@ -1,9 +1,7 @@
-import { EMAIL_SENDER_SIGNATURE } from '$env/static/private'
-import { createHtmlTemplate, createTextTemplate } from '$lib/server/email/forgot-password-template'
-import { updateResetTokenToUser, getUserByEmail } from '$lib/server/entities/user'
-import postmark from '$lib/server/postmark'
+import { sendPasswordResetEmail } from '$lib/email/mailer'
+import { getUserByEmail, updateResetTokenToUser } from '$lib/server/entities/user'
+import { generateSecureRandomToken } from '$lib/server/utils/crypto'
 import { fail } from '@sveltejs/kit'
-import { randomUUID } from 'crypto'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
 
@@ -26,18 +24,10 @@ export const actions: Actions = {
         })
       }
 
-      const uuid = randomUUID()
-      user = await updateResetTokenToUser(user.id, uuid)
-      const resetUrl = `${url.origin}/reset-password/${uuid}`
+      const resetToken = generateSecureRandomToken()
+      user = await updateResetTokenToUser(user.id, resetToken)
 
-      await postmark.sendEmail({
-        From: EMAIL_SENDER_SIGNATURE,
-        To: user.email,
-        Subject: 'Password Reset',
-        HtmlBody: createHtmlTemplate(resetUrl, user.name),
-        TextBody: createTextTemplate(resetUrl, user.name),
-        MessageStream: 'outbound',
-      })
+      await sendPasswordResetEmail(user, url.origin, resetToken)
     } catch (error) {
       if (error instanceof ZodError) {
         const errors = error.flatten().fieldErrors
@@ -55,9 +45,7 @@ export const actions: Actions = {
     }
 
     return {
-      fields: {
-        email: '',
-      },
+      fields,
       success: 'Password reset email sent.',
     }
   },

@@ -1,5 +1,10 @@
 import { dev } from '$app/environment'
-import { createUserSession, doesCredentialsMatch, getUserByEmail } from '$lib/server/entities/user'
+import {
+  createUserSession,
+  createUserSessionAndCookie,
+  doesCredentialsMatch,
+  getUserByEmail,
+} from '$lib/server/entities/user'
 import { fail, redirect } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
@@ -29,15 +34,7 @@ export const actions: Actions = {
         })
       }
 
-      const { sessionId } = await createUserSession(user.id)
-
-      cookies.set('session_id', sessionId, {
-        path: '/',
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: !dev,
-        maxAge: schema.remember ? 60 * 60 * 24 * 7 : undefined, // one week or undefined
-      })
+      await createUserSessionAndCookie(user.id, cookies, schema.remember)
     } catch (error) {
       if (error instanceof ZodError) {
         const errors = error.flatten().fieldErrors

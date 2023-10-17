@@ -1,12 +1,30 @@
 <script lang="ts">
-  import UserGroup from '@babeard/svelte-heroicons/solid/UserGroup'
-  import type { PageServerData } from './$types'
-  import { PlusIcon } from '@babeard/svelte-heroicons/solid'
-  import Envelope from '@babeard/svelte-heroicons/solid/Envelope'
   import { enhance } from '$app/forms'
   import Gravatar from '$lib/components/Gravatar.svelte'
+  import { notificationStore } from '$lib/stores/notification'
+  import { generateRandomInt } from '$lib/utils/number'
+  import { EnvelopeIcon, PlusIcon, UserGroupIcon } from '@babeard/svelte-heroicons/solid'
+  import type { PageServerData } from './$types'
 
   export let data: PageServerData
+
+  if (!data.user.activeUserTeamId) {
+    if (!$notificationStore.find((notification) => notification.type === 'FLASH')) {
+      notificationStore.update((notifications) => {
+        notifications.push({
+          id: generateRandomInt(),
+          type: 'FLASH',
+          title: 'You are not a member of any team',
+          body: 'Please pick/create a team.',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          read: false,
+          userId: data.user.id,
+        })
+        return notifications
+      })
+    }
+  }
 </script>
 
 <header
@@ -45,7 +63,7 @@
               <input type="hidden" name="userTeamId" value={userTeam.id} />
             </form>
           {:else}
-            <span class="text-white opacity-60 text-sm"> (Active team)</span> 
+            <span class="text-white opacity-60 text-sm"> (Active team)</span>
           {/if}
           <a href="/app/settings/teams/{userTeam?.team?.id}">
             <button
@@ -65,7 +83,7 @@
 
     <div class="flex gap-16 items-center justify-center mt-12">
       <div class="text-center">
-        <UserGroup class="mx-auto h-12 w-12 text-gray-400" />
+        <UserGroupIcon class="mx-auto h-12 w-12 text-gray-400" />
         <h3 class="mt-2 text-sm font-semibold text-accent">Create a team</h3>
         <p class="mt-1 text-sm text-gray-500">Get started by creating a new team.</p>
         <div class="mt-6">
@@ -80,7 +98,7 @@
       </div>
       <div class="h-32 w-[1px] opacity-30 py-4 bg-accent" />
       <div class="text-center">
-        <Envelope class="mx-auto h-12 w-12 text-gray-400" />
+        <EnvelopeIcon class="mx-auto h-12 w-12 text-gray-400" />
         <h3 class="mt-2 text-sm font-semibold text-accent">Get an invitation</h3>
         <p class="mt-1 text-sm text-gray-500">Wait for a team to invite you</p>
         <p class="mt-1 text-sm text-gray-500">or</p>

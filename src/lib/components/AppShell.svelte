@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { UserBySessionId } from '$lib/server/entities/user'
+  import Gravatar from '$lib/components/Gravatar.svelte'
+  import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
+  import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
   import { Bars3Icon, XMarkIcon } from '@babeard/svelte-heroicons/outline'
   import { TransitionChild, TransitionRoot } from '@rgossiaux/svelte-headlessui'
-  import Gravatar from './Gravatar.svelte'
-  import TacoIcon from './icons/TacoIcon.svelte'
 
-  export let user: UserBySessionId
+  export let user: UserWithUserTeamsActiveTeamAndChats
 
   let sidebarOpen: boolean
 

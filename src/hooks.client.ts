@@ -1,9 +1,10 @@
-import { PUBLIC_SENTRY_DSN } from '$env/static/public'
+import { PUBLIC_SENTRY_DSN, PUBLIC_SENTRY_ENV } from '$env/static/public'
 import * as Sentry from '@sentry/sveltekit'
 import { handleErrorWithSentry, Replay } from '@sentry/sveltekit'
 
 Sentry.init({
   dsn: PUBLIC_SENTRY_DSN,
+  environment: PUBLIC_SENTRY_ENV || 'production',
   tracesSampleRate: 1.0,
 
   // This sets the sample rate to be 10%. You may want this to be 100% while
