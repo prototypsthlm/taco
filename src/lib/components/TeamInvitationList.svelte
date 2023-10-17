@@ -1,7 +1,12 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import Alert from '$lib/components/Alert.svelte'
-  import { CheckIcon, PlusIcon, TrashIcon } from '@babeard/svelte-heroicons/solid'
+  import {
+    CheckIcon,
+    PlusIcon,
+    TrashIcon,
+    ClipboardDocumentIcon,
+  } from '@babeard/svelte-heroicons/solid'
   import type { Invitation } from '@prisma/client'
   import { page } from '$app/stores'
 
@@ -86,7 +91,7 @@
                 {#if currentClipboardText === createInvitationUrl(invite.hash)}
                   <CheckIcon class="h-4 w-4" />
                 {:else}
-                  <ClipboardDocument class="h-4 w-4" />
+                  <ClipboardDocumentIcon class="h-4 w-4" />
                 {/if}
               </button>
               {#if isAdmin}
