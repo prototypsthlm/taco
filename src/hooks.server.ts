@@ -1,4 +1,4 @@
-import { PUBLIC_SENTRY_DSN } from '$env/static/public'
+import { PUBLIC_SENTRY_DSN, PUBLIC_SENTRY_ENV } from '$env/static/public'
 import { getUserBySessionId, type UserBySessionId } from '$lib/server/entities/user'
 import * as Sentry from '@sentry/sveltekit'
 import { type Handle, redirect } from '@sveltejs/kit'
@@ -6,6 +6,7 @@ import { sequence } from '@sveltejs/kit/hooks'
 
 Sentry.init({
   dsn: PUBLIC_SENTRY_DSN,
+  environment: PUBLIC_SENTRY_ENV || 'production',
   tracesSampleRate: 1,
 })
 
@@ -46,14 +47,6 @@ export const handle: Handle = sequence(Sentry.sentryHandle(), async ({ event, re
     }
 
     event.locals.currentUser = currentUser
-
-    if (
-      !currentUser.activeUserTeamId &&
-      !(targetRoute.includes('/app/settings') || targetRoute.includes('/invitation'))
-    ) {
-      // no active team -> force team selection
-      throw redirect(303, '/app/settings/teams')
-    }
   }
 
   return resolve(event)

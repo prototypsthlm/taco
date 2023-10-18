@@ -1,5 +1,13 @@
 import { changeActiveUserTeam, getUserWithUserTeamsById } from '$lib/server/entities/user'
-import { fail, redirect, type Actions } from '@sveltejs/kit'
+import { fail, redirect } from '@sveltejs/kit'
+import type { Actions, PageServerLoad } from './$types'
+
+export const load: PageServerLoad = async ({ parent }) => {
+  const { user } = await parent()
+  return {
+    user,
+  }
+}
 
 export const actions: Actions = {
   selectTeam: async ({ request, locals }) => {
