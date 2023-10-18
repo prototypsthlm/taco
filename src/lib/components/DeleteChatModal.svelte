@@ -2,10 +2,11 @@
   import { goto, invalidateAll } from '$app/navigation'
   import Alert from '$lib/components/Alert.svelte'
   import ModalConfirm from '$lib/components/ModalConfirm.svelte'
+  import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { socketStore } from '$lib/stores/socket.js'
   import { TrashIcon } from '@babeard/svelte-heroicons/solid'
 
-  export let chatId: number
+  export let chat: UserWithUserTeamsActiveTeamAndChats['sharedChats'][number]['chat']
 
   let errors: string[] = []
   let isOpen = false
@@ -33,7 +34,7 @@
   bind:isOpen
   on:confirm={() => {
     errors = []
-    deleteChat(chatId)
+    deleteChat(chat.id)
   }}
 >
   <button
@@ -48,7 +49,7 @@
     <TrashIcon class="h-5 w-5 text-gray-500 hover:text-red-500 duration-200" />
   </button>
   <svelte:fragment slot="body">
-    Are you sure you want to delete the chat {name}
+    Are you sure you want to delete the chat {chat.name ? `"${chat.name}"` : chat.id}
     {#each errors as err}
       <Alert class="mt-4" type="error" message={err} />
     {/each}
