@@ -118,7 +118,7 @@ async function seed() {
     },
   })
 
-  const sharedChat = await prisma.chat.create({
+  await prisma.chat.create({
     data: {
       name: 'Test Shared Chat',
       ownerId: user.userTeams[0].id,

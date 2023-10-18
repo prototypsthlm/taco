@@ -2,7 +2,6 @@
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { Models } from '$lib/types/models'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
-  import ListBullet from '@babeard/svelte-heroicons/solid/ListBullet'
   import UsersTyping from '$lib/components/UsersTyping.svelte'
   import { createEventDispatcher, onMount } from 'svelte'
   import autosize from 'svelte-autosize'

@@ -3,7 +3,7 @@
 
   export let header: string
   export let description: string
-  export let buttonText: string = 'Save'
+  export let buttonText = 'Save'
   export let form: any
 </script>
 

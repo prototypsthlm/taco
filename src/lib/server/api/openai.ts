@@ -1,5 +1,5 @@
-import { setChatName } from '$lib/server/entities/chat'
 import type { ChatWithRelations } from '$lib/server/entities/chat'
+import { setChatName } from '$lib/server/entities/chat'
 import { decrypt } from '$lib/server/utils/crypto'
 import { trim } from '$lib/utils/string'
 import type { ChatCompletionRequestMessage, CreateChatCompletionRequest } from 'openai'
