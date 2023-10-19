@@ -1,23 +1,27 @@
 import {
   generateChatName,
   getApiKey,
+  getModelSettings,
   transformChatToCompletionRequest,
 } from '$lib/server/api/openai'
 import {
   addQuestionToChat,
   type ChatWithRelations,
+  countChatInputTokens,
   createChat,
   getChatWithRelationsById,
   storeAnswer,
 } from '$lib/server/entities/chat'
+import { countTokens } from '$lib/server/utils/tokenizer'
+import { Models } from '$lib/types/models'
 import { decodeChunkData, encodeChunkData, extractDelta } from '$lib/utils/stream'
 import * as Sentry from '@sentry/sveltekit'
 import { error } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { RequestHandler } from './$types'
-import { Models } from '$lib/types/models'
 
 export const POST: RequestHandler = async ({ request, fetch, locals: { currentUser } }) => {
+  console.time('countGeneral')
   // This is called from the 'eventSource = new SSE' in the 'handleSubmit' function in 'ChatRoom.svelte'.
   const requestData = await request.json()
 
@@ -35,25 +39,35 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   }
 
   let chat: ChatWithRelations
-  const givenModel = schema.data.model
 
   if (schema.data.id) {
     try {
       chat = await getChatWithRelationsById(schema.data.id)
-      await generateChatName(chat, givenModel)
     } catch (e) {
-      throw error(500, JSON.stringify({ error: `Error getting chat ${e}` }))
+      throw error(
+        500,
+        JSON.stringify({
+          title: 'There was a problem reading the chat',
+          body: 'Please try again later.',
+        })
+      )
     }
+    generateChatName(chat, schema.data.model)
   } else {
     if (!currentUser.activeUserTeamId) {
-      throw error(500, JSON.stringify({ error: `User has no active team` }))
+      throw error(
+        500,
+        JSON.stringify({
+          title: 'User has no active team',
+        })
+      )
     }
     chat = await createChat(currentUser.activeUserTeamId, schema.data.role)
   }
 
   const chatRequestBody = transformChatToCompletionRequest(
     chat,
-    givenModel,
+    schema.data.model,
     schema.data.question,
     true
   ) // This is the request body that will be sent to the openAI API.
@@ -67,9 +81,33 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     body: JSON.stringify(chatRequestBody),
   })
 
+  const messagesTokenCount = await countChatInputTokens(chat)
+  console.log({ messagesTokenCount })
+  const questionTokenCount = countTokens(schema.data.question) || 0
+  console.log({ questionTokenCount })
+  const inputTokenCount = messagesTokenCount + questionTokenCount
+  const modelSettings = getModelSettings(schema.data.model)
+  const tokenLimit = modelSettings.maxTokens - modelSettings.outputRoom
+  console.log({ inputTokenCount, tokenLimit })
+
+  if (inputTokenCount > tokenLimit) {
+    throw error(
+      422,
+      JSON.stringify({
+        title: `Token Limit Exceeded`,
+        body: `Current token limit is ${tokenLimit} tokens. Please reduce the length of your next question (currently: ${questionTokenCount} tokens) or remove some previous messages (currently: ${messagesTokenCount} tokens).`,
+      })
+    )
+  }
+
   const stream = new ReadableStream({
     async start(controller) {
-      chat = await addQuestionToChat(chat.id, givenModel, schema.data.question, currentUser.id) // We save the question (request + response) in the chat.
+      chat = await addQuestionToChat(
+        chat.id,
+        schema.data.model,
+        schema.data.question,
+        currentUser.id
+      ) // We save the question (request + response) in the chat.
       const lastMessage = chat.messages[chat.messages.length - 1]
       lastMessage.answer = ''
 
@@ -100,6 +138,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
           const modifiedDataArray = (
             await Promise.all(
               dataArray.map(async (data) => {
+                console.log(data)
                 if (data === '[DONE]') {
                   if (lastMessage?.answer) {
                     await storeAnswer(lastMessage.id, lastMessage.answer)

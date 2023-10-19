@@ -1,4 +1,4 @@
-import { getPricingForModel } from '$lib/server/api/openai'
+import { getModelSettings } from '$lib/server/api/openai'
 import type { ChatWithMessages } from '$lib/server/entities/chat'
 import { prisma } from '$lib/server/prisma'
 import { countTokens } from '$lib/server/utils/tokenizer'
@@ -21,7 +21,7 @@ export const calcMessageTokenCosts = async (
   message: ChatWithMessages['messages'][number],
   chat: Chat
 ) => {
-  const messagePricing = getPricingForModel(message.model || chat.model)
+  const messagePricing = getModelSettings(message.model || chat.model)
 
   if (!messagePricing) {
     throw new Error(

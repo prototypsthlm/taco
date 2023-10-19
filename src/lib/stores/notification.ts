@@ -15,8 +15,8 @@ export const notificationStore: Writable<Notification[]> = writable([])
 export const flashNotificationStore: Writable<FlashNotification[]> = writable([])
 
 export const addFlashNotification = (
-  title: string,
-  body: string,
+  title = '',
+  body = '',
   {
     type = 'INFO',
     category = 'GENERAL',

@@ -1,9 +1,10 @@
+import { getModelSettings } from '$lib/server/api/openai'
 import { calcMessageTokenCosts, calcMessageTokenCount } from '$lib/server/entities/message'
 import { prisma } from '$lib/server/prisma'
 import { countTokens } from '$lib/server/utils/tokenizer'
-import { asyncReduce } from '$lib/utils/array'
+import { calcTokenCount } from '$lib/server/utils/tokens'
+import { asyncMap, asyncReduce } from '$lib/utils/array'
 import type { Prisma } from '.prisma/client'
-import { getPricingForModel } from '$lib/server/api/openai'
 
 export type ChatWithRelations = Prisma.PromiseReturnType<typeof getChatWithRelationsById>
 
@@ -119,20 +120,6 @@ export const setChatName = (id: number, name: string) => {
       id,
     },
     data: { name },
-    include: {
-      owner: {
-        include: {
-          user: true,
-          team: true,
-        },
-      },
-      messages: {
-        include: {
-          author: true,
-        },
-        orderBy: { createdAt: 'asc' },
-      },
-    },
   })
 }
 
@@ -278,7 +265,7 @@ export const fillMissingChatTokenCount = async (chat: ChatWithMessages) => {
 }
 
 export const calcChatTokenCosts = async (chat: ChatWithMessages) => {
-  const chatPricing = getPricingForModel(chat.model)
+  const chatPricing = getModelSettings(chat.model)
 
   if (!chatPricing) {
     throw new Error(`No pricing found for model ${chat.model}`)
@@ -300,4 +287,63 @@ export const calcChatTokenCosts = async (chat: ChatWithMessages) => {
     },
     costs
   )
+}
+
+export const countChatInputTokens = async (chat: ChatWithMessages) => {
+  if (
+    chat.roleContent.length > 0 &&
+    (chat.roleContentTokenCount == null || chat.roleContentTokenCount === 0)
+  ) {
+    const roleContentTokenCount = calcTokenCount(chat.roleContent)
+    await prisma.chat.update({
+      where: {
+        id: chat.id,
+      },
+      data: {
+        roleContentTokenCount,
+      },
+    })
+    chat.roleContentTokenCount = roleContentTokenCount
+  }
+
+  return (
+    await asyncMap(chat.messages, async (message) => {
+      if (
+        message.question.length > 0 &&
+        (message.questionTokenCount == null || message.questionTokenCount === 0)
+      ) {
+        const questionTokenCount = calcTokenCount(message.question)
+        await prisma.message.update({
+          where: {
+            id: message.id,
+          },
+          data: {
+            questionTokenCount,
+          },
+        })
+        message.questionTokenCount = questionTokenCount
+      }
+
+      if (
+        message.answer &&
+        message.answer.length > 0 &&
+        (message.answerTokenCount == null || message.answerTokenCount === 0)
+      ) {
+        const answerTokenCount = calcTokenCount(message.answer)
+        await prisma.message.update({
+          where: {
+            id: message.id,
+          },
+          data: {
+            answerTokenCount,
+          },
+        })
+        message.answerTokenCount = answerTokenCount
+      }
+
+      return message
+    })
+  ).reduce((memo, message) => {
+    return memo + (message.questionTokenCount || 0) + (message.answerTokenCount || 0)
+  }, chat.roleContentTokenCount || 0)
 }

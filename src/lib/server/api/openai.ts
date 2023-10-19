@@ -19,7 +19,7 @@ export const generateChatName = async (chat: ChatWithRelations, newModel: string
     console.error(
       'API Error: At least one message completed (question and answer) is needed to generate a title.'
     )
-    return chat
+    return
   }
 
   const client = getClient(chat)
@@ -34,7 +34,7 @@ export const generateChatName = async (chat: ChatWithRelations, newModel: string
 
   if (!res.data.choices[0].message?.content) {
     console.error('API Error: no content.')
-    return chat
+    return
   }
 
   let name = res.data.choices[0].message.content
@@ -43,7 +43,7 @@ export const generateChatName = async (chat: ChatWithRelations, newModel: string
   name = trim(name, '.').trim()
   name = trim(name, 'Topic:').trim()
 
-  return setChatName(chat.id, name)
+  await setChatName(chat.id, name)
 }
 
 export const transformChatToCompletionRequest = (
@@ -99,29 +99,37 @@ export const getApiKey = (chat: ChatWithRelations) => {
   return decrypt(chat.owner.team.openAiApiKey, process.env.SECRET_KEY)
 }
 
-export const PRICING = [
+export const SETTINGS = [
   {
     model: 'gpt-4',
     input: 0.03,
     output: 0.06,
+    maxTokens: 8_192,
+    outputRoom: 500,
   },
   {
     model: 'gpt-4-32k',
     input: 0.06,
     output: 0.12,
+    maxTokens: 32_768,
+    outputRoom: 500,
   },
   {
     model: 'gpt-3.5-turbo',
     input: 0.0015,
     output: 0.002,
+    maxTokens: 4_097,
+    outputRoom: 500,
   },
   {
     model: 'gpt-3.5-turbo-16k',
     input: 0.003,
     output: 0.004,
+    maxTokens: 16_385,
+    outputRoom: 500,
   },
 ]
 
-export const getPricingForModel = (model: string) => {
-  return PRICING.find((x) => x.model === model)
+export const getModelSettings = (model: string) => {
+  return SETTINGS.find((x) => x.model === model) || SETTINGS[2]
 }

@@ -6,10 +6,15 @@
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
-  import { type BaseSocketUser, type SocketUser, socketUsersStore } from '$lib/stores/socket'
+  import { addFlashNotification } from '$lib/stores/notification'
+  import {
+    type BaseSocketUser,
+    socketStore,
+    type SocketUser,
+    socketUsersStore,
+  } from '$lib/stores/socket'
   import { buildSocketUsers, updateSocketUsers } from '$lib/utils/socket'
   import type { LlmPersonality } from '@prisma/client'
-  import { socketStore } from '$lib/stores/socket'
   import { SSE } from 'sse.js'
   import { onDestroy } from 'svelte'
   import { flip } from 'svelte/animate'
@@ -136,7 +141,17 @@
       }),
     })
 
-    eventSource.addEventListener('error', handleError)
+    eventSource.addEventListener('error', (err: { data: string }) => {
+      console.log(err)
+      loading = false
+      const message = JSON.parse(JSON.parse(err.data).message)
+
+      if (message) {
+        addFlashNotification(message.title, message.body, { type: 'ERROR' })
+      }
+
+      scrollToBottom()
+    })
 
     eventSource.addEventListener('message', async (e) => {
       scrollToBottom()
@@ -164,18 +179,14 @@
           eventSource?.close()
         }
       } catch (err) {
-        handleError(err)
+        loading = false
+        console.error(err)
       }
 
       scrollToBottom()
     })
 
     eventSource.stream()
-  }
-
-  function handleError<T>(err: T) {
-    loading = false
-    console.error(err)
   }
 </script>
 
