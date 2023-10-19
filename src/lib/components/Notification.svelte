@@ -12,6 +12,7 @@
   } from '@babeard/svelte-heroicons/outline'
   import type { Notification } from '@prisma/client'
   import { fly } from 'svelte/transition'
+  import { flip } from 'svelte/animate'
 
   function isPersistedNotification(n: Notification | FlashNotification): n is Notification {
     return 'read' in n
@@ -53,6 +54,7 @@
       <div
         class="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5"
         transition:fly={{ x: 400 }}
+        animate:flip={{ duration: 300 }}
       >
         <div class="p-4">
           <div class="flex items-start">
