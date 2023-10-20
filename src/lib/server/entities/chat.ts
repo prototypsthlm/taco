@@ -1,9 +1,4 @@
-import { getModelSettings } from '$lib/server/api/openai'
-import { calcMessageTokenCosts, calcMessageTokenCount } from '$lib/server/entities/message'
 import { prisma } from '$lib/server/prisma'
-import { countTokens } from '$lib/server/utils/tokenizer'
-import { calcTokenCount } from '$lib/server/utils/tokens'
-import { asyncMap, asyncReduce } from '$lib/utils/array'
 import type { Prisma } from '.prisma/client'
 
 export type ChatWithRelations = Prisma.PromiseReturnType<typeof getChatWithRelationsById>
@@ -39,7 +34,6 @@ export const createChat = (userTeamId: number, role = 'You are a helpful assista
     data: {
       ownerId: userTeamId,
       roleContent: role,
-      roleContentTokenCount: countTokens(role),
     },
     include: {
       owner: {
@@ -75,7 +69,6 @@ export const addQuestionToChat = (id: number, model: string, question: string, u
           question,
           model,
           authorId: userId,
-          questionTokenCount: countTokens(question),
         },
       },
     },
@@ -109,7 +102,6 @@ export const storeAnswer = (id: number, answer: string) => {
     },
     data: {
       answer,
-      answerTokenCount: countTokens(answer),
     },
   })
 }
@@ -239,52 +231,4 @@ export const unshareChatWithUsers = async (id: number, usersIds: number[]) => {
       },
     })
   }
-}
-
-export type ChatWithMessages = Prisma.PromiseReturnType<typeof getChatWithMessagesById>
-
-export const getChatWithMessagesById = (id: number) =>
-  prisma.chat.findUniqueOrThrow({
-    where: { id },
-    include: {
-      messages: true,
-    },
-  })
-
-export const fillMissingChatTokenCount = async (chat: ChatWithMessages) => {
-  await prisma.chat.update({
-    where: {
-      id: chat.id,
-    },
-    data: {
-      roleContentTokenCount: chat.roleContent ? countTokens(chat.roleContent) : 0,
-    },
-  })
-
-  await Promise.all(chat.messages.map(calcMessageTokenCount))
-}
-
-export const calcChatTokenCosts = async (chat: ChatWithMessages) => {
-  const chatPricing = getModelSettings(chat.model)
-
-  if (!chatPricing) {
-    throw new Error(`No pricing found for model ${chat.model}`)
-  }
-
-  const costs = {
-    input: chatPricing.input * ((chat.roleContentTokenCount || 0) / 1000),
-    output: 0,
-  }
-
-  return await asyncReduce(
-    chat.messages,
-    async (memo, message) => {
-      const messageCost = await calcMessageTokenCosts(message, chat)
-      return {
-        input: memo.input + messageCost.input,
-        output: memo.output + messageCost.output,
-      }
-    },
-    costs
-  )
 }

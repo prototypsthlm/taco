@@ -1,11 +1,5 @@
-import {
-  calcChatTokenCosts,
-  fillMissingChatTokenCount,
-  getAllTeamChats,
-} from '$lib/server/entities/chat'
 import { prisma } from '$lib/server/prisma'
 import { encrypt } from '$lib/server/utils/crypto'
-import { asyncMap, asyncReduce } from '$lib/utils/array'
 import type { Prisma } from '@prisma/client'
 
 export const updateTeam = async (id: number, name: string, openAiApiKey: string | null) => {
@@ -61,39 +55,4 @@ export const createTeam = async (name: string, openAiApiKey: string | null) => {
       openAiApiKey: apiKey,
     },
   })
-}
-
-export const calcTeamTokenCosts = async (teamId: number) => {
-  const teamChats = await prisma.chat.findMany({
-    where: {
-      owner: {
-        teamId: teamId,
-      },
-      roleContentTokenCount: null,
-      messages: {
-        every: {
-          questionTokenCount: null,
-          answerTokenCount: null,
-        },
-      },
-    },
-    include: {
-      messages: true,
-    },
-  })
-
-  await asyncMap(teamChats, fillMissingChatTokenCount)
-
-  const refreshedTeamChats = await getAllTeamChats(teamId)
-
-  const cost = await asyncReduce(
-    refreshedTeamChats,
-    async (memo, chat) => {
-      const chatCost = await calcChatTokenCosts(chat)
-      return { input: memo.input + chatCost.input, output: memo.output + chatCost.output }
-    },
-    { input: 0, output: 0 }
-  )
-
-  return cost.input + cost.output
 }

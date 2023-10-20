@@ -5,12 +5,7 @@ import {
   getInvitationById,
   getInvitationsByTeamId,
 } from '$lib/server/entities/invitation'
-import {
-  calcTeamTokenCosts,
-  getTeamByIdWithMembers,
-  getTeamByName,
-  updateTeam,
-} from '$lib/server/entities/team'
+import { getTeamByIdWithMembers, getTeamByName, updateTeam } from '$lib/server/entities/team'
 import { getUserWithUserTeamsById, isUserAdmin, isUserInTeam } from '$lib/server/entities/user'
 import { getUserTeamById, removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
 import { decrypt } from '$lib/server/utils/crypto'
@@ -48,7 +43,6 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
     team,
     chatCount: countTeamChats(userTeam.teamId),
     invitations,
-    cost: calcTeamTokenCosts(teamId),
   }
 }
 
