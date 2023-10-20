@@ -3,7 +3,7 @@
   import { Models } from '$lib/types/models'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
   import UsersTyping from '$lib/components/UsersTyping.svelte'
-  import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher, onMount, tick } from 'svelte'
   import autosize from 'svelte-autosize'
 
   // Variables got from <ChatInput {chat} {loading} on:message={handleSubmit} />
@@ -28,7 +28,7 @@
     // Actually dispatch message.
     if (question.trim() && !loading) {
       dispatch('message', { question, model })
-      question = '' // Empty any written text as it has already been sent, we do NOT do so with the model, which remains the same.
+      reset()
     }
   }
 
@@ -36,6 +36,16 @@
   onMount(() => {
     textarea.focus()
   })
+
+  async function reset() {
+    await tick()
+    autosize.update(textarea)
+  }
+
+  $: if (question === '') {
+    // Autosize textarea.
+    reset()
+  }
 </script>
 
 <div class="relative">
