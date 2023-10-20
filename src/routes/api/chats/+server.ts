@@ -12,6 +12,7 @@ import {
   getChatWithRelationsById,
   storeAnswer,
 } from '$lib/server/entities/chat'
+import { countTokens } from '$lib/server/utils/tokenizer'
 import { Models } from '$lib/types/models'
 import { decodeChunkData, encodeChunkData, extractDelta } from '$lib/utils/stream'
 import * as Sentry from '@sentry/sveltekit'
@@ -80,6 +81,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   })
 
   const inputTokenCount = countMessagesTokens(chatRequestBody.messages)
+  const newQuestionTokenCount = countTokens(`"user": "${schema.data.question}"`)
   const modelSettings = getModelSettings(schema.data.model)
   const tokenLimit = modelSettings.maxTokens - modelSettings.outputRoom
 
@@ -87,8 +89,8 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     throw error(
       422,
       JSON.stringify({
-        title: `Token Limit Exceeded`,
-        body: `Please reduce the length of your next question or remove some previous messages.`,
+        title: `Token Limit of Exceeded`,
+        body: `Current messages are ${inputTokenCount} tokens and the limit is ${tokenLimit} tokens. Please reduce the length of your next question (${newQuestionTokenCount} tokens) or remove some previous messages.`,
       })
     )
   }

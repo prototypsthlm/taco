@@ -8,11 +8,12 @@
     CheckCircleIcon,
     ExclamationTriangleIcon,
     InformationCircleIcon,
+    XCircleIcon,
     XMarkIcon,
   } from '@babeard/svelte-heroicons/outline'
   import type { Notification } from '@prisma/client'
-  import { fly } from 'svelte/transition'
   import { flip } from 'svelte/animate'
+  import { fly } from 'svelte/transition'
 
   function isPersistedNotification(n: Notification | FlashNotification): n is Notification {
     return 'read' in n
@@ -64,7 +65,7 @@
               {:else if n.type === 'WARNING'}
                 <ExclamationTriangleIcon class="h-6 w-6 text-yellow-400" aria-hidden="true" />
               {:else if n.type === 'ERROR'}
-                <CheckCircleIcon class="h-6 w-6 text-red-400" aria-hidden="true" />
+                <XCircleIcon class="h-6 w-6 text-red-400" aria-hidden="true" />
               {:else}
                 <InformationCircleIcon class="h-6 w-6 text-blue-400" aria-hidden="true" />
               {/if}
