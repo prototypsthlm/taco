@@ -44,7 +44,7 @@
       <Alert
         type={(form?.personalityList?.error && 'error') ||
           (form?.personalityList?.success && 'success')}
-        message={form?.personalityList?.error || form?.personalityList?.success}
+        title={form?.personalityList?.error || form?.personalityList?.success}
       />
       <LlmPersonalityList personalities={data?.personalities} />
     </div>

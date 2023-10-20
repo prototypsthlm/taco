@@ -51,7 +51,7 @@
   <svelte:fragment slot="body">
     Are you sure you want to delete the chat {chat.name ? `"${chat.name}"` : chat.id}
     {#each errors as err}
-      <Alert class="mt-4" type="error" message={err} />
+      <Alert class="mt-4" type="error" title={err} />
     {/each}
   </svelte:fragment>
   <svelte:fragment slot="confirm">Delete</svelte:fragment>

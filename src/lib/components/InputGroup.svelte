@@ -28,7 +28,7 @@
       </button>
       <Alert
         type={(form?.error && 'error') || (form?.success && 'success')}
-        message={form?.error || form?.success}
+        title={form?.error || form?.success}
       />
     </div>
   </div>

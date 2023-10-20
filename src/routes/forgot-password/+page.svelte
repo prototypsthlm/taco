@@ -30,7 +30,7 @@
     <div class="bg-white dark:bg-gray-900 px-6 py-12 shadow sm:px-12">
       <Alert
         type={(form?.error && 'error') || (form?.success && 'success')}
-        message={form?.error || form?.success}
+        title={form?.error || form?.success}
       />
 
       <form

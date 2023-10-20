@@ -8,38 +8,43 @@
   import classNames from 'classnames'
   import { slide } from 'svelte/transition'
 
-  export let message: string
+  export let title: string
+  export let body: string | undefined = undefined
   export let type: 'success' | 'warning' | 'error' | 'info' = 'info'
 
   const typeMap = {
     success: {
       bg: 'bg-green-50',
-      text: 'text-green-700',
+      title: 'text-green-800',
+      body: 'text-green-700',
       iconColor: 'text-green-400',
       icon: CheckCircleIcon,
     },
     warning: {
       bg: 'bg-yellow-50',
-      text: 'text-yellow-700',
+      title: 'text-yellow-800',
+      body: 'text-yellow-700',
       iconColor: 'text-yellow-400',
       icon: ExclamationTriangleIcon,
     },
     error: {
       bg: 'bg-red-50',
-      text: 'text-red-700',
+      title: 'text-red-800',
+      body: 'text-red-700',
       iconColor: 'text-red-400',
       icon: XCircleIcon,
     },
     info: {
       bg: 'bg-blue-50',
-      text: 'text-blue-700',
+      title: 'text-blue-800',
+      body: 'text-blue-700',
       iconColor: 'text-blue-400',
       icon: InformationCircleIcon,
     },
   }
 </script>
 
-{#if message}
+{#if title || body}
   <div transition:slide class={classNames('rounded-md p-4', typeMap[type].bg, $$props.class)}>
     <div class="flex">
       <div class="flex-shrink-0">
@@ -49,10 +54,15 @@
           aria-hidden="true"
         />
       </div>
-      <div class="ml-3 flex-1 md:flex md:justify-between">
-        <p class={classNames('text-sm', typeMap[type].text)}>
-          {message}
-        </p>
+      <div class="ml-3">
+        <h3 class={classNames('text-sm font-medium', typeMap[type].title)}>{title}</h3>
+        {#if body}
+          <div class={classNames('mt-2 text-sm', typeMap[type].body)}>
+            <p>
+              {body}
+            </p>
+          </div>
+        {/if}
       </div>
     </div>
   </div>

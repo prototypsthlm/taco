@@ -97,7 +97,7 @@
       {/each}
     </ul>
     {#if error}
-      <Alert type="error" message={error} />
+      <Alert type="error" title={error} />
     {/if}
   </div>
 {/if}
