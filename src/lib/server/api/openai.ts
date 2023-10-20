@@ -1,6 +1,7 @@
 import type { ChatWithRelations } from '$lib/server/entities/chat'
 import { setChatName } from '$lib/server/entities/chat'
 import { decrypt } from '$lib/server/utils/crypto'
+import { countTokens } from '$lib/server/utils/tokenizer'
 import { trim } from '$lib/utils/string'
 import type { ChatCompletionRequestMessage, CreateChatCompletionRequest } from 'openai'
 import { Configuration, OpenAIApi } from 'openai'
@@ -132,4 +133,10 @@ export const SETTINGS = [
 
 export const getModelSettings = (model: string) => {
   return SETTINGS.find((x) => x.model === model) || SETTINGS[2]
+}
+
+export const countMessagesTokens = (messages: ChatCompletionRequestMessage[]) => {
+  return (
+    countTokens(messages.map((message) => `${message.role}: ${message.content}`).join('\n')) || 0
+  )
 }

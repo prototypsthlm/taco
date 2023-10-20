@@ -1,4 +1,5 @@
 import {
+  countMessagesTokens,
   generateChatName,
   getApiKey,
   getModelSettings,
@@ -7,12 +8,10 @@ import {
 import {
   addQuestionToChat,
   type ChatWithRelations,
-  countChatInputTokens,
   createChat,
   getChatWithRelationsById,
   storeAnswer,
 } from '$lib/server/entities/chat'
-import { countTokens } from '$lib/server/utils/tokenizer'
 import { Models } from '$lib/types/models'
 import { decodeChunkData, encodeChunkData, extractDelta } from '$lib/utils/stream'
 import * as Sentry from '@sentry/sveltekit'
@@ -21,7 +20,6 @@ import { z } from 'zod'
 import type { RequestHandler } from './$types'
 
 export const POST: RequestHandler = async ({ request, fetch, locals: { currentUser } }) => {
-  console.time('countGeneral')
   // This is called from the 'eventSource = new SSE' in the 'handleSubmit' function in 'ChatRoom.svelte'.
   const requestData = await request.json()
 
@@ -81,21 +79,16 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     body: JSON.stringify(chatRequestBody),
   })
 
-  const messagesTokenCount = await countChatInputTokens(chat)
-  console.log({ messagesTokenCount })
-  const questionTokenCount = countTokens(schema.data.question) || 0
-  console.log({ questionTokenCount })
-  const inputTokenCount = messagesTokenCount + questionTokenCount
+  const inputTokenCount = countMessagesTokens(chatRequestBody.messages)
   const modelSettings = getModelSettings(schema.data.model)
   const tokenLimit = modelSettings.maxTokens - modelSettings.outputRoom
-  console.log({ inputTokenCount, tokenLimit })
 
   if (inputTokenCount > tokenLimit) {
     throw error(
       422,
       JSON.stringify({
         title: `Token Limit Exceeded`,
-        body: `Current token limit is ${tokenLimit} tokens. Please reduce the length of your next question (currently: ${questionTokenCount} tokens) or remove some previous messages (currently: ${messagesTokenCount} tokens).`,
+        body: `Please reduce the length of your next question or remove some previous messages.`,
       })
     )
   }
@@ -111,39 +104,45 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       const lastMessage = chat.messages[chat.messages.length - 1]
       lastMessage.answer = ''
 
-      controller.enqueue(encodeChunkData([JSON.stringify({ initial: true, chat })]))
+      controller.enqueue(encodeChunkData([JSON.stringify({ state: 'INITIAL', chat })]))
 
       const chatResponse = await chatRequest
 
-      if (!chatResponse.ok || !chatResponse.body) {
-        const err = await chatResponse.json()
-        throw error(500, JSON.stringify({ error: `OpenAI API Error: ${err.error.message}` }))
+      if (!chatResponse.ok) {
+        const json = await chatResponse.json()
+        controller.enqueue(
+          encodeChunkData([
+            JSON.stringify({ state: 'ERROR', title: 'Request Error', body: json?.error?.message }),
+          ])
+        )
+        controller.close()
+        Sentry.captureException('Request Error', json)
+        return
       }
 
       const chatResponseReader = chatResponse.body?.getReader()
 
       const readAndEnqueue = async () => {
-        if (!chatResponseReader) return
-
-        const { value, done } = await chatResponseReader.read()
-
-        if (done) {
-          controller.close()
-          return
-        }
-
         try {
+          if (!chatResponseReader) return
+
+          const { value, done } = await chatResponseReader.read()
+
+          if (done) {
+            controller.close()
+            return
+          }
+
           const dataArray = decodeChunkData(value)
 
           const modifiedDataArray = (
             await Promise.all(
               dataArray.map(async (data) => {
-                console.log(data)
                 if (data === '[DONE]') {
                   if (lastMessage?.answer) {
                     await storeAnswer(lastMessage.id, lastMessage.answer)
                   }
-                  return JSON.stringify({ final: true })
+                  return JSON.stringify({ state: 'DONE' })
                 }
 
                 const parsedData = JSON.parse(data)
@@ -153,7 +152,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
                 }
                 lastMessage.answer! += delta
 
-                return JSON.stringify({ during: true, delta })
+                return JSON.stringify({ state: 'PROCESSING', delta })
               })
             )
           ).filter((x) => x !== null) as string[]
@@ -161,7 +160,12 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
           controller.enqueue(encodeChunkData(modifiedDataArray))
         } catch (e) {
           Sentry.captureException(error)
-          controller.enqueue(value)
+          controller.enqueue(
+            encodeChunkData([
+              JSON.stringify({ state: 'ERROR', title: 'Request Error', body: error }),
+            ])
+          )
+          controller.close()
         }
 
         await readAndEnqueue()

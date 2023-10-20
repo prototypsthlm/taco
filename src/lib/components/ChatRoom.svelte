@@ -19,6 +19,7 @@
   import { onDestroy } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
+  import * as Sentry from '@sentry/svelte'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: ChatWithRelations | undefined = undefined
@@ -30,6 +31,8 @@
   let eventSource: SSE | undefined
 
   let socketUsers: SocketUser[] = []
+
+  let question = ''
 
   function joinChat() {
     if (!chat) return
@@ -50,18 +53,18 @@
     $socketStore.on('streaming-response', (data) => {
       scrollToBottom()
 
-      if (data.initial && data.chat) {
+      if (data.state === 'INITIAL' && data.chat) {
         loading = true
         chat = data.chat
       }
 
-      if (chat && data.during && data.delta) {
+      if (chat && data.state === 'PROCESSING' && data.delta) {
         const lastMessage = chat.messages[chat.messages.length - 1]
         lastMessage.answer += data.delta
         chat.messages[chat.messages.length - 1] = lastMessage
       }
 
-      if (chat && data.final) {
+      if (chat && data.state === 'DONE') {
         loading = false
         invalidateAll()
         eventSource?.close()
@@ -125,7 +128,7 @@
   }
 
   async function handleSubmit(event: CustomEvent<{ question: string; model: string }>) {
-    const { question, model } = event.detail
+    const { question: q, model } = event.detail
     loading = true
 
     // The following event will be handled by the 'POST: RequestHandler' function in 'server.ts'.
@@ -136,41 +139,57 @@
       payload: JSON.stringify({
         id: chat?.id,
         role: selectedPersonalityContext,
-        question,
+        question: q,
         model,
       }),
     })
 
     eventSource.addEventListener('error', (err: { data: string }) => {
-      console.log(err)
       loading = false
-      const message = JSON.parse(JSON.parse(err.data).message)
+      Sentry.captureException(err)
 
-      if (message) {
-        addFlashNotification(message.title, message.body, { type: 'ERROR' })
+      if (!err.data) {
+        return
       }
 
-      scrollToBottom()
+      const msg = JSON.parse(JSON.parse(err.data).message)
+
+      if (msg) {
+        addFlashNotification(msg.title, msg.body, { type: 'ERROR' })
+      }
     })
 
     eventSource.addEventListener('message', async (e) => {
       scrollToBottom()
-
       try {
         const data = JSON.parse(e.data)
-        $socketStore.emit('stream-response', data)
 
-        if (data.initial && data.chat) {
-          chat = data.chat
+        if (data.state === 'ERROR') {
+          loading = false
+          addFlashNotification(data.title, data.body, { type: 'ERROR' })
+          eventSource?.close()
+          return
         }
 
-        if (chat && data.during && data.delta) {
+        $socketStore.emit('stream-response', data)
+
+        if (data.state === 'INITIAL' && data.chat) {
+          loading = true
+          question = ''
+          chat = data.chat
+
+          scrollToBottom()
+        }
+
+        if (chat && data.state === 'PROCESSING' && data.delta) {
           const lastMessage = chat.messages[chat.messages.length - 1]
           lastMessage.answer += data.delta
           chat.messages[chat.messages.length - 1] = lastMessage
+
+          scrollToBottom()
         }
 
-        if (chat && data.final) {
+        if (chat && data.state === 'DONE') {
           loading = false
           if ($page.url.pathname !== `/app/chats/${chat.id}`) {
             await goto(`/app/chats/${chat.id}`)
@@ -180,10 +199,9 @@
         }
       } catch (err) {
         loading = false
-        console.error(err)
+        Sentry.captureException(err)
+        console.error('eventSource.message.catch', { e, err })
       }
-
-      scrollToBottom()
     })
 
     eventSource.stream()
