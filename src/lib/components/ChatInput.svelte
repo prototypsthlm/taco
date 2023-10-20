@@ -11,7 +11,7 @@
   export let loading = false
 
   let model = chat?.model || Models.gpt3 // Get the last session selected model, get the GPT3.5 if none.
-  let question = ''
+  export let question = ''
   let isShiftPressed = false
   const dispatch = createEventDispatcher() // Events created this way are handled by the handleSubmit function in 'ChatRoom.svelte'.
 

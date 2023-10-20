@@ -226,6 +226,7 @@
       {#each chat?.messages as message (message.id)}
         <div out:slide animate:flip={{ duration: 400 }}>
           <ChatMessage
+            {loading}
             {message}
             on:delete={() => {
               deleteMessage(message.id)
@@ -240,6 +241,7 @@
     <ChatInput
       {chat}
       {loading}
+      bind:question
       on:message={handleSubmit}
       on:focus={() => {
         $socketStore.emit('start-typing')
