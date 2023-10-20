@@ -206,7 +206,7 @@
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-auto">
       {#each chat?.messages as message (message.id)}
-        <div out:slide animate:flip={{ duration: (d) => d * 1.2 }}>
+        <div out:slide animate:flip={{ duration: 400 }}>
           <ChatMessage
             {message}
             on:delete={() => {
