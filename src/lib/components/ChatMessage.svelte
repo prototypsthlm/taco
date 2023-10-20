@@ -15,6 +15,7 @@
 <div class="p-4 md:p-8 flex justify-center">
   <div class="max-w-screen-lg w-full flex gap-4 md:gap-8 text-accent">
     <Avatar
+      transition={false}
       class="w-10 rounded-xl"
       dotConnectedClass="-bottom-0.5 -left-0.5 h-2.5 w-2.5 bg-green-400 ring ring-[#111827]"
       dotDisconnectedClass="bottom-0 left-0 h-1.5 w-1.5 bg-[#111827] ring-[2.5px] ring-[#111827] ring-offset-2 ring-offset-gray-400"

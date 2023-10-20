@@ -8,11 +8,12 @@
   export let user: User
   export let dotConnectedClass: string | undefined
   export let dotDisconnectedClass: string | undefined
+  export let transition = true
 
   const socketUser = getSocketUserForUser(user, $socketUsersStore)
 </script>
 
-<div class="relative self-start" in:scale>
+<div class="relative self-start" in:scale={{ duration: transition ? 400 : 0 }}>
   <Gravatar
     title={user.name || user.email}
     class="{$$restProps?.class} overflow-hidden"
