@@ -177,16 +177,12 @@
           loading = true
           question = ''
           chat = data.chat
-
-          scrollToBottom()
         }
 
         if (chat && data.state === 'PROCESSING' && data.delta) {
           const lastMessage = chat.messages[chat.messages.length - 1]
           lastMessage.answer += data.delta
           chat.messages[chat.messages.length - 1] = lastMessage
-
-          scrollToBottom()
         }
 
         if (chat && data.state === 'DONE') {
@@ -202,6 +198,8 @@
         Sentry.captureException(err)
         console.error('eventSource.message.catch', { e, err })
       }
+
+      scrollToBottom()
     })
 
     eventSource.stream()
@@ -223,9 +221,10 @@
     </div>
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-auto">
-      {#each chat?.messages as message (message.id)}
+      {#each chat?.messages as message, i (message.id)}
         <div out:slide animate:flip={{ duration: 400 }}>
           <ChatMessage
+            last={chat.messages.length - 1 === i}
             {loading}
             {message}
             on:delete={() => {

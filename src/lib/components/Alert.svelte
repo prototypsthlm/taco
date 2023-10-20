@@ -55,12 +55,12 @@
         />
       </div>
       <div class="ml-3">
-        <h3 class={classNames('text-sm font-medium', typeMap[type].title)}>{title}</h3>
-        {#if body}
+        {#if title}
+          <h3 class={classNames('text-sm font-medium', typeMap[type].title)}>{title}</h3>
+        {/if}
+        {#if $$slots.default}
           <div class={classNames('mt-2 text-sm', typeMap[type].body)}>
-            <p>
-              {body}
-            </p>
+            <slot />
           </div>
         {/if}
       </div>

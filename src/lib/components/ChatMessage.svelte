@@ -10,6 +10,7 @@
 
   export let message: ChatWithRelations['messages'][number]
   export let loading: boolean
+  export let last = false
 
   const dispatch = createEventDispatcher()
 </script>
@@ -37,8 +38,10 @@
 </div>
 <div class="p-4 md:p-8 bg-accent bg-opacity-10 flex justify-center">
   <div class="max-w-screen-lg w-full flex gap-4 md:gap-8 text-accent">
-    {#if !message?.answer && !loading}
-      <Alert class="w-full" title="There was an error generating the response" type="error" />
+    {#if !message?.answer && (!last || !loading)}
+      <Alert class="w-full" title="There was an error generating the response" type="error"
+        >You can delete it.</Alert
+      >
     {:else}
       <div class="flex-shrink-0 h-10 w-10 bg-[#19c37c] rounded-xl flex items-center justify-center">
         <ChatGptIcon />
