@@ -1,0 +1,37 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+
+        <mj-text font-size="20px" font-weight="bold">
+          Hi {{username}},
+        </mj-text>
+
+        <mj-text>
+          Welcome to TACO! To get started, please verify your email address by clicking the button below.
+        </mj-text>
+
+        <mj-button background-color="#4CAF50" href="{{verificationUrl}}" target="_blank">
+          Verify Email
+        </mj-button>
+
+        <mj-text>
+          If you did not sign up for a TACO account, please ignore this email.
+        </mj-text>
+
+        <mj-text>
+          Thanks, <br />The TACO Team
+        </mj-text>
+
+        <mj-text font-style="italic">
+          If you’re having trouble with the button above, copy and paste the URL below into your web browser.
+        </mj-text>
+
+        <mj-text font-style="italic">
+          {{verificationUrl}}
+        </mj-text>
+
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

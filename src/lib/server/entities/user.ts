@@ -1,7 +1,10 @@
+import { dev } from '$app/environment'
+import { createNotification, markVerifyNotificationAsRead } from '$lib/server/entities/notification'
 import { prisma } from '$lib/server/prisma'
-import { generateSessionId } from '$lib/server/utils/crypto'
+import { generateSecureRandomToken } from '$lib/server/utils/crypto'
 import type { Prisma } from '@prisma/client'
-import { Role } from '@prisma/client'
+import { NotificationType, Role } from '@prisma/client'
+import type { Cookies } from '@sveltejs/kit'
 import bcrypt from 'bcryptjs'
 
 export const getUserWithPasswordById = async (id: number) =>
@@ -38,6 +41,15 @@ export const getUserByResetToken = (resetToken: string) =>
     where: {
       password: {
         resetToken,
+      },
+    },
+  })
+
+export const getUserByVerifyToken = (verificationToken: string) =>
+  prisma.user.findFirst({
+    where: {
+      password: {
+        verificationToken,
       },
     },
   })
@@ -79,11 +91,20 @@ export const createUser = async (name: string, email: string, password: string) 
       password: {
         create: {
           hash: await bcrypt.hash(password, 10),
+          verificationToken: generateSecureRandomToken(),
+        },
+      },
+      notifications: {
+        create: {
+          type: NotificationType.VERIFY_EMAIL,
+          title: 'Welcome to TACO!',
+          body: 'Please check your email and verify your address.',
         },
       },
     },
     include: {
       userSessions: true,
+      password: true,
     },
   })
 
@@ -91,7 +112,7 @@ export const createUserSession = (userId: number) =>
   prisma.userSession.create({
     data: {
       userId,
-      sessionId: generateSessionId(),
+      sessionId: generateSecureRandomToken(),
     },
   })
 
@@ -189,6 +210,11 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) =>
           },
         },
       },
+      notifications: {
+        where: {
+          read: false,
+        },
+      },
     },
   })
 
@@ -230,4 +256,84 @@ export const isUserOwningChat = async (chatId: number, userId: number) => {
     },
   })
   return !!chat
+}
+
+export const isUserVerified = async (id: number) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      password: true,
+    },
+  })
+  return user?.password?.verificationToken === null
+}
+
+export const userHasNotificationOfTypeAsRead = async (
+  id: number,
+  notificationType: NotificationType
+) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      notifications: true,
+    },
+  })
+
+  return !!user?.notifications.some(
+    (notification) => notification.type === notificationType && notification.read === true
+  )
+}
+
+export const markVerifyUserNotificationAsUnread = async (id: number) => {
+  await prisma.notification.updateMany({
+    where: {
+      type: NotificationType.VERIFY_EMAIL,
+      userId: id,
+    },
+    data: {
+      read: false,
+    },
+  })
+}
+
+export const markUserAsVerified = async (id: number) => {
+  await prisma.user.update({
+    where: { id: id },
+    data: {
+      password: {
+        update: {
+          verificationToken: null,
+        },
+      },
+    },
+  })
+
+  await markVerifyNotificationAsRead(id)
+
+  await createNotification(
+    'Email verified',
+    'Your email has been verified',
+    id,
+    NotificationType.GENERAL
+  )
+}
+
+export const createUserSessionAndCookie = async (
+  userId: number,
+  cookies: Cookies,
+  remember = false
+) => {
+  const { sessionId } = await createUserSession(userId)
+
+  cookies.set('session_id', sessionId, {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: !dev,
+    maxAge: remember ? 60 * 60 * 24 * 7 : undefined, // one week or undefined
+  })
 }

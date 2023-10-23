@@ -1,7 +1,7 @@
-import { createUser, createUserSession } from '$lib/server/entities/user'
+import { sendVerifyUserEmail } from '$lib/email/mailer'
+import { createUser, createUserSessionAndCookie } from '$lib/server/entities/user'
 import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
-import { dev } from '$app/environment'
 import { fail, redirect } from '@sveltejs/kit'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
@@ -23,15 +23,14 @@ export const actions: Actions = {
         .parse(fields)
 
       const user = await createUser(schema.name, schema.email, schema.password)
-      const { sessionId } = await createUserSession(user.id)
 
-      cookies.set('session_id', sessionId, {
-        path: '/',
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: !dev,
-        maxAge: 60 * 60 * 24 * 7, // one week
-      })
+      await createUserSessionAndCookie(user.id, cookies)
+
+      if (user.password?.verificationToken) {
+        await sendVerifyUserEmail(user, url.origin, user.password.verificationToken)
+      } else {
+        throw new Error('User verification token not found')
+      }
     } catch (error) {
       if (error instanceof ZodError) {
         return fail(422, {

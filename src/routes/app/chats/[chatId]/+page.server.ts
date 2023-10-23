@@ -6,9 +6,12 @@ import type { PageServerLoad } from './$types'
 export const load: PageServerLoad = async ({ params }) => {
   const chatId = Number(params.chatId)
 
-  return {
-    chatId,
-    chat: getChatWithRelationsById(chatId),
+  try {
+    return {
+      chat: await getChatWithRelationsById(chatId),
+    }
+  } catch (error) {
+    throw redirect(303, '/app')
   }
 }
 

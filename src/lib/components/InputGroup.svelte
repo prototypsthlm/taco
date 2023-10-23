@@ -3,7 +3,7 @@
 
   export let header: string
   export let description: string
-  export let buttonText: string = 'Save'
+  export let buttonText = 'Save'
   export let form: any
 </script>
 
@@ -28,7 +28,7 @@
       </button>
       <Alert
         type={(form?.error && 'error') || (form?.success && 'success')}
-        message={form?.error || form?.success}
+        title={form?.error || form?.success}
       />
     </div>
   </div>

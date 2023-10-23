@@ -1,19 +1,25 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation'
-  import { page } from '$app/stores'
+  import { navigating, page } from '$app/stores'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
-  import { type BaseSocketUser, type SocketUser, socketUsersStore } from '$lib/stores/socket'
+  import { addFlashNotification } from '$lib/stores/notification'
+  import {
+    type BaseSocketUser,
+    socketStore,
+    type SocketUser,
+    socketUsersStore,
+  } from '$lib/stores/socket'
   import { buildSocketUsers, updateSocketUsers } from '$lib/utils/socket'
   import type { LlmPersonality } from '@prisma/client'
-  import { socketStore } from '$lib/stores/socket'
   import { SSE } from 'sse.js'
   import { onDestroy } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
+  import * as Sentry from '@sentry/svelte'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: ChatWithRelations | undefined = undefined
@@ -25,6 +31,8 @@
   let eventSource: SSE | undefined
 
   let socketUsers: SocketUser[] = []
+
+  let question = ''
 
   function joinChat() {
     if (!chat) return
@@ -45,18 +53,18 @@
     $socketStore.on('streaming-response', (data) => {
       scrollToBottom()
 
-      if (data.initial && data.chat) {
+      if (data.state === 'INITIAL' && data.chat) {
         loading = true
         chat = data.chat
       }
 
-      if (chat && data.during && data.delta) {
+      if (chat && data.state === 'PROCESSING' && data.delta) {
         const lastMessage = chat.messages[chat.messages.length - 1]
         lastMessage.answer += data.delta
         chat.messages[chat.messages.length - 1] = lastMessage
       }
 
-      if (chat && data.final) {
+      if (chat && data.state === 'DONE') {
         loading = false
         invalidateAll()
         eventSource?.close()
@@ -120,7 +128,7 @@
   }
 
   async function handleSubmit(event: CustomEvent<{ question: string; model: string }>) {
-    const { question, model } = event.detail
+    const { question: q, model } = event.detail
     loading = true
 
     // The following event will be handled by the 'POST: RequestHandler' function in 'server.ts'.
@@ -131,31 +139,53 @@
       payload: JSON.stringify({
         id: chat?.id,
         role: selectedPersonalityContext,
-        question,
+        question: q,
         model,
       }),
     })
 
-    eventSource.addEventListener('error', handleError)
+    eventSource.addEventListener('error', (err: { data: string }) => {
+      loading = false
+      Sentry.captureException(err)
+
+      if (!err.data) {
+        return
+      }
+
+      const msg = JSON.parse(JSON.parse(err.data).message)
+
+      if (msg) {
+        addFlashNotification(msg.title, msg.body, { type: 'ERROR' })
+      }
+    })
 
     eventSource.addEventListener('message', async (e) => {
       scrollToBottom()
-
       try {
         const data = JSON.parse(e.data)
+
+        if (data.state === 'ERROR') {
+          loading = false
+          addFlashNotification(data.title, data.body, { type: 'ERROR' })
+          eventSource?.close()
+          return
+        }
+
         $socketStore.emit('stream-response', data)
 
-        if (data.initial && data.chat) {
+        if (data.state === 'INITIAL' && data.chat) {
+          loading = true
+          question = ''
           chat = data.chat
         }
 
-        if (chat && data.during && data.delta) {
+        if (chat && data.state === 'PROCESSING' && data.delta) {
           const lastMessage = chat.messages[chat.messages.length - 1]
           lastMessage.answer += data.delta
           chat.messages[chat.messages.length - 1] = lastMessage
         }
 
-        if (chat && data.final) {
+        if (chat && data.state === 'DONE') {
           loading = false
           if ($page.url.pathname !== `/app/chats/${chat.id}`) {
             await goto(`/app/chats/${chat.id}`)
@@ -164,18 +194,15 @@
           eventSource?.close()
         }
       } catch (err) {
-        handleError(err)
+        loading = false
+        Sentry.captureException(err)
+        console.error('eventSource.message.catch', { e, err })
       }
 
       scrollToBottom()
     })
 
     eventSource.stream()
-  }
-
-  function handleError<T>(err: T) {
-    loading = false
-    console.error(err)
   }
 </script>
 
@@ -194,9 +221,14 @@
     </div>
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-auto">
-      {#each chat?.messages as message (message.id)}
-        <div out:slide animate:flip={{ duration: (d) => d * 1.2 }}>
+      {#each chat.messages as message, i (message.id)}
+        <div
+          out:slide={{ duration: $navigating ? 0 : 400 }}
+          animate:flip={{ duration: $navigating ? 0 : 400 }}
+        >
           <ChatMessage
+            last={chat.messages.length - 1 === i}
+            {loading}
             {message}
             on:delete={() => {
               deleteMessage(message.id)
@@ -209,7 +241,9 @@
 
   <div class="self-end py-3 md:py-6 w-full bg-gray-900">
     <ChatInput
+      {chat}
       {loading}
+      bind:question
       on:message={handleSubmit}
       on:focus={() => {
         $socketStore.emit('start-typing')

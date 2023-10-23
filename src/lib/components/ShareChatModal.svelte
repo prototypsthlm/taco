@@ -126,7 +126,7 @@
       </form>
 
       {#if error}
-        <Alert type="error" message={error} />
+        <Alert type="error" title={error} />
       {/if}
       <ChatMembers {chat} {members} {user} />
     </div>

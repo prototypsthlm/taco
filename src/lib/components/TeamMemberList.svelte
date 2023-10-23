@@ -2,7 +2,6 @@
   import { enhance } from '$app/forms'
   import Alert from '$lib/components/Alert.svelte'
   import Avatar from '$lib/components/Avatar.svelte'
-  import Gravatar from '$lib/components/Gravatar.svelte'
   import { ArrowDownIcon, ChevronUpIcon, TrashIcon } from '@babeard/svelte-heroicons/solid'
 
   const formatDate = (date: Date) =>
@@ -31,7 +30,7 @@
     </div>
     <Alert
       type={(form?.error && 'error') || (form?.success && 'success')}
-      message={form?.error || form?.success}
+      title={form?.error || form?.success}
     />
     <ul class="divide-y divide-gray-800">
       {#each team.teamUsers as teamUser}
