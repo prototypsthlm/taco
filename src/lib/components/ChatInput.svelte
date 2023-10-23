@@ -6,6 +6,7 @@
   import UsersTyping from '$lib/components/UsersTyping.svelte'
   import { createEventDispatcher, onMount } from 'svelte'
   import autosize from 'svelte-autosize'
+  import ChatSettingsPopover from './ChatSettingsPopover.svelte'
 
   // Variables got from <ChatInput {chat} {loading} on:message={handleSubmit} />
   export let chat: ChatWithRelations | undefined = undefined
@@ -13,6 +14,7 @@
 
   let model = chat?.model // Get the last session selected model
   let question = ''
+  let chatSettingsAreVisible = false
   let isShiftPressed = false
   const dispatch = createEventDispatcher() // Events created this way are handled by the handleSubmit function in 'ChatRoom.svelte'.
 
@@ -24,14 +26,13 @@
     }
   }
 
-  function chooseMessageSettings() {
+  function toggleModel() {
     if (loading) return
     if (model == Models.gpt3) {
       model = Models.gpt4
     } else {
       model = Models.gpt3
     }
-    console.log('Selected model: ' + model)
   }
 
   let textarea: HTMLTextAreaElement
@@ -75,8 +76,7 @@
         />
       </div>
 
-      <!-- Chat-GPT4 toggle. -->
-      <div class="flex flex-col items-center justify-center bg-primary pb-1">
+      <!-- <div class="flex flex-col items-center justify-center bg-primary pb-1">
         <span class="text-white">GPT4</span>
         <button
           on:click={chooseMessageSettings}
@@ -96,7 +96,7 @@
               : 'translate-x-0'} pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
           />
         </button>
-      </div>
+      </div> -->
 
       <!-- Send message button. -->
       <button
@@ -113,6 +113,10 @@
         {/if}
       </button>
     </div>
+
+    <!-- Chat settings button. -->
+    <div class="ml-2" />
+    <ChatSettingsPopover {model} {loading} on:model={toggleModel} />
   </div>
   <div class="w-5/6 max-w-5xl flex justify-between gap-4 text-accent text-opacity-50 text-xs">
     <UsersTyping />
