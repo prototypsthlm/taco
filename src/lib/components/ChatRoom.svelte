@@ -1,15 +1,19 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation'
-  import { page } from '$app/stores'
+  import { navigating, page } from '$app/stores'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
-  import { type BaseSocketUser, type SocketUser, socketUsersStore } from '$lib/stores/socket'
+  import {
+    type BaseSocketUser,
+    socketStore,
+    type SocketUser,
+    socketUsersStore,
+  } from '$lib/stores/socket'
   import { buildSocketUsers, updateSocketUsers } from '$lib/utils/socket'
   import type { LlmPersonality } from '@prisma/client'
-  import { socketStore } from '$lib/stores/socket'
   import { SSE } from 'sse.js'
   import { onDestroy } from 'svelte'
   import { flip } from 'svelte/animate'
@@ -194,8 +198,11 @@
     </div>
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-auto">
-      {#each chat?.messages as message (message.id)}
-        <div out:slide animate:flip={{ duration: (d) => d * 1.2 }}>
+      {#each chat.messages as message (message.id)}
+        <div
+          out:slide={{ duration: $navigating ? 0 : 400 }}
+          animate:flip={{ duration: $navigating ? 0 : 400 }}
+        >
           <ChatMessage
             {message}
             on:delete={() => {
