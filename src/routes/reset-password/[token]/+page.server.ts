@@ -1,7 +1,5 @@
-import { dev } from '$app/environment'
 import { createNotification } from '$lib/server/entities/notification'
 import {
-  createUserSession,
   createUserSessionAndCookie,
   getUserByResetToken,
   updatePassword,

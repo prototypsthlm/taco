@@ -29,7 +29,7 @@ export const getChatWithRelationsById = (id: number) => {
   })
 }
 
-export const createChat = (userTeamId: number, role: string | undefined) => {
+export const createChat = (userTeamId: number, role = 'You are a helpful assistant.') => {
   return prisma.chat.create({
     data: {
       ownerId: userTeamId,
@@ -63,7 +63,7 @@ export const addQuestionToChat = (id: number, model: string, question: string, u
     where: { id },
     // Given data:
     data: {
-      model, // Save the model in the chat so we get the last session selected model if connecting from elsewhere
+      model, // Save the model in the chat, so we get the last session selected model if connecting from elsewhere
       messages: {
         create: {
           question,
@@ -100,7 +100,9 @@ export const storeAnswer = (id: number, answer: string) => {
     where: {
       id,
     },
-    data: { answer },
+    data: {
+      answer,
+    },
   })
 }
 
@@ -110,20 +112,6 @@ export const setChatName = (id: number, name: string) => {
       id,
     },
     data: { name },
-    include: {
-      owner: {
-        include: {
-          user: true,
-          team: true,
-        },
-      },
-      messages: {
-        include: {
-          author: true,
-        },
-        orderBy: { createdAt: 'asc' },
-      },
-    },
   })
 }
 

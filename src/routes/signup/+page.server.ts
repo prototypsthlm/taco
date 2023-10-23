@@ -1,14 +1,7 @@
 import { sendVerifyUserEmail } from '$lib/email/mailer'
-import { createHtmlTemplate, createTextTemplate } from '$lib/server/email/forgot-password-template'
-import {
-  createUser,
-  createUserSession,
-  createUserSessionAndCookie,
-} from '$lib/server/entities/user'
-import postmark from '$lib/server/postmark'
+import { createUser, createUserSessionAndCookie } from '$lib/server/entities/user'
 import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
-import { dev } from '$app/environment'
 import { fail, redirect } from '@sveltejs/kit'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 

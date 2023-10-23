@@ -15,7 +15,7 @@ export const load: LayoutServerLoad = async ({ url, locals: { currentUser } }) =
     currentUser.id
   )
 
-  if (!currentUser.activeUserTeamId && !url.pathname.startsWith('/app/settings/teams')) {
+  if (!currentUser.activeUserTeamId && url.pathname === '/app') {
     // no active team -> force team selection
     throw redirect(303, '/app/settings/teams')
   }

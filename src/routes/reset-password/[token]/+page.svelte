@@ -31,7 +31,7 @@
     {#if data.isTokenValid}
       <div class="bg-white dark:bg-gray-900 px-6 py-12 shadow sm:px-12">
         {#if form?.error}
-          <Alert type="error" message={form?.error} />
+          <Alert type="error" title={form?.error} />
         {/if}
 
         <form
@@ -71,7 +71,7 @@
         </form>
       </div>
     {:else}
-      <Alert type="error" message="The reset password link is invalid or has expired." />
+      <Alert type="error" title="The reset password link is invalid or has expired." />
     {/if}
 
     <p class="mt-10 text-center text-sm text-gray-500">

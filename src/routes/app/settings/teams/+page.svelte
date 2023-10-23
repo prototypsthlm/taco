@@ -1,30 +1,27 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import Gravatar from '$lib/components/Gravatar.svelte'
-  import { notificationStore } from '$lib/stores/notification'
-  import { generateRandomInt } from '$lib/utils/number'
+  import {
+    addFlashNotification,
+    flashNotificationStore,
+    removeFlashNotificationOfCategory,
+  } from '$lib/stores/notification'
   import { EnvelopeIcon, PlusIcon, UserGroupIcon } from '@babeard/svelte-heroicons/solid'
   import type { PageServerData } from './$types'
-
+  import { afterNavigate } from '$app/navigation'
   export let data: PageServerData
 
-  if (!data.user.activeUserTeamId) {
-    if (!$notificationStore.find((notification) => notification.type === 'FLASH')) {
-      notificationStore.update((notifications) => {
-        notifications.push({
-          id: generateRandomInt(),
-          type: 'FLASH',
-          title: 'You are not a member of any team',
-          body: 'Please pick/create a team.',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          read: false,
-          userId: data.user.id,
-        })
-        return notifications
+  afterNavigate(() => {
+    if (
+      !data.user.activeUserTeamId &&
+      !$flashNotificationStore.find((n) => n.category === 'NO_TEAM')
+    ) {
+      addFlashNotification('You are not a member of any team', 'Please select or create a team.', {
+        type: 'WARNING',
+        category: 'NO_TEAM',
       })
     }
-  }
+  })
 </script>
 
 <header
@@ -56,9 +53,12 @@
           {#if data?.user.activeUserTeamId !== userTeam?.id}
             <form method="post" action="?/selectTeam" use:enhance>
               <button
+                on:click={() => {
+                  removeFlashNotificationOfCategory('NO_TEAM')
+                }}
                 type="submit"
                 class="rounded-md bg-yellow-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >Switch</button
+                >Select</button
               >
               <input type="hidden" name="userTeamId" value={userTeam.id} />
             </form>
