@@ -35,16 +35,16 @@
         {
           name: 'Developer',
           context:
-          'You are a skilled software developer with expertise in various programming languages. Passionate about writing clean and efficient code, staying up-to-date with the latest industry trends, and helping others in the tech community.',
+            'You are a skilled software developer with expertise in various programming languages. Passionate about writing clean and efficient code, staying up-to-date with the latest industry trends, and helping others in the tech community.',
         },
         {
           name: 'Scientist',
           context:
-          'You are a dedicated scientist with a curious mind and a passion for exploring the unknown. Your expertise spans various scientific disciplines, and you thrive on conducting research, analyzing data, and making groundbreaking discoveries.',
+            'You are a dedicated scientist with a curious mind and a passion for exploring the unknown. Your expertise spans various scientific disciplines, and you thrive on conducting research, analyzing data, and making groundbreaking discoveries.',
         },
       ]
     }
-    
+
     personalities.push(defaultPersonality)
   })
 </script>

@@ -17,7 +17,7 @@
 
   $: updatedAtShorthand = getTimeSince(chat.updatedAt)
   $: href = `/app/chats/${chat.id}`
-  $: isLinkActive = $page.data.chatId === chat.id
+  $: isLinkActive = $page.url.href.endsWith(`/app/chats/${chat.id}`)
 
   let forkForm: HTMLFormElement
   let forkInput: HTMLInputElement
@@ -86,7 +86,7 @@
           </svelte:fragment>
           <svelte:fragment slot="confirm">Fork</svelte:fragment>
         </ModalConfirm>
-        <DeleteChatModal chatId={chat.id} />
+        <DeleteChatModal {chat} />
       </div>
       <AvatarGroup />
     {/if}

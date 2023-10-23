@@ -2,9 +2,8 @@
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { Models } from '$lib/types/models'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
-  import ListBullet from '@babeard/svelte-heroicons/solid/ListBullet'
   import UsersTyping from '$lib/components/UsersTyping.svelte'
-  import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher, onMount, tick } from 'svelte'
   import autosize from 'svelte-autosize'
 
   // Variables got from <ChatInput {chat} {loading} on:message={handleSubmit} />
@@ -12,7 +11,7 @@
   export let loading = false
 
   let model = chat?.model || Models.gpt3 // Get the last session selected model, get the GPT3.5 if none.
-  let question = ''
+  export let question = ''
   let isShiftPressed = false
   const dispatch = createEventDispatcher() // Events created this way are handled by the handleSubmit function in 'ChatRoom.svelte'.
 
@@ -29,7 +28,7 @@
     // Actually dispatch message.
     if (question.trim() && !loading) {
       dispatch('message', { question, model })
-      question = '' // Empty any written text as it has already been sent, we do NOT do so with the model, which remains the same.
+      reset()
     }
   }
 
@@ -37,6 +36,16 @@
   onMount(() => {
     textarea.focus()
   })
+
+  async function reset() {
+    await tick()
+    autosize.update(textarea)
+  }
+
+  $: if (question === '') {
+    // Autosize textarea.
+    reset()
+  }
 </script>
 
 <div class="relative">

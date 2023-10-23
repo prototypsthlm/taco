@@ -30,7 +30,7 @@
     </div>
     <Alert
       type={(form?.error && 'error') || (form?.success && 'success')}
-      message={form?.error || form?.success}
+      title={form?.error || form?.success}
     />
     <ul class="divide-y divide-gray-800">
       {#each team.teamUsers as teamUser}

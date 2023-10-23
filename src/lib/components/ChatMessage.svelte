@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Alert from '$lib/components/Alert.svelte'
   import Avatar from '$lib/components/Avatar.svelte'
   import ChatGptIcon from '$lib/components/icons/ChatGptIcon.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
@@ -8,6 +9,8 @@
   import { createEventDispatcher } from 'svelte'
 
   export let message: ChatWithRelations['messages'][number]
+  export let loading: boolean
+  export let last = false
 
   const dispatch = createEventDispatcher()
 </script>
@@ -35,23 +38,29 @@
 </div>
 <div class="p-4 md:p-8 bg-accent bg-opacity-10 flex justify-center">
   <div class="max-w-screen-lg w-full flex gap-4 md:gap-8 text-accent">
-    <div class="flex-shrink-0 h-10 w-10 bg-[#19c37c] rounded-xl flex items-center justify-center">
-      <ChatGptIcon />
-    </div>
-    <div class="flex flex-col flex-grow">
-      <span class="font-bold">{message.model}</span>
-      {#if message?.answer}
-        <!-- We need to force prose-invert, which is the dark mode for the prose class due to not having a non dark option -->
-        <div class="prose prose-invert overflow-x-hidden prose-pre:overflow-x-scroll">
-          {#await markdownToHtml(message.answer) then parsedText}
-            {@html parsedText}
-          {/await}
-        </div>
-      {:else}
-        <div class="flex items-center justify-center space-x-2">
-          <ArrowPathIcon class="h-6 w-6 text-white animate-spin" />
-        </div>
-      {/if}
-    </div>
+    {#if !message?.answer && (!last || !loading)}
+      <Alert class="w-full" title="There was an error generating the response" type="error"
+        >You can delete it.</Alert
+      >
+    {:else}
+      <div class="flex-shrink-0 h-10 w-10 bg-[#19c37c] rounded-xl flex items-center justify-center">
+        <ChatGptIcon />
+      </div>
+      <div class="flex flex-col flex-grow">
+        <span class="font-bold">{message.model}</span>
+        {#if message?.answer}
+          <!-- We need to force prose-invert, which is the dark mode for the prose class due to not having a non dark option -->
+          <div class="prose prose-invert overflow-x-hidden prose-pre:overflow-x-scroll">
+            {#await markdownToHtml(message.answer) then parsedText}
+              {@html parsedText}
+            {/await}
+          </div>
+        {:else}
+          <div class="flex items-center justify-center space-x-2">
+            <ArrowPathIcon class="h-6 w-6 text-white animate-spin" />
+          </div>
+        {/if}
+      </div>
+    {/if}
   </div>
 </div>
