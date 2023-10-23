@@ -236,18 +236,17 @@
     </div>
   {/if}
 
-  <div class="self-end py-3 md:py-6 w-full bg-gray-900">
-    <ChatInput
-      {chat}
-      {loading}
-      bind:question
-      on:message={handleSubmit}
-      on:focus={() => {
-        $socketStore.emit('start-typing')
-      }}
-      on:blur={() => {
-        $socketStore.emit('stop-typing')
-      }}
-    />
-  </div>
+  <ChatInput
+    class="self-end py-3 md:py-6 w-full bg-gray-900"
+    {chat}
+    {loading}
+    bind:question
+    on:message={handleSubmit}
+    on:focus={() => {
+      $socketStore.emit('start-typing')
+    }}
+    on:blur={() => {
+      $socketStore.emit('stop-typing')
+    }}
+  />
 </div>
