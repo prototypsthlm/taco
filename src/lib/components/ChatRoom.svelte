@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation'
-  import { page } from '$app/stores'
+  import { navigating, page } from '$app/stores'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
@@ -221,8 +221,11 @@
     </div>
   {:else}
     <div bind:this={element} class="flex flex-col w-full h-full overflow-auto">
-      {#each chat?.messages as message, i (message.id)}
-        <div out:slide animate:flip={{ duration: 400 }}>
+      {#each chat.messages as message, i (message.id)}
+        <div
+          out:slide={{ duration: $navigating ? 0 : 400 }}
+          animate:flip={{ duration: $navigating ? 0 : 400 }}
+        >
           <ChatMessage
             last={chat.messages.length - 1 === i}
             {loading}
