@@ -42,7 +42,7 @@
       </p>
       <p class="mt-6 text-lg leading-8 text-gray-300">
         Collaborate with your team LLMs together in one place. Get an advantage of useful features
-        to improve your poductivity and collaboration between team members.
+        to improve your productivity and collaboration between team members.
       </p>
     </div>
     <div class="mx-auto mt-16 px-8 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">

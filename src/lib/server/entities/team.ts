@@ -1,5 +1,6 @@
 import { prisma } from '$lib/server/prisma'
 import { encrypt } from '$lib/server/utils/crypto'
+import type { Prisma } from '@prisma/client'
 
 export const updateTeam = async (id: number, name: string, openAiApiKey: string | null) => {
   if (!process.env.SECRET_KEY) {
@@ -24,6 +25,8 @@ export const getTeamByName = async (name: string) => {
     },
   })
 }
+
+export type TeamWithMembers = Prisma.PromiseReturnType<typeof getTeamByIdWithMembers>
 
 export const getTeamByIdWithMembers = async (id: number) =>
   prisma.team.findUniqueOrThrow({

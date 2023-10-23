@@ -1,6 +1,4 @@
-import { dev } from '$app/environment'
 import {
-  createUserSession,
   createUserSessionAndCookie,
   doesCredentialsMatch,
   getUserByEmail,

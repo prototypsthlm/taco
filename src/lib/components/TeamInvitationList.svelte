@@ -63,7 +63,7 @@
     </div>
     <Alert
       type={(form?.error && 'error') || (form?.success && 'success')}
-      message={form?.error || form?.success}
+      title={form?.error || form?.success}
     />
     {#if invitations.length > 0}
       <ul class="divide-y divide-gray-800">
