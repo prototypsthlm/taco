@@ -11,10 +11,21 @@ export const scrollToBottom = ({ force = false, ms = 300 } = {}) => {
   }
 }
 
-export const autoscroll = (node: HTMLElement): { destroy: () => void } | void => {
+export const autoscroll = (node: HTMLElement): { destroy: () => void } => {
+  let prevScrollHeight = node.scrollHeight
+
   elem = node
   const checkScroll = () => {
-    shouldAutoscroll.set(node.clientHeight + node.scrollTop > node.scrollHeight - 10)
+    const scrollBottom = node.scrollTop + node.clientHeight
+
+    if (prevScrollHeight === node.scrollHeight) {
+      if (scrollBottom > node.scrollHeight - 10) {
+        shouldAutoscroll.set(true)
+      } else {
+        shouldAutoscroll.set(false)
+      }
+    }
+    prevScrollHeight = node.scrollHeight
   }
 
   node.addEventListener('scroll', checkScroll)
