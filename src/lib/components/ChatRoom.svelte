@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation'
-  import { page } from '$app/stores'
+  import { navigating, page } from '$app/stores'
   import { autoscroll, scrollToBottom } from '$lib/actions/autoscroll'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
@@ -110,6 +110,7 @@
   }
 
   let isDeleting = false
+
   async function deleteMessage(id: number) {
     try {
       isDeleting = true
@@ -224,8 +225,11 @@
   {:else}
     <div class="w-full h-full overflow-auto relative">
       <div use:autoscroll class="flex flex-col w-full h-full overflow-auto">
-        {#each chat?.messages as message, i (message.id)}
-          <div out:slide animate:flip={{ duration: 400 }}>
+        {#each chat.messages as message, i (message.id)}
+          <div
+            out:slide={{ duration: $navigating ? 0 : 400 }}
+            animate:flip={{ duration: $navigating ? 0 : 400 }}
+          >
             <ChatMessage
               last={chat.messages.length - 1 === i}
               {loading}

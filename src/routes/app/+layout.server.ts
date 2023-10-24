@@ -11,16 +11,12 @@ export const load: LayoutServerLoad = async ({ url, locals: { currentUser } }) =
     await markVerifyUserNotificationAsUnread(currentUser.id)
   }
 
-  const userWithActiveTeamAndChats = await getUserWithUserTeamsActiveTeamAndChatsById(
-    currentUser.id
-  )
-
-  if (!currentUser.activeUserTeamId && url.pathname === '/app') {
+  if (!currentUser.activeUserTeamId && !url.pathname.startsWith('/app/settings')) {
     // no active team -> force team selection
     throw redirect(303, '/app/settings/teams')
   }
 
   return {
-    user: userWithActiveTeamAndChats,
+    user: getUserWithUserTeamsActiveTeamAndChatsById(currentUser.id),
   }
 }
