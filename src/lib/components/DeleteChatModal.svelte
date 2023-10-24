@@ -11,9 +11,10 @@
   let errors: string[] = []
   let isOpen = false
 
+  let loading = false
   async function deleteChat(id: number) {
+    loading = true
     const res = await fetch(`/api/chats/${id}`, { method: 'DELETE' })
-
     if (res.ok) {
       $socketStore.emit('delete-chat')
       await invalidateAll()
@@ -26,7 +27,10 @@
         errors = []
       }, 5000)
     }
+    loading = false
   }
+
+  // ADD DELETE LOADING STATE TO DELETE MESSAGE
 </script>
 
 <ModalConfirm
@@ -42,6 +46,7 @@
     type="button"
     title="Delete it"
     slot="trigger"
+    disabled={loading}
     on:click={() => {
       isOpen = true
     }}

@@ -109,15 +109,23 @@
     prevChatId = chat?.id
   }
 
+  let isDeleting = false
   async function deleteMessage(id: number) {
-    const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' })
+    try {
+      isDeleting = true
+      const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' })
 
-    const json = await res.json()
-    if (json?.success && chat?.messages) {
-      chat.messages = chat.messages.filter((x) => x.id !== id)
-      $socketStore.emit('delete-message')
-    } else {
-      console.error(json?.error)
+      const json = await res.json()
+      if (json?.success && chat?.messages) {
+        chat.messages = chat.messages.filter((x) => x.id !== id)
+        $socketStore.emit('delete-message')
+      } else {
+        console.error(json?.error)
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      isDeleting = false
     }
   }
 
@@ -222,6 +230,7 @@
               last={chat.messages.length - 1 === i}
               {loading}
               {message}
+              {isDeleting}
               on:delete={() => {
                 deleteMessage(message.id)
               }}

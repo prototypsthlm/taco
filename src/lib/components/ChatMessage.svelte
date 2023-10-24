@@ -11,6 +11,7 @@
   export let message: ChatWithRelations['messages'][number]
   export let loading: boolean
   export let last = false
+  export let isDeleting = false
 
   const dispatch = createEventDispatcher()
 </script>
@@ -31,7 +32,7 @@
         {/await}
       </div>
     </div>
-    <button class="text-white self-start" on:click={() => dispatch('delete')}>
+    <button disabled={isDeleting} class="text-white self-start" on:click={() => dispatch('delete')}>
       <TrashIcon class="w-5" />
     </button>
   </div>
