@@ -3,11 +3,11 @@ import { get } from 'svelte/store'
 
 let elem: HTMLElement
 
-export const scrollToBottom = ({ force = false } = {}) => {
+export const scrollToBottom = ({ force = false, ms = 200 } = {}) => {
   if (get(shouldAutoscroll) || force) {
     setTimeout(() => {
       elem?.scroll({ top: elem.scrollHeight, behavior: 'smooth' })
-    }, 300)
+    }, ms)
   }
 }
 

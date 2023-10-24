@@ -5,6 +5,7 @@
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
+  import ScrollToBottomButton from '$lib/components/ScrollToBottomButton.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { addFlashNotification } from '$lib/stores/notification'
@@ -213,19 +214,25 @@
       />
     </div>
   {:else}
-    <div use:autoscroll class="flex flex-col w-full h-full overflow-auto">
-      {#each chat?.messages as message, i (message.id)}
-        <div out:slide animate:flip={{ duration: 400 }}>
-          <ChatMessage
-            last={chat.messages.length - 1 === i}
-            {loading}
-            {message}
-            on:delete={() => {
-              deleteMessage(message.id)
-            }}
-          />
-        </div>
-      {/each}
+    <div class="w-full h-full overflow-auto relative">
+      <div use:autoscroll class="flex flex-col w-full h-full overflow-auto">
+        {#each chat?.messages as message, i (message.id)}
+          <div out:slide animate:flip={{ duration: 400 }}>
+            <ChatMessage
+              last={chat.messages.length - 1 === i}
+              {loading}
+              {message}
+              on:delete={() => {
+                deleteMessage(message.id)
+              }}
+            />
+          </div>
+        {/each}
+      </div>
+      <ScrollToBottomButton
+        class="absolute bottom-4 right-4"
+        on:click={() => scrollToBottom({ force: true, ms: 0 })}
+      />
     </div>
   {/if}
 
