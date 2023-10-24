@@ -37,5 +37,8 @@
   ],
   "rules": {
     "prettier/prettier": "error"
+  },
+  "globals": {
+    "NodeJS": true
   }
 }
