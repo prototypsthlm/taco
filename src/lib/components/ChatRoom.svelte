@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation'
   import { page } from '$app/stores'
+  import { autoscroll, scrollToBottom } from '$lib/actions/autoscroll'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
@@ -15,11 +16,11 @@
   } from '$lib/stores/socket'
   import { buildSocketUsers, updateSocketUsers } from '$lib/utils/socket'
   import type { LlmPersonality } from '@prisma/client'
+  import * as Sentry from '@sentry/svelte'
   import { SSE } from 'sse.js'
   import { onDestroy } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
-  import * as Sentry from '@sentry/svelte'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: ChatWithRelations | undefined = undefined
@@ -27,7 +28,6 @@
 
   let loading = false
   let selectedPersonalityContext: string | null = 'You are a helpful assistant.'
-  let element: HTMLElement
   let eventSource: SSE | undefined
 
   let socketUsers: SocketUser[] = []
@@ -36,7 +36,7 @@
 
   function joinChat() {
     if (!chat) return
-    scrollToBottom()
+    scrollToBottom({ force: true })
     socketUsers = buildSocketUsers(user, chat)
     if (!$socketStore.connected) {
       $socketStore.connect()
@@ -106,13 +106,6 @@
     leaveChat()
     joinChat()
     prevChatId = chat?.id
-  }
-
-  // that should be only if it was already at the bottom
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      element?.scroll({ top: element.scrollHeight, behavior: 'smooth' })
-    }, 500)
   }
 
   async function deleteMessage(id: number) {
@@ -220,7 +213,7 @@
       />
     </div>
   {:else}
-    <div bind:this={element} class="flex flex-col w-full h-full overflow-auto">
+    <div use:autoscroll class="flex flex-col w-full h-full overflow-auto">
       {#each chat?.messages as message, i (message.id)}
         <div out:slide animate:flip={{ duration: 400 }}>
           <ChatMessage
