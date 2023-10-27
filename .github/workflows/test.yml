@@ -22,3 +22,5 @@ jobs:
 
       - name: Run tests
         run: npm test
+        env:
+          POSTMARK_API_KEY: ${{ secrets.POSTMARK_API_KEY }}
