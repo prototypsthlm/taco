@@ -23,4 +23,8 @@ jobs:
       - name: Run tests
         run: npm test
         env:
-          POSTMARK_API_KEY: ${{ secrets.POSTMARK_API_KEY }}
+          POSTMARK_API_KEY: 'SECRET'
+          PUBLIC_SITE_NAME: 'TACO [TEST]'
+          EMAIL_SENDER_SIGNATURE: 'test@tacoai.app'
+          PUBLIC_SENTRY_DSN: 'SECRET'
+          PUBLIC_SENTRY_ENV: 'test'
