@@ -1,9 +1,11 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation'
   import { navigating, page } from '$app/stores'
+  import { autoscroll, scrollToBottom } from '$lib/actions/autoscroll'
   import ChatInput from '$lib/components/ChatInput.svelte'
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
+  import ScrollToBottomButton from '$lib/components/ScrollToBottomButton.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { addFlashNotification } from '$lib/stores/notification'
@@ -15,11 +17,11 @@
   } from '$lib/stores/socket'
   import { buildSocketUsers, updateSocketUsers } from '$lib/utils/socket'
   import type { LlmPersonality } from '@prisma/client'
+  import * as Sentry from '@sentry/svelte'
   import { SSE } from 'sse.js'
   import { onDestroy } from 'svelte'
   import { flip } from 'svelte/animate'
   import { slide } from 'svelte/transition'
-  import * as Sentry from '@sentry/svelte'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: ChatWithRelations | undefined = undefined
@@ -27,7 +29,6 @@
 
   let loading = false
   let selectedPersonalityContext: string | null = 'You are a helpful assistant.'
-  let element: HTMLElement
   let eventSource: SSE | undefined
 
   let socketUsers: SocketUser[] = []
@@ -36,7 +37,7 @@
 
   function joinChat() {
     if (!chat) return
-    scrollToBottom()
+    scrollToBottom({ force: true })
     socketUsers = buildSocketUsers(user, chat)
     if (!$socketStore.connected) {
       $socketStore.connect()
@@ -108,22 +109,24 @@
     prevChatId = chat?.id
   }
 
-  // that should be only if it was already at the bottom
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      element?.scroll({ top: element.scrollHeight, behavior: 'smooth' })
-    }, 500)
-  }
+  let isDeleting = false
 
   async function deleteMessage(id: number) {
-    const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' })
+    try {
+      isDeleting = true
+      const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' })
 
-    const json = await res.json()
-    if (json?.success && chat?.messages) {
-      chat.messages = chat.messages.filter((x) => x.id !== id)
-      $socketStore.emit('delete-message')
-    } else {
-      console.error(json?.error)
+      const json = await res.json()
+      if (json?.success && chat?.messages) {
+        chat.messages = chat.messages.filter((x) => x.id !== id)
+        $socketStore.emit('delete-message')
+      } else {
+        console.error(json?.error)
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      isDeleting = false
     }
   }
 
@@ -220,37 +223,43 @@
       />
     </div>
   {:else}
-    <div bind:this={element} class="flex flex-col w-full h-full overflow-auto">
-      {#each chat.messages as message, i (message.id)}
-        <div
-          out:slide={{ duration: $navigating ? 0 : 400 }}
-          animate:flip={{ duration: $navigating ? 0 : 400 }}
-        >
-          <ChatMessage
-            last={chat.messages.length - 1 === i}
-            {loading}
-            {message}
-            on:delete={() => {
-              deleteMessage(message.id)
-            }}
-          />
-        </div>
-      {/each}
+    <div class="w-full h-full overflow-auto relative">
+      <div use:autoscroll class="flex flex-col w-full h-full overflow-auto">
+        {#each chat.messages as message, i (message.id)}
+          <div
+            out:slide={{ duration: $navigating ? 0 : 400 }}
+            animate:flip={{ duration: $navigating ? 0 : 400 }}
+          >
+            <ChatMessage
+              last={chat.messages.length - 1 === i}
+              {loading}
+              {message}
+              {isDeleting}
+              on:delete={() => {
+                deleteMessage(message.id)
+              }}
+            />
+          </div>
+        {/each}
+      </div>
+      <ScrollToBottomButton
+        class="absolute bottom-4 right-4"
+        on:click={() => scrollToBottom({ force: true, ms: 0 })}
+      />
     </div>
   {/if}
 
-  <div class="self-end py-3 md:py-6 w-full bg-gray-900">
-    <ChatInput
-      {chat}
-      {loading}
-      bind:question
-      on:message={handleSubmit}
-      on:focus={() => {
-        $socketStore.emit('start-typing')
-      }}
-      on:blur={() => {
-        $socketStore.emit('stop-typing')
-      }}
-    />
-  </div>
+  <ChatInput
+    class="self-end py-3 md:py-6 w-full bg-gray-900"
+    {chat}
+    {loading}
+    bind:question
+    on:message={handleSubmit}
+    on:focus={() => {
+      $socketStore.emit('start-typing')
+    }}
+    on:blur={() => {
+      $socketStore.emit('stop-typing')
+    }}
+  />
 </div>
