@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Models } from '$lib/types/models'
   import { createEventDispatcher } from 'svelte'
-  import { writable } from 'svelte/store'
 
   type MemoryOption = {
     name: string
@@ -17,7 +16,7 @@
 
   export let model: string
   let mem = memoryOptions.find((option) => option.name === model)
-  const changeModel = createEventDispatcher() // Used with changeModel('changeModel', value), where value is any Models value.
+  const changeModel = createEventDispatcher()
   export let loading: boolean
 
   function getClass(option: MemoryOption, active: boolean, checked: boolean) {
@@ -53,7 +52,3 @@
     {/each}
   </div>
 </div>
-
-<style>
-  /* You can include any Svelte-specific styles here */
-</style>

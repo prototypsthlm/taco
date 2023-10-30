@@ -108,8 +108,6 @@
           </button>
         </div>
 
-        <!-- Chat settings button. -->
-        <div class="ml-2" />
         <ChatSettingsPopover
           {model}
           {availableModels}
