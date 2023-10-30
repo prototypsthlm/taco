@@ -2,20 +2,39 @@ import type { ChatWithRelations } from '$lib/server/entities/chat'
 import { setChatName } from '$lib/server/entities/chat'
 import { decrypt } from '$lib/server/utils/crypto'
 import { countTokens } from '$lib/server/utils/tokenizer'
+import { Models } from '$lib/types/models'
 import { trim } from '$lib/utils/string'
+import type { Team } from '@prisma/client'
 import type { ChatCompletionRequestMessage, CreateChatCompletionRequest } from 'openai'
 import { Configuration, OpenAIApi } from 'openai'
 import { ChatCompletionRequestMessageRoleEnum } from 'openai/api'
 
-export const getClient = (chat: ChatWithRelations) => {
+export const getClient = (encryptedApiKey: string) => {
   const configuration = new Configuration({
-    apiKey: getApiKey(chat),
+    apiKey: decryptApiKey(encryptedApiKey),
   })
 
   return new OpenAIApi(configuration)
 }
 
-export const generateChatName = async (chat: ChatWithRelations, newModel: string) => {
+export const getAvailableModels = async (team: Team) => {
+  if (!team.openAiApiKey) {
+    throw new Error('API Error: Open AI API key is not set for team')
+  }
+  const client = getClient(team.openAiApiKey)
+  const res = await client.listModels();
+  // From all the received available OpenAI models, get only the ones we are interested in, the ones listed in Models from models.ts.
+  const availableModels: string[] = []
+  for (let i = 0; i < res.data.data.length; i++) {
+    let modelId = res.data.data[i]["id"]
+    if (Object.values(Models).includes(modelId as Models)) {
+      availableModels.push(modelId)
+    }
+  }
+  return availableModels
+}
+
+export const generateChatName = async (chat: ChatWithRelations, newModel: string, newTemperature: number) => {
   if (chat.messages.every((x) => !x.answer)) {
     console.error(
       'API Error: At least one message completed (question and answer) is needed to generate a title.'
@@ -23,12 +42,22 @@ export const generateChatName = async (chat: ChatWithRelations, newModel: string
     return
   }
 
-  const client = getClient(chat)
+
+  if (!chat?.owner) {
+    throw new Error('API Error: Chat doesnt have an chat owner!')
+  }
+
+  if (!chat?.owner?.team?.openAiApiKey) {
+    throw new Error('API Error: Open AI API key is not set')
+  }
+
+  const client = getClient(chat?.owner?.team?.openAiApiKey)
 
   const res = await client.createChatCompletion(
     transformChatToCompletionRequest(
       chat,
       newModel,
+      newTemperature,
       'Main topic of the conversation in no more than 5 words'
     )
   )
@@ -50,6 +79,7 @@ export const generateChatName = async (chat: ChatWithRelations, newModel: string
 export const transformChatToCompletionRequest = (
   chat: ChatWithRelations,
   newModel: string,
+  newTemperature: number,
   newMessage?: string,
   stream = false
 ): CreateChatCompletionRequest => {
@@ -65,11 +95,11 @@ export const transformChatToCompletionRequest = (
 
   const newMessageAsArray = newMessage
     ? [
-        {
-          role: ChatCompletionRequestMessageRoleEnum.User,
-          content: newMessage,
-        },
-      ]
+      {
+        role: ChatCompletionRequestMessageRoleEnum.User,
+        content: newMessage,
+      },
+    ]
     : []
 
   return {
@@ -79,25 +109,18 @@ export const transformChatToCompletionRequest = (
       ...messages,
       ...newMessageAsArray,
     ],
-    temperature: Number(chat.temperature),
+    temperature: newTemperature, // A given temperature chosen for each message is used.
     stream,
   }
 }
 
-export const getApiKey = (chat: ChatWithRelations) => {
-  if (!chat?.owner) {
-    throw new Error('API Error: Chat doesnt have an chat owner!')
-  }
-
-  if (!chat?.owner?.team?.openAiApiKey) {
-    throw new Error('API Error: Open AI API key is not set')
-  }
+export const decryptApiKey = (encryptedApiKey: string) => {
 
   if (!process.env.SECRET_KEY) {
     throw new Error(`API Error: You must have SECRET_KEY set in your env.`)
   }
 
-  return decrypt(chat.owner.team.openAiApiKey, process.env.SECRET_KEY)
+  return decrypt(encryptedApiKey, process.env.SECRET_KEY)
 }
 
 export const SETTINGS = [

@@ -9,26 +9,28 @@
 
   // Variables got from <ChatInput {chat} {loading} on:message={handleSubmit} />
   export let chat: ChatWithRelations | undefined = undefined
+  export let availableModels: string[]
   export let loading = false
 
   let model = chat?.model || Models.gpt3 // Get the last session selected model, get the GPT3.5 if none.
+  let temperature = Number(chat?.temperature) || 0.9 // Get the last session selected temperature, set it to 0.9 if none.
   export let question = ''
   let isShiftPressed = false
   const dispatch = createEventDispatcher() // Events created this way are handled by the handleSubmit function in 'ChatRoom.svelte'.
 
-  function chooseMessageSettings() {
+  function changeModel(event: { detail: any }) {
     if (loading) return
-    if (model == Models.gpt3) {
-      model = Models.gpt4
-    } else {
-      model = Models.gpt3
-    }
+    model = event.detail
+  }
+  function changeTemperature(event: { detail: any }) {
+    if (loading) return
+    temperature = event.detail
   }
 
   function dispatchMessage() {
     // Actually dispatch message.
     if (question.trim() && !loading) {
-      dispatch('message', { question, model })
+      dispatch('message', { question, model, temperature })
       reset()
     }
   }
@@ -46,6 +48,13 @@
   $: if (question === '') {
     // Autosize textarea.
     reset()
+  }
+
+  let oldChat: ChatWithRelations | undefined = undefined
+  $: if (chat !== oldChat) {
+    model = chat?.model || Models.gpt3
+    temperature = Number(chat?.temperature) || 0.9
+    oldChat = chat
   }
 </script>
 
@@ -86,29 +95,6 @@
           />
         </div>
 
-        <!-- Chat-GPT4 toggle. -->
-        <div class="flex flex-col items-center justify-center bg-primary pb-1">
-          <span class="text-white">GPT4</span>
-          <button
-            on:click={chooseMessageSettings}
-            disabled={loading}
-            type="button"
-            class="{model === Models.gpt4
-              ? 'bg-indigo-600'
-              : 'bg-gray-200'} inline-flex h-4 w-9 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
-            role="switch"
-            aria-checked="false"
-          >
-            <span class="sr-only">Use setting</span>
-            <span
-              aria-hidden="true"
-              class="{model === Models.gpt4
-                ? 'translate-x-5'
-                : 'translate-x-0'} pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-            />
-          </button>
-        </div>
-
         <!-- Send message button. -->
         <button
           on:click={dispatchMessage}
@@ -124,6 +110,17 @@
           {/if}
         </button>
       </div>
+
+      <!-- Chat settings button. -->
+      <div class="ml-2" />
+      <ChatSettingsPopover
+        {model}
+        {availableModels}
+        {temperature}
+        {loading}
+        on:changeModel={changeModel}
+        on:changeTemperature={changeTemperature}
+      />
     </div>
     <div class="w-5/6 max-w-5xl flex justify-between gap-4 text-accent text-opacity-50 text-xs">
       <UsersTyping />

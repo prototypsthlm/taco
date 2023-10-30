@@ -1,7 +1,7 @@
 import {
   countMessagesTokens,
+  decryptApiKey,
   generateChatName,
-  getApiKey,
   getModelSettings,
   transformChatToCompletionRequest,
 } from '$lib/server/api/openai'
@@ -30,6 +30,11 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       role: z.union([z.string(), z.undefined()]),
       question: z.string(),
       model: z.union([z.literal(Models.gpt3), z.literal(Models.gpt4)]),
+      temperature: z
+        .number()
+        .refine(value => 0 <= value && value <= 2, {
+          message: "Temperature must be a number between 0 and 2 (inclusive)",
+        }),
     })
     .safeParse(requestData)
 
@@ -51,7 +56,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
         })
       )
     }
-    generateChatName(chat, schema.data.model)
+    generateChatName(chat, schema.data.model, schema.data.temperature)
   } else {
     if (!currentUser.activeUserTeamId) {
       throw error(
@@ -67,13 +72,25 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   const chatRequestBody = transformChatToCompletionRequest(
     chat,
     schema.data.model,
+    schema.data.temperature,
     schema.data.question,
     true
   ) // This is the request body that will be sent to the openAI API.
+
+
+  if (!chat?.owner?.team?.openAiApiKey) {
+    throw error(
+      500,
+      JSON.stringify({
+        title: 'No api key',
+      })
+    )
+  }
+
   const chatRequest = fetch('https://api.openai.com/v1/chat/completions', {
     // This is the final request that will be sent to the openAI API.
     headers: {
-      Authorization: `Bearer ${getApiKey(chat)}`,
+      Authorization: `Bearer ${decryptApiKey(chat?.owner?.team?.openAiApiKey)}`,
       'Content-Type': 'application/json',
     },
     method: 'POST',
@@ -100,6 +117,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       chat = await addQuestionToChat(
         chat.id,
         schema.data.model,
+        schema.data.temperature,
         schema.data.question,
         currentUser.id
       ) // We save the question (request + response) in the chat.

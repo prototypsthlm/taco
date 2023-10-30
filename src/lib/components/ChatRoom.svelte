@@ -23,6 +23,7 @@
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: ChatWithRelations | undefined = undefined
+  export let availableModels: string[]
   export let customPersonalities: LlmPersonality[] | null = null
 
   let loading = false
@@ -127,11 +128,13 @@
     }
   }
 
-  async function handleSubmit(event: CustomEvent<{ question: string; model: string }>) {
-    const { question: q, model } = event.detail
+  async function handleSubmit(
+    event: CustomEvent<{ question: string; model: string; temperature: number }>
+  ) {
+    const { question: q, model, temperature } = event.detail
     loading = true
 
-    // The following event will be handled by the 'POST: RequestHandler' function in 'server.ts'.
+    // The following event will be handled by the 'POST: RequestHandler' function in '+server.ts'.
     eventSource = new SSE('/api/chats', {
       headers: {
         'Content-Type': 'application/json',
@@ -141,6 +144,7 @@
         role: selectedPersonalityContext,
         question: q,
         model,
+        temperature,
       }),
     })
 
@@ -242,6 +246,7 @@
   <div class="self-end py-3 md:py-6 w-full bg-gray-900">
     <ChatInput
       {chat}
+      {availableModels}
       {loading}
       bind:question
       on:message={handleSubmit}
