@@ -25,7 +25,7 @@
 
 <a href={isLinkActive ? null : href} title={name} on:click={() => isSidebarOpen.set(false)}>
   <li
-    class="px-1 py-3 sm:px-4 lg:px-4 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-xl flex flex-col gap-4"
+    class="p-3 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-lg flex flex-col gap-4"
     class:bg-accent={isLinkActive}
   >
     <div class="flex items-center gap-x-3">
