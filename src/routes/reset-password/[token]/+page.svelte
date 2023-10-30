@@ -18,7 +18,7 @@
 >
   <div class="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center gap-4">
     <div class="text-3xl md:text-5xl">
-      <TacoIcon class="h-16 md:h-24 w-auto" dark />
+      <TacoIcon class="w-16 md:w-24" />
     </div>
     <h2
       class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-gray-100"

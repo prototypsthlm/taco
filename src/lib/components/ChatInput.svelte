@@ -1,22 +1,21 @@
 <script lang="ts">
+  import UsersTyping from '$lib/components/UsersTyping.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { Models } from '$lib/types/models'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
-  import UsersTyping from '$lib/components/UsersTyping.svelte'
   import { createEventDispatcher, onMount, tick } from 'svelte'
   import autosize from 'svelte-autosize'
   import ChatSettingsPopover from './ChatSettingsPopover.svelte'
 
-  // Variables got from <ChatInput {chat} {loading} on:message={handleSubmit} />
   export let chat: ChatWithRelations | undefined = undefined
   export let availableModels: string[]
   export let loading = false
 
-  let model = chat?.model || Models.gpt3 // Get the last session selected model, get the GPT3.5 if none.
-  let temperature = Number(chat?.temperature) || 0.9 // Get the last session selected temperature, set it to 0.9 if none.
+  let model = chat?.model || Models.gpt3
+  let temperature = Number(chat?.temperature) || 0.6
   export let question = ''
   let isShiftPressed = false
-  const dispatch = createEventDispatcher() // Events created this way are handled by the handleSubmit function in 'ChatRoom.svelte'.
+  const dispatch = createEventDispatcher()
 
   function changeModel(event: { detail: any }) {
     if (loading) return
@@ -28,7 +27,6 @@
   }
 
   function dispatchMessage() {
-    // Actually dispatch message.
     if (question.trim() && !loading) {
       dispatch('message', { question, model, temperature })
       reset()
@@ -46,7 +44,6 @@
   }
 
   $: if (question === '') {
-    // Autosize textarea.
     reset()
   }
 
@@ -58,42 +55,41 @@
   }
 </script>
 
-<div class="relative">
-  <!-- Main Screen Content -->
-  <div class="flex flex-col items-center gap-1">
-    <div class="w-full flex justify-center">
-      <div class="flex w-5/6 max-w-5xl shadow-xl">
-        <div class="flex justify-centermin-h-[4rem] w-full bg-primary rounded-l-xl">
-          <textarea
-            bind:this={textarea}
-            rows="1"
-            name="message"
-            bind:value={question}
-            on:keydown={(e) => {
-              // Keyboard input handling.
-              if (e.key === 'Enter' && !isShiftPressed) {
-                dispatchMessage()
-                e.preventDefault()
-              } else if (e.key === 'Shift') {
-                isShiftPressed = true
-              }
-            }}
-            on:keyup={(e) => {
-              if (e.key === 'Shift') {
-                isShiftPressed = false
-              }
-            }}
-            placeholder="Type your message"
-            class="no-border w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white max-h-96"
-            use:autosize
-            on:focus={() => {
-              dispatch('focus')
-            }}
-            on:blur={() => {
-              dispatch('blur')
-            }}
-          />
-        </div>
+<div class={$$props.class}>
+  <div class="relative">
+    <div class="flex flex-col items-center gap-1">
+      <div class="w-full flex justify-center">
+        <div class="flex w-5/6 max-w-5xl shadow-xl">
+          <div class="flex justify-centermin-h-[4rem] w-full bg-primary rounded-l-xl">
+            <textarea
+              bind:this={textarea}
+              rows="1"
+              name="message"
+              bind:value={question}
+              on:keydown={(e) => {
+                if (e.key === 'Enter' && !isShiftPressed) {
+                  dispatchMessage()
+                  e.preventDefault()
+                } else if (e.key === 'Shift') {
+                  isShiftPressed = true
+                }
+              }}
+              on:keyup={(e) => {
+                if (e.key === 'Shift') {
+                  isShiftPressed = false
+                }
+              }}
+              placeholder="Type your message"
+              class="border-0 focus:ring-0 w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white max-h-96"
+              use:autosize
+              on:focus={() => {
+                dispatch('focus')
+              }}
+              on:blur={() => {
+                dispatch('blur')
+              }}
+            />
+          </div>
 
         <!-- Send message button. -->
         <button
@@ -127,12 +123,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  .no-border {
-    appearance: none;
-    border: none;
-    outline: none;
-    box-shadow: none;
-  }
-</style>

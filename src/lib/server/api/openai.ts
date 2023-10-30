@@ -5,9 +5,14 @@ import { countTokens } from '$lib/server/utils/tokenizer'
 import { Models } from '$lib/types/models'
 import { trim } from '$lib/utils/string'
 import type { Team } from '@prisma/client'
-import type { ChatCompletionRequestMessage, CreateChatCompletionRequest } from 'openai'
-import { Configuration, OpenAIApi } from 'openai'
+import {
+  type ChatCompletionRequestMessage,
+  Configuration,
+  type CreateChatCompletionRequest,
+  OpenAIApi,
+} from 'openai'
 import { ChatCompletionRequestMessageRoleEnum } from 'openai/api'
+import * as Sentry from '@sentry/sveltekit'
 
 export const getClient = (encryptedApiKey: string) => {
   const configuration = new Configuration({
@@ -162,4 +167,56 @@ export const countMessagesTokens = (messages: ChatCompletionRequestMessage[]) =>
   return (
     countTokens(messages.map((message) => `${message.role}: ${message.content}`).join('\n')) || 0
   )
+}
+
+export const retryWithExponentialBackoff = (
+  func: (...args: never[]) => Promise<Response>, // Adjusting the type to Promise<Response>
+  {
+    initialDelay = 1000,
+    exponentialBase = 2,
+    jitter = true,
+    maxRetries = 10,
+  }: {
+    initialDelay?: number
+    exponentialBase?: number
+    jitter?: boolean
+    maxRetries?: number
+  } = {}
+): ((...args: never[]) => Promise<Response>) => {
+  const retry = async (args: never[], retriesLeft: number, delay: number): Promise<Response> => {
+    // console.log('Retries left:', retriesLeft)
+
+    // console.log('Calling function...')
+    const response = await func(...args)
+    // console.log('Function returned with status:', response.status)
+
+    if (response.status === 429 && retriesLeft > 0) {
+      // console.log('Waiting for', delay, 'milliseconds...')
+
+      await new Promise((resolve) => setTimeout(resolve, delay))
+      // console.log('Waited for', delay, 'milliseconds...')
+
+      Sentry.captureException(
+        new Error('retryWithExponentialBackoff OpenAI API Error: 429 Too many requests'),
+        {
+          extra: {
+            retriesLeft,
+            delay,
+            exponentialBase,
+            jitter,
+            maxRetries,
+          },
+        }
+      )
+
+      return retry(
+        args,
+        retriesLeft - 1,
+        delay * exponentialBase * (1 + (jitter ? Math.random() : 0))
+      )
+    }
+    return response
+  }
+
+  return (...args: never[]) => retry(args, maxRetries, initialDelay)
 }
