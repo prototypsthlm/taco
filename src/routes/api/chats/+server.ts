@@ -3,6 +3,7 @@ import {
   generateChatName,
   getApiKey,
   getModelSettings,
+  retryWithExponentialBackoff,
   transformChatToCompletionRequest,
 } from '$lib/server/api/openai'
 import {
@@ -70,14 +71,15 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     schema.data.question,
     true
   ) // This is the request body that will be sent to the openAI API.
-  const chatRequest = fetch('https://api.openai.com/v1/chat/completions', {
-    // This is the final request that will be sent to the openAI API.
-    headers: {
-      Authorization: `Bearer ${getApiKey(chat)}`,
-      'Content-Type': 'application/json',
-    },
-    method: 'POST',
-    body: JSON.stringify(chatRequestBody),
+  const chatRequest = retryWithExponentialBackoff(async () => {
+    return fetch('https://api.openai.com/v1/chat/completions', {
+      headers: {
+        Authorization: `Bearer ${getApiKey(chat)}`,
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify(chatRequestBody),
+    })
   })
 
   const inputTokenCount = countMessagesTokens(chatRequestBody.messages)
@@ -108,7 +110,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
 
       controller.enqueue(encodeChunkData([JSON.stringify({ state: 'INITIAL', chat })]))
 
-      const chatResponse = await chatRequest
+      const chatResponse = await chatRequest()
 
       if (!chatResponse.ok) {
         const json = await chatResponse.json()
