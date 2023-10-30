@@ -21,6 +21,7 @@
     if (loading) return
     model = event.detail
   }
+
   function changeTemperature(event: { detail: any }) {
     if (loading) return
     temperature = event.detail
@@ -91,35 +92,36 @@
             />
           </div>
 
-        <!-- Send message button. -->
-        <button
-          on:click={dispatchMessage}
-          disabled={loading}
-          class="p-3 pr-14 w-12 rounded-r-xl bg-primary group"
-        >
-          {#if !loading}
-            <PaperAirplaneIcon
-              class="text-white h-8 w-10 opacity-40 group-hover:opacity-95 duration-200"
-            />
-          {:else}
-            <ArrowPathIcon class="h-8 w-10 text-white animate-spin" />
-          {/if}
-        </button>
-      </div>
+          <!-- Send message button. -->
+          <button
+            on:click={dispatchMessage}
+            disabled={loading}
+            class="p-3 pr-14 w-12 rounded-r-xl bg-primary group"
+          >
+            {#if !loading}
+              <PaperAirplaneIcon
+                class="text-white h-8 w-10 opacity-40 group-hover:opacity-95 duration-200"
+              />
+            {:else}
+              <ArrowPathIcon class="h-8 w-10 text-white animate-spin" />
+            {/if}
+          </button>
+        </div>
 
-      <!-- Chat settings button. -->
-      <div class="ml-2" />
-      <ChatSettingsPopover
-        {model}
-        {availableModels}
-        {temperature}
-        {loading}
-        on:changeModel={changeModel}
-        on:changeTemperature={changeTemperature}
-      />
-    </div>
-    <div class="w-5/6 max-w-5xl flex justify-between gap-4 text-accent text-opacity-50 text-xs">
-      <UsersTyping />
+        <!-- Chat settings button. -->
+        <div class="ml-2" />
+        <ChatSettingsPopover
+          {model}
+          {availableModels}
+          {temperature}
+          {loading}
+          on:changeModel={changeModel}
+          on:changeTemperature={changeTemperature}
+        />
+      </div>
+      <div class="w-5/6 max-w-5xl flex justify-between gap-4 text-accent text-opacity-50 text-xs">
+        <UsersTyping />
+      </div>
     </div>
   </div>
 </div>

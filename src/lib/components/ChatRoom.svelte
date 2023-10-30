@@ -257,7 +257,7 @@
     class="self-end py-3 md:py-6 w-full bg-gray-900"
     {chat}
     {availableModels}
-      {loading}
+    {loading}
     bind:question
     on:message={handleSubmit}
     on:focus={() => {
