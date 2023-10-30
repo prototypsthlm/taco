@@ -40,7 +40,7 @@
   </form>
   {#if data?.personalities?.length}
     <div class="px-4 sm:px-6 lg:px-8 py-8 max-w-5xl">
-      <h1 class="text-xl font-bold mb-8 text-accent">Your custom personalities</h1>
+      <h1 class="text-xl font-bold mb-8 text-neutral-100">Your custom personalities</h1>
       <Alert
         type={(form?.personalityList?.error && 'error') ||
           (form?.personalityList?.success && 'success')}
@@ -50,7 +50,7 @@
     </div>
   {:else}
     <div class="px-4 sm:px-6 lg:px-8 py-16">
-      <p class="text-accent font-bold text-lg">No custom personalities yet...</p>
+      <p class="text-neutral-100 font-bold text-lg">No custom personalities yet...</p>
     </div>
   {/if}
 </div>

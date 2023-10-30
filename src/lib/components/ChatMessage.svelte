@@ -17,7 +17,7 @@
 </script>
 
 <div class="p-4 md:p-8 flex justify-center">
-  <div class="max-w-screen-lg w-full flex gap-4 md:gap-8 text-accent">
+  <div class="max-w-screen-lg w-full flex gap-4 md:gap-8 text-neutral-100">
     <Avatar
       transition={false}
       class="w-10 rounded-xl"
@@ -38,8 +38,8 @@
     </button>
   </div>
 </div>
-<div class="p-4 md:p-8 bg-accent bg-opacity-10 flex justify-center">
-  <div class="max-w-screen-lg w-full flex gap-4 md:gap-8 text-accent">
+<div class="p-4 md:p-8 bg-neutral-100 bg-opacity-10 flex justify-center">
+  <div class="max-w-screen-lg w-full flex gap-4 md:gap-8 text-neutral-100">
     {#if !message?.answer && (!last || !loading)}
       <Alert class="w-full" title="There was an error generating the response" type="error"
         >You can delete it.</Alert

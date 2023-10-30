@@ -65,6 +65,6 @@
     </button>
   {/each}
 </div>
-<p class="text-accent max-w-2xl text-center px-4 text-sm md:text-xl text-opacity-70">
+<p class="text-neutral-100 max-w-2xl text-center px-4 text-sm md:text-xl text-opacity-70">
   {selectedPersonality?.context}
 </p>
