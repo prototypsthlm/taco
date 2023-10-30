@@ -32,7 +32,7 @@
 
 <div class="bg-gray-900 py-24 sm:py-32 min-h-screen flex flex-col justify-center">
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="mx-auto max-w-2xl lg:text-center">
+    <div class="mx-auto max-w-2xl text-center">
       <div class="text-5xl md:text-7xl mb-12 md:mb-4">
         <TacoIcon class="w-24 md:w-32 dark" />
       </div>
