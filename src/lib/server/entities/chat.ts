@@ -57,7 +57,13 @@ export const createChat = (userTeamId: number, role = 'You are a helpful assista
   })
 }
 
-export const addQuestionToChat = (id: number, model: string, temperature: number, question: string, userId: number) => {
+export const addQuestionToChat = (
+  id: number,
+  model: string,
+  temperature: number,
+  question: string,
+  userId: number
+) => {
   return prisma.chat.update({
     // Filtres:
     where: { id },

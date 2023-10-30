@@ -27,11 +27,11 @@ export const getAvailableModels = async (team: Team) => {
     throw new Error('API Error: Open AI API key is not set for team')
   }
   const client = getClient(team.openAiApiKey)
-  const res = await client.listModels();
+  const res = await client.listModels()
   // From all the received available OpenAI models, get only the ones we are interested in, the ones listed in Models from models.ts.
   const availableModels: string[] = []
   for (let i = 0; i < res.data.data.length; i++) {
-    let modelId = res.data.data[i]["id"]
+    const modelId = res.data.data[i]['id']
     if (Object.values(Models).includes(modelId as Models)) {
       availableModels.push(modelId)
     }
@@ -39,14 +39,17 @@ export const getAvailableModels = async (team: Team) => {
   return availableModels
 }
 
-export const generateChatName = async (chat: ChatWithRelations, newModel: string, newTemperature: number) => {
+export const generateChatName = async (
+  chat: ChatWithRelations,
+  newModel: string,
+  newTemperature: number
+) => {
   if (chat.messages.every((x) => !x.answer)) {
     console.error(
       'API Error: At least one message completed (question and answer) is needed to generate a title.'
     )
     return
   }
-
 
   if (!chat?.owner) {
     throw new Error('API Error: Chat doesnt have an chat owner!')
@@ -100,11 +103,11 @@ export const transformChatToCompletionRequest = (
 
   const newMessageAsArray = newMessage
     ? [
-      {
-        role: ChatCompletionRequestMessageRoleEnum.User,
-        content: newMessage,
-      },
-    ]
+        {
+          role: ChatCompletionRequestMessageRoleEnum.User,
+          content: newMessage,
+        },
+      ]
     : []
 
   return {
@@ -120,7 +123,6 @@ export const transformChatToCompletionRequest = (
 }
 
 export const decryptApiKey = (encryptedApiKey: string) => {
-
   if (!process.env.SECRET_KEY) {
     throw new Error(`API Error: You must have SECRET_KEY set in your env.`)
   }
