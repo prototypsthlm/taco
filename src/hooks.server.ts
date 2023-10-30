@@ -4,12 +4,13 @@ import * as Sentry from '@sentry/sveltekit'
 import { type Handle, redirect } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
 
-Sentry.init({
-  dsn: PUBLIC_SENTRY_DSN,
-  environment: PUBLIC_SENTRY_ENV || 'production',
-  tracesSampleRate: 1,
-})
-
+if (PUBLIC_SENTRY_ENV !== 'test') {
+  Sentry.init({
+    dsn: PUBLIC_SENTRY_DSN,
+    environment: PUBLIC_SENTRY_ENV || 'production',
+    tracesSampleRate: 1,
+  })
+}
 const protectedRoutes = ['/app']
 const authRoutes = ['/signin', '/signup']
 
