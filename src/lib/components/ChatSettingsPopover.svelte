@@ -4,6 +4,7 @@
   import { EllipsisVerticalIcon } from '@babeard/svelte-heroicons/solid'
   import { Popover, PopoverButton, PopoverPanel } from '@rgossiaux/svelte-headlessui'
   import { fade } from 'svelte/transition'
+  import classNames from 'classnames'
 
   export let model: string
   export let models: Model[]
@@ -36,10 +37,19 @@
           <div class="border-t border-gray-100 mt-4">
             <div class="mt-4 flex items-center gap-2">
               <h2 class="text-sm font-medium leading-6 text-neutral-900">Temperature</h2>
-              <span
-                class="text-sm font-medium text-neutral-50 bg-neutral-300 py-1 px-1.5 rounded-lg"
-                >{temperature}</span
-              >
+              <input
+                type="number"
+                class={classNames(
+                  'text-sm font-medium border-none text-neutral-50 bg-neutral-400 py-1 px-1.5 rounded-md w-16',
+                  'focus:ring-0 focus:outline-none',
+                  'invalid:ring focus:invalid:ring invalid:ring-red-400'
+                )}
+                bind:value={temperature}
+                disabled={loading}
+                min="0.1"
+                max="2"
+                step="0.1"
+              />
               <span class="italic text-neutral-300 text-xs ml-auto">Recommended 0.6</span>
             </div>
             <input
