@@ -6,4 +6,4 @@
   export let data: PageData
 </script>
 
-<ChatRoom chat={data.chat} availableModels={data.models} user={data.user} />
+<ChatRoom chat={data.chat} models={data.models} user={data.user} />

@@ -2,7 +2,8 @@ import {
   countMessagesTokens,
   decryptApiKey,
   generateChatName,
-  getModelSettings,
+  getModel,
+  MODELS,
   retryWithExponentialBackoff,
   transformChatToCompletionRequest,
 } from '$lib/server/api/openai'
@@ -14,7 +15,6 @@ import {
   storeAnswer,
 } from '$lib/server/entities/chat'
 import { countTokens } from '$lib/server/utils/tokenizer'
-import { Models } from '$lib/types/models'
 import { decodeChunkData, encodeChunkData, extractDelta } from '$lib/utils/stream'
 import * as Sentry from '@sentry/sveltekit'
 import { error } from '@sveltejs/kit'
@@ -30,12 +30,10 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       id: z.union([z.preprocess(Number, z.number()), z.undefined()]),
       role: z.union([z.string(), z.undefined()]),
       question: z.string(),
-      model: z.union([z.literal(Models.gpt3), z.literal(Models.gpt4)]),
-      temperature: z
-        .number()
-        .refine(value => 0 <= value && value <= 2, {
-          message: "Temperature must be a number between 0 and 2 (inclusive)",
-        }),
+      model: z.enum(MODELS.map((x) => x.id) as [string, ...string[]]),
+      temperature: z.number().refine((value) => 0 <= value && value <= 2, {
+        message: 'Temperature must be a number between 0 and 2 (inclusive)',
+      }),
     })
     .safeParse(requestData)
 
@@ -78,8 +76,8 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
     true
   ) // This is the request body that will be sent to the openAI API.
 
-
-  if (!chat?.owner?.team?.openAiApiKey) {
+  const openAiApiKey = chat?.owner?.team?.openAiApiKey
+  if (!openAiApiKey) {
     throw error(
       500,
       JSON.stringify({
@@ -91,7 +89,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   const chatRequest = retryWithExponentialBackoff(async () => {
     return fetch('https://api.openai.com/v1/chat/completions', {
       headers: {
-        Authorization: `Bearer ${decryptApiKey(chat?.owner?.team?.openAiApiKey)}`,
+        Authorization: `Bearer ${decryptApiKey(openAiApiKey)}`,
         'Content-Type': 'application/json',
       },
       method: 'POST',
@@ -101,7 +99,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
 
   const inputTokenCount = countMessagesTokens(chatRequestBody.messages)
   const newQuestionTokenCount = countTokens(`"user": "${schema.data.question}"`)
-  const modelSettings = getModelSettings(schema.data.model)
+  const modelSettings = getModel(schema.data.model)
   const tokenLimit = modelSettings.maxTokens - modelSettings.outputRoom
 
   if (inputTokenCount > tokenLimit) {

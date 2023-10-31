@@ -1,14 +1,15 @@
 <script lang="ts">
+  import ChatSettingsPopover from '$lib/components/ChatSettingsPopover.svelte'
   import UsersTyping from '$lib/components/UsersTyping.svelte'
+  import type { Model } from '$lib/server/api/openai'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { Models } from '$lib/types/models'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
   import { createEventDispatcher, onMount, tick } from 'svelte'
   import autosize from 'svelte-autosize'
-  import ChatSettingsPopover from './ChatSettingsPopover.svelte'
 
   export let chat: ChatWithRelations | undefined = undefined
-  export let availableModels: string[]
+  export let models: Model[]
   export let loading = false
 
   let model = chat?.model || Models.gpt3
@@ -16,16 +17,6 @@
   export let question = ''
   let isShiftPressed = false
   const dispatch = createEventDispatcher()
-
-  function changeModel(event: { detail: any }) {
-    if (loading) return
-    model = event.detail
-  }
-
-  function changeTemperature(event: { detail: any }) {
-    if (loading) return
-    temperature = event.detail
-  }
 
   function dispatchMessage() {
     if (question.trim() && !loading) {
@@ -51,7 +42,7 @@
   let oldChat: ChatWithRelations | undefined = undefined
   $: if (chat !== oldChat) {
     model = chat?.model || Models.gpt3
-    temperature = Number(chat?.temperature) || 0.9
+    temperature = Number(chat?.temperature) || 0.6
     oldChat = chat
   }
 </script>
@@ -59,9 +50,9 @@
 <div class={$$props.class}>
   <div class="relative">
     <div class="flex flex-col items-center gap-1">
-      <div class="w-full flex justify-center">
+      <div class="w-full flex justify-center gap-2">
         <div class="flex w-5/6 max-w-5xl shadow-xl">
-          <div class="flex justify-centermin-h-[4rem] w-full bg-primary rounded-l-xl">
+          <div class="flex w-full bg-neutral-500 rounded-l-xl">
             <textarea
               bind:this={textarea}
               rows="1"
@@ -81,7 +72,7 @@
                 }
               }}
               placeholder="Type your message"
-              class="border-0 focus:ring-0 w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white max-h-96"
+              class="border-0 focus:ring-0 w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-neutral-500 text-white max-h-96"
               use:autosize
               on:focus={() => {
                 dispatch('focus')
@@ -92,11 +83,10 @@
             />
           </div>
 
-          <!-- Send message button. -->
           <button
             on:click={dispatchMessage}
             disabled={loading}
-            class="p-3 pr-14 w-12 rounded-r-xl bg-primary group"
+            class="p-3 pr-14 w-12 rounded-r-xl bg-neutral-500 group"
           >
             {#if !loading}
               <PaperAirplaneIcon
@@ -108,16 +98,11 @@
           </button>
         </div>
 
-        <ChatSettingsPopover
-          {model}
-          {availableModels}
-          {temperature}
-          {loading}
-          on:changeModel={changeModel}
-          on:changeTemperature={changeTemperature}
-        />
+        <ChatSettingsPopover bind:model {models} bind:temperature {loading} />
       </div>
-      <div class="w-5/6 max-w-5xl flex justify-between gap-4 text-accent text-opacity-50 text-xs">
+      <div
+        class="w-5/6 max-w-5xl flex justify-between gap-4 text-neutral-100 text-opacity-50 text-xs"
+      >
         <UsersTyping />
       </div>
     </div>

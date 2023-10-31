@@ -6,6 +6,7 @@
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import ScrollToBottomButton from '$lib/components/ScrollToBottomButton.svelte'
+  import type { Model } from '$lib/server/api/openai'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { addFlashNotification } from '$lib/stores/notification'
@@ -25,7 +26,7 @@
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: ChatWithRelations | undefined = undefined
-  export let availableModels: string[]
+  export let models: Model[]
   export let customPersonalities: LlmPersonality[] | null = null
 
   let loading = false
@@ -136,6 +137,8 @@
   ) {
     const { question: q, model, temperature } = event.detail
     loading = true
+
+    console.log({ q, model, temperature })
 
     // The following event will be handled by the 'POST: RequestHandler' function in '+server.ts'.
     eventSource = new SSE('/api/chats', {
@@ -256,7 +259,7 @@
   <ChatInput
     class="self-end py-3 md:py-6 w-full bg-gray-900"
     {chat}
-    {availableModels}
+    {models}
     {loading}
     bind:question
     on:message={handleSubmit}

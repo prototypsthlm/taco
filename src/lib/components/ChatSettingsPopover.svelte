@@ -1,75 +1,59 @@
 <script lang="ts">
-  import { Models } from '$lib/types/models'
+  import SmallCards from '$lib/components/SmallCards.svelte'
+  import type { Model } from '$lib/server/api/openai'
+  import { EllipsisVerticalIcon } from '@babeard/svelte-heroicons/solid'
   import { Popover, PopoverButton, PopoverPanel } from '@rgossiaux/svelte-headlessui'
-  import { createPopperActions } from 'svelte-popperjs'
-  import { createEventDispatcher } from 'svelte'
-  import OptionsIcon from './icons/OptionsIcon.svelte'
-  import TemperatureSlider from './TemperatureSlider.svelte'
-  import SmallCards from './SmallCards.svelte'
+  import { fade } from 'svelte/transition'
 
   export let model: string
-  export let availableModels: string[]
+  export let models: Model[]
   export let temperature: number
   export let loading: boolean
-
-  const changeSettings = createEventDispatcher()
-
-  const [popperRef, popperContent] = createPopperActions()
-
-  // Popper configuration
-  const popperOptions = {
-    placement: 'bottom-end',
-    strategy: 'fixed',
-    modifiers: [{ name: 'offset', options: { offset: [0, 10] } }],
-  }
 </script>
 
-<Popover style="position: relative;">
-  <!-- Button -->
-  <PopoverButton use={[popperRef]} class="rounded-xl bg-primary group">
-    <OptionsIcon class="w-8 h-8 text-white opacity-40" />
+<Popover let:open class="relative flex {$$props.class}">
+  <PopoverButton
+    class="inline-flex items-center rounded-lg bg-neutral-500 p-2 text-neutral-100 shadow-sm hover:bg-neutral-100 hover:text-neutral-500"
+  >
+    <span class="absolute -inset-1" />
+    <span class="sr-only">Open options menu</span>
+    <EllipsisVerticalIcon class="w-6" aria-hidden="true" />
   </PopoverButton>
 
-  <!-- Panel shown upon pressing button -->
-  <PopoverPanel use={[[popperContent, popperOptions]]}>
-    <div class="flex justify-centermin-h-[4rem] w-full bg-primary rounded-xl shadow-xl p-2">
-      <div class="panel-contents">
-        <!-- Model -->
-        <SmallCards
-          {model}
-          {loading}
-          {availableModels}
-          on:changeModel={(event) => {
-            changeSettings('changeModel', event.detail)
-          }}
-        />
+  {#if open}
+    <div transition:fade={{ duration: 100 }}>
+      <PopoverPanel class="absolute bottom-16 right-0">
+        <div class="flex flex-col justify-center bg-white rounded-xl shadow-xl p-4">
+          <SmallCards
+            {loading}
+            bind:value={model}
+            options={models.map((x) => ({ value: x.id, label: x.label, enabled: x.enabled }))}
+            heading="Model"
+            groupLabel="Choose a model option"
+            class="mb-4"
+          />
 
-        <div class="mt-4" />
-
-        <!-- Temperature -->
-        <div class="flex items-center">
-          <div class="max-w-xl text-sm">
-            <p>Temperature:</p>
-          </div>
-          <div class="mt-5 sm:ml-6 sm:mt-0 sm:flex sm:flex-shrink-0 sm:items-center">
-            <TemperatureSlider
-              {temperature}
-              {loading}
-              on:changeTemperature={(event) => {
-                changeSettings('changeTemperature', event.detail)
-              }}
-              class="w-24 accent-indigo-600"
+          <div class="border-t border-gray-100 mt-4">
+            <div class="mt-4 flex items-center gap-2">
+              <h2 class="text-sm font-medium leading-6 text-neutral-900">Temperature</h2>
+              <span
+                class="text-sm font-medium text-neutral-50 bg-neutral-300 py-1 px-1.5 rounded-lg"
+                >{temperature}</span
+              >
+              <span class="italic text-neutral-300 text-xs ml-auto">Recommended 0.6</span>
+            </div>
+            <input
+              disabled={loading}
+              type="range"
+              min="0"
+              max="2"
+              step="0.1"
+              bind:value={temperature}
+              class="mt-4 w-full accent-indigo-600"
             />
           </div>
         </div>
-      </div>
+      </PopoverPanel>
     </div>
-  </PopoverPanel>
+  {/if}
 </Popover>
-
-<style>
-  .panel-contents {
-    display: grid;
-    grid-template-columns: repeat(minmax(0, 1fr), 2);
-  }
-</style>
