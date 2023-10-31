@@ -38,8 +38,8 @@
           <div class="flex gap-x-4">
             <Avatar
               class="w-10 rounded-full"
-              dotConnectedClass="-bottom-0.5 -left-0.5 h-2.5 w-2.5 bg-green-400 ring ring-[#111827]"
-              dotDisconnectedClass="bottom-0 left-0 h-1.5 w-1.5 bg-[#111827] ring-[2.5px] ring-[#111827] ring-offset-2 ring-offset-gray-400"
+              dotConnectedClass="-bottom-0.5 -left-0.5 h-2.5 w-2.5 bg-green-400 ring ring-gray-900"
+              dotDisconnectedClass="bottom-0 left-0 h-1.5 w-1.5 bg-gray-900 ring-[2.5px] ring-gray-900 ring-offset-2 ring-offset-gray-400"
               user={teamUser.user}
             />
             <div class="min-w-0 flex-auto">

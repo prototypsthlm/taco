@@ -19,8 +19,6 @@ export const PATCH: RequestHandler = async ({ params, locals }) => {
 
     await markAsRead(schema.id)
 
-    console.log('markAsRead', schema.id)
-
     return json({
       message: 'Notification marked as read',
     })
