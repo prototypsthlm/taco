@@ -2,13 +2,20 @@ import { forkChat, getChatWithRelationsById } from '$lib/server/entities/chat'
 import { type Actions, fail, redirect } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { PageServerLoad } from './$types'
+import { getAvailableModels } from '$lib/server/api/openai'
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals: { currentUser } }) => {
   const chatId = Number(params.chatId)
+
+
+  if (!currentUser.activeUserTeam?.team) {
+    throw redirect(303, '/app/settings/teams')
+  }
 
   try {
     return {
-      chat: await getChatWithRelationsById(chatId),
+      chat: getChatWithRelationsById(chatId),
+      models: getAvailableModels(currentUser.activeUserTeam?.team),
     }
   } catch (error) {
     throw redirect(303, '/app')
@@ -55,3 +62,7 @@ export const actions: Actions = {
     })
   },
 }
+function getModels(): any {
+  throw new Error('Function not implemented.')
+}
+

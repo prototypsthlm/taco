@@ -25,8 +25,8 @@
 
 <a href={isLinkActive ? null : href} title={name} on:click={() => isSidebarOpen.set(false)}>
   <li
-    class="p-3 hover:bg-accent hover:bg-opacity-10 bg-opacity-10 rounded-lg flex flex-col gap-4"
-    class:bg-accent={isLinkActive}
+    class="p-3 hover:bg-neutral-100 hover:bg-opacity-10 bg-opacity-10 rounded-lg flex flex-col gap-4"
+    class:bg-neutral-100={isLinkActive}
   >
     <div class="flex items-center gap-x-3">
       {#if chat.sharedWith.length}

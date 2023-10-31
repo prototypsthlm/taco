@@ -6,6 +6,7 @@
   import ChatMessage from '$lib/components/ChatMessage.svelte'
   import PersonalitySelector from '$lib/components/PersonalitySelector.svelte'
   import ScrollToBottomButton from '$lib/components/ScrollToBottomButton.svelte'
+  import type { Model } from '$lib/server/api/openai'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { addFlashNotification } from '$lib/stores/notification'
@@ -25,6 +26,7 @@
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   export let chat: ChatWithRelations | undefined = undefined
+  export let models: Model[]
   export let customPersonalities: LlmPersonality[] | null = null
 
   let loading = false
@@ -130,11 +132,15 @@
     }
   }
 
-  async function handleSubmit(event: CustomEvent<{ question: string; model: string }>) {
-    const { question: q, model } = event.detail
+  async function handleSubmit(
+    event: CustomEvent<{ question: string; model: string; temperature: number }>
+  ) {
+    const { question: q, model, temperature } = event.detail
     loading = true
 
-    // The following event will be handled by the 'POST: RequestHandler' function in 'server.ts'.
+    console.log({ q, model, temperature })
+
+    // The following event will be handled by the 'POST: RequestHandler' function in '+server.ts'.
     eventSource = new SSE('/api/chats', {
       headers: {
         'Content-Type': 'application/json',
@@ -144,6 +150,7 @@
         role: selectedPersonalityContext,
         question: q,
         model,
+        temperature,
       }),
     })
 
@@ -212,8 +219,8 @@
 <div class="flex flex-col justify-between items-center h-full w-full">
   {#if !chat?.messages?.length}
     <div class="flex flex-col gap-3 md:gap-4 justify-center items-center text-center grow h-full">
-      <h1 class="text-accent text-2xl md:text-5xl font-bold">New Chat!</h1>
-      <p class="text-accent text-md px-8 md:text-2xl">
+      <h1 class="text-neutral-100 text-2xl md:text-5xl font-bold">New Chat!</h1>
+      <p class="text-neutral-100 text-md px-8 md:text-2xl">
         Choose your taco topping or bring your
         <a href="/app/settings/customization" class="text-indigo-500"> own topping </a>
       </p>
@@ -252,6 +259,7 @@
   <ChatInput
     class="self-end py-3 md:py-6 w-full bg-gray-900"
     {chat}
+    {models}
     {loading}
     bind:question
     on:message={handleSubmit}

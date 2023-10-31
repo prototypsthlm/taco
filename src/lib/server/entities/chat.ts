@@ -57,17 +57,25 @@ export const createChat = (userTeamId: number, role = 'You are a helpful assista
   })
 }
 
-export const addQuestionToChat = (id: number, model: string, question: string, userId: number) => {
+export const addQuestionToChat = (
+  id: number,
+  model: string,
+  temperature: number,
+  question: string,
+  userId: number
+) => {
   return prisma.chat.update({
     // Filtres:
     where: { id },
     // Given data:
     data: {
       model, // Save the model in the chat, so we get the last session selected model if connecting from elsewhere
+      temperature: temperature.toString(), // Save the temperature in the chat, so we get the last session selected temperature if connecting from elsewhere
       messages: {
         create: {
           question,
           model,
+          temperature: temperature.toString(),
           authorId: userId,
         },
       },
@@ -136,7 +144,7 @@ export const forkChat = async (
       name,
       shared: chat.shared,
       model: chat.model,
-      temperature: chat.temperature,
+      temperature: chat.temperature.toString(),
       roleContent: chat.roleContent,
       messages: {
         create: chat.messages.map((x) => ({

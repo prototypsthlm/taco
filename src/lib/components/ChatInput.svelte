@@ -1,5 +1,7 @@
 <script lang="ts">
+  import ChatSettingsPopover from '$lib/components/ChatSettingsPopover.svelte'
   import UsersTyping from '$lib/components/UsersTyping.svelte'
+  import type { Model } from '$lib/server/api/openai'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { Models } from '$lib/types/models'
   import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
@@ -7,25 +9,18 @@
   import autosize from 'svelte-autosize'
 
   export let chat: ChatWithRelations | undefined = undefined
+  export let models: Model[]
   export let loading = false
 
   let model = chat?.model || Models.gpt3
+  let temperature = Number(chat?.temperature) || 0.6
   export let question = ''
   let isShiftPressed = false
   const dispatch = createEventDispatcher()
 
-  function chooseMessageSettings() {
-    if (loading) return
-    if (model == Models.gpt3) {
-      model = Models.gpt4
-    } else {
-      model = Models.gpt3
-    }
-  }
-
   function dispatchMessage() {
     if (question.trim() && !loading) {
-      dispatch('message', { question, model })
+      dispatch('message', { question, model, temperature })
       reset()
     }
   }
@@ -43,14 +38,21 @@
   $: if (question === '') {
     reset()
   }
+
+  let oldChat: ChatWithRelations | undefined = undefined
+  $: if (chat !== oldChat) {
+    model = chat?.model || Models.gpt3
+    temperature = Number(chat?.temperature) || 0.6
+    oldChat = chat
+  }
 </script>
 
 <div class={$$props.class}>
   <div class="relative">
     <div class="flex flex-col items-center gap-1">
-      <div class="w-full flex justify-center">
+      <div class="w-full flex justify-center gap-2">
         <div class="flex w-5/6 max-w-5xl shadow-xl">
-          <div class="flex justify-centermin-h-[4rem] w-full bg-primary rounded-l-xl">
+          <div class="flex w-full bg-neutral-500 rounded-l-xl">
             <textarea
               bind:this={textarea}
               rows="1"
@@ -70,7 +72,7 @@
                 }
               }}
               placeholder="Type your message"
-              class="border-0 focus:ring-0 w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-primary text-white max-h-96"
+              class="border-0 focus:ring-0 w-full items-center my-auto resize-none m-2 placeholder-white placeholder-opacity-50 bg-neutral-500 text-white max-h-96"
               use:autosize
               on:focus={() => {
                 dispatch('focus')
@@ -81,32 +83,10 @@
             />
           </div>
 
-          <div class="flex flex-col items-center justify-center bg-primary pb-1">
-            <span class="text-white">GPT4</span>
-            <button
-              on:click={chooseMessageSettings}
-              disabled={loading}
-              type="button"
-              class="{model === Models.gpt4
-                ? 'bg-indigo-600'
-                : 'bg-gray-200'} inline-flex h-4 w-9 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
-              role="switch"
-              aria-checked="false"
-            >
-              <span class="sr-only">Use setting</span>
-              <span
-                aria-hidden="true"
-                class="{model === Models.gpt4
-                  ? 'translate-x-5'
-                  : 'translate-x-0'} pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-              />
-            </button>
-          </div>
-
           <button
             on:click={dispatchMessage}
             disabled={loading}
-            class="p-3 pr-14 w-12 rounded-r-xl bg-primary group"
+            class="p-3 pr-14 w-12 rounded-r-xl bg-neutral-500 group"
           >
             {#if !loading}
               <PaperAirplaneIcon
@@ -117,8 +97,12 @@
             {/if}
           </button>
         </div>
+
+        <ChatSettingsPopover bind:model {models} bind:temperature {loading} />
       </div>
-      <div class="w-5/6 max-w-5xl flex justify-between gap-4 text-accent text-opacity-50 text-xs">
+      <div
+        class="w-5/6 max-w-5xl flex justify-between gap-4 text-neutral-100 text-opacity-50 text-xs"
+      >
         <UsersTyping />
       </div>
     </div>

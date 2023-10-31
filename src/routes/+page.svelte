@@ -68,7 +68,7 @@
   <div class="mt-16 md:mt-32">
     {#if isLoggedIn}
       <div class="flex flex-col gap-2 items-center">
-        <p class="text-sm text-accent opacity-70">Your are logged in!</p>
+        <p class="text-sm text-neutral-100 opacity-70">Your are logged in!</p>
         <a
           href="/app"
           class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"

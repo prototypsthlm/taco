@@ -27,7 +27,11 @@ export const getUserBySessionId = (sessionId: string) =>
       },
     },
     include: {
-      activeUserTeam: true,
+      activeUserTeam: {
+        include: {
+          team: true
+        }
+      },
     },
   })
 

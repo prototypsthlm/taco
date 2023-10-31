@@ -79,12 +79,12 @@
   </div>
 {:else}
   <div class="flex flex-col items-center justify-center mt-16 sm:mt-24 md:mt-32">
-    <h3 class="text-3xl font-semibold text-accent">You are not a member of any team</h3>
+    <h3 class="text-3xl font-semibold text-neutral-100">You are not a member of any team</h3>
 
     <div class="flex gap-16 items-center justify-center mt-12">
       <div class="text-center">
         <UserGroupIcon class="mx-auto h-12 w-12 text-gray-400" />
-        <h3 class="mt-2 text-sm font-semibold text-accent">Create a team</h3>
+        <h3 class="mt-2 text-sm font-semibold text-neutral-100">Create a team</h3>
         <p class="mt-1 text-sm text-gray-500">Get started by creating a new team.</p>
         <div class="mt-6">
           <a
@@ -96,10 +96,10 @@
           </a>
         </div>
       </div>
-      <div class="h-32 w-[1px] opacity-30 py-4 bg-accent" />
+      <div class="h-32 w-[1px] opacity-30 py-4 bg-neutral-100" />
       <div class="text-center">
         <EnvelopeIcon class="mx-auto h-12 w-12 text-gray-400" />
-        <h3 class="mt-2 text-sm font-semibold text-accent">Get an invitation</h3>
+        <h3 class="mt-2 text-sm font-semibold text-neutral-100">Get an invitation</h3>
         <p class="mt-1 text-sm text-gray-500">Wait for a team to invite you</p>
         <p class="mt-1 text-sm text-gray-500">or</p>
         <p class="mt-1 text-sm text-gray-500">ask an admin of a team for an invitation.</p>

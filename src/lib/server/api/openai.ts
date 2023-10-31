@@ -3,6 +3,8 @@ import { setChatName } from '$lib/server/entities/chat'
 import { decrypt } from '$lib/server/utils/crypto'
 import { countTokens } from '$lib/server/utils/tokenizer'
 import { trim } from '$lib/utils/string'
+import type { Team } from '@prisma/client'
+import * as Sentry from '@sentry/sveltekit'
 import {
   type ChatCompletionRequestMessage,
   Configuration,
@@ -10,17 +12,36 @@ import {
   OpenAIApi,
 } from 'openai'
 import { ChatCompletionRequestMessageRoleEnum } from 'openai/api'
-import * as Sentry from '@sentry/sveltekit'
 
-export const getClient = (chat: ChatWithRelations) => {
+export const getClient = (encryptedApiKey: string) => {
   const configuration = new Configuration({
-    apiKey: getApiKey(chat),
+    apiKey: decryptApiKey(encryptedApiKey),
   })
 
   return new OpenAIApi(configuration)
 }
 
-export const generateChatName = async (chat: ChatWithRelations, newModel: string) => {
+export const getAvailableModels = async (team: Team) => {
+  if (!team.openAiApiKey) {
+    throw new Error('API Error: Open AI API key is not set for team')
+  }
+  const client = getClient(team.openAiApiKey)
+  const res = await client.listModels()
+
+  return MODELS.map(
+    (x) =>
+      ({
+        ...x,
+        enabled: res.data.data.some((y) => x.id === y.id),
+      } as Model)
+  )
+}
+
+export const generateChatName = async (
+  chat: ChatWithRelations,
+  newModel: string,
+  newTemperature: number
+) => {
   if (chat.messages.every((x) => !x.answer)) {
     console.error(
       'API Error: At least one message completed (question and answer) is needed to generate a title.'
@@ -28,12 +49,21 @@ export const generateChatName = async (chat: ChatWithRelations, newModel: string
     return
   }
 
-  const client = getClient(chat)
+  if (!chat?.owner) {
+    throw new Error('API Error: Chat doesnt have an chat owner!')
+  }
+
+  if (!chat?.owner?.team?.openAiApiKey) {
+    throw new Error('API Error: Open AI API key is not set')
+  }
+
+  const client = getClient(chat?.owner?.team?.openAiApiKey)
 
   const res = await client.createChatCompletion(
     transformChatToCompletionRequest(
       chat,
       newModel,
+      newTemperature,
       'Main topic of the conversation in no more than 5 words'
     )
   )
@@ -55,6 +85,7 @@ export const generateChatName = async (chat: ChatWithRelations, newModel: string
 export const transformChatToCompletionRequest = (
   chat: ChatWithRelations,
   newModel: string,
+  newTemperature: number,
   newMessage?: string,
   stream = false
 ): CreateChatCompletionRequest => {
@@ -78,66 +109,76 @@ export const transformChatToCompletionRequest = (
     : []
 
   return {
-    model: newModel, // A given model chosen for each message is used.
+    model: newModel,
     messages: [
       { role: ChatCompletionRequestMessageRoleEnum.System, content: chat.roleContent },
       ...messages,
       ...newMessageAsArray,
     ],
-    temperature: Number(chat.temperature),
+    temperature: newTemperature,
     stream,
   }
 }
 
-export const getApiKey = (chat: ChatWithRelations) => {
-  if (!chat?.owner) {
-    throw new Error('API Error: Chat doesnt have an chat owner!')
-  }
-
-  if (!chat?.owner?.team?.openAiApiKey) {
-    throw new Error('API Error: Open AI API key is not set')
-  }
-
+export const decryptApiKey = (encryptedApiKey: string) => {
   if (!process.env.SECRET_KEY) {
     throw new Error(`API Error: You must have SECRET_KEY set in your env.`)
   }
 
-  return decrypt(chat.owner.team.openAiApiKey, process.env.SECRET_KEY)
+  return decrypt(encryptedApiKey, process.env.SECRET_KEY)
 }
 
-export const SETTINGS = [
+export type Model = {
+  id: string
+  input: number
+  output: number
+  maxTokens: number
+  outputRoom: number
+  label: string
+  enabled: boolean
+}
+
+export const MODELS: Model[] = [
   {
-    model: 'gpt-4',
-    input: 0.03,
-    output: 0.06,
-    maxTokens: 8_192,
-    outputRoom: 500,
-  },
-  {
-    model: 'gpt-4-32k',
-    input: 0.06,
-    output: 0.12,
-    maxTokens: 32_768,
-    outputRoom: 500,
-  },
-  {
-    model: 'gpt-3.5-turbo',
+    id: 'gpt-3.5-turbo',
     input: 0.0015,
     output: 0.002,
     maxTokens: 4_097,
     outputRoom: 500,
+    label: 'GPT-3.5 Turbo',
+    enabled: true,
   },
   {
-    model: 'gpt-3.5-turbo-16k',
+    id: 'gpt-3.5-turbo-16k',
     input: 0.003,
     output: 0.004,
     maxTokens: 16_385,
     outputRoom: 500,
+    label: 'GPT-3.5 Turbo 16k',
+    enabled: true,
+  },
+  {
+    id: 'gpt-4',
+    input: 0.03,
+    output: 0.06,
+    maxTokens: 8_192,
+    outputRoom: 500,
+    label: 'GPT-4',
+    enabled: true,
+  },
+  {
+    id: 'gpt-4-32k',
+    input: 0.06,
+    output: 0.12,
+    maxTokens: 32_768,
+    outputRoom: 500,
+    label: 'GPT-4 32k',
+    enabled: true,
   },
 ]
 
-export const getModelSettings = (model: string) => {
-  return SETTINGS.find((x) => x.model === model) || SETTINGS[2]
+export const getModel = (id?: string): Model => {
+  return MODELS.find((x) => x.id === id) || MODELS[0]
 }
 
 export const countMessagesTokens = (messages: ChatCompletionRequestMessage[]) => {
