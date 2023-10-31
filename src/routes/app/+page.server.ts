@@ -1,8 +1,8 @@
+import { getAvailableModels } from '$lib/server/api/openai'
 import { getLlmPersonalitiesByUserId } from '$lib/server/entities/llmPersonalities'
 import { changeActiveUserTeam, getUserWithUserTeamsById } from '$lib/server/entities/user'
 import { fail, redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
-import { getAvailableModels } from '$lib/server/api/openai'
 
 export const load: PageServerLoad = async ({ locals: { currentUser } }) => {
   const llmPersonalities = await getLlmPersonalitiesByUserId(currentUser.id)
@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ locals: { currentUser } }) => {
   }
   return {
     llmPersonalities: llmPersonalities.length ? llmPersonalities : null,
-    models: getAvailableModels(currentUser.activeUserTeam?.team)
+    models: getAvailableModels(currentUser.activeUserTeam?.team),
   }
 }
 
