@@ -55,7 +55,7 @@
             <input
               disabled={loading}
               type="range"
-              min="0"
+              min="0.1"
               max="2"
               step="0.1"
               bind:value={temperature}
