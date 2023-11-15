@@ -135,7 +135,6 @@
   function stopSubmit() {
     eventSource?.close()
     loading = false
-    console.log('eventSource stoped!')
   }
 
   async function handleSubmit(

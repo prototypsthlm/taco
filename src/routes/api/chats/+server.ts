@@ -166,9 +166,6 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
                 await Promise.all(
                   dataArray.map(async (data) => {
                     if (data === '[DONE]') {
-                      if (lastMessage?.answer) {
-                        await storeAnswer(lastMessage.id, lastMessage.answer)
-                      }
                       return JSON.stringify({ state: 'DONE' })
                     }
 
@@ -178,6 +175,15 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
                       return null
                     }
                     lastMessage.answer! += delta
+
+
+                    if (lastMessage?.answer) {
+                      // We store the answer every time we get an update, we deliveratelly
+                      // do not wait for it to be completed so if the message is cancelled,
+                      // the part of the answer that took time enough to be generated is
+                      // stored eitherway.
+                      await storeAnswer(lastMessage.id, lastMessage.answer)
+                    }
 
                     return JSON.stringify({ state: 'PROCESSING', delta })
                   })
@@ -201,6 +207,10 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
         controller.close()
       }
     },
+    async cancel(controller) {
+      console.log("CLOSED from SERVER");
+      controller.close()
+    }
   })
 
   return new Response(stream, {
