@@ -132,6 +132,12 @@
     }
   }
 
+  function stopSubmit() {
+    eventSource?.close()
+    loading = false
+    console.log('eventSource stoped!')
+  }
+
   async function handleSubmit(
     event: CustomEvent<{ question: string; model: string; temperature: number }>
   ) {
@@ -263,6 +269,7 @@
     {loading}
     bind:question
     on:message={handleSubmit}
+    on:stop={stopSubmit}
     on:focus={() => {
       $socketStore.emit('start-typing')
     }}
