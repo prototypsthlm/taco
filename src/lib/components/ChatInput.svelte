@@ -4,7 +4,7 @@
   import type { Model } from '$lib/server/api/openai'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { Models } from '$lib/types/models'
-  import { ArrowPathIcon, PaperAirplaneIcon } from '@babeard/svelte-heroicons/solid'
+  import { ArrowPathIcon, PaperAirplaneIcon, StopIcon } from '@babeard/svelte-heroicons/solid'
   import { createEventDispatcher, onMount, tick } from 'svelte'
   import autosize from 'svelte-autosize'
 
@@ -17,6 +17,10 @@
   export let question = ''
   let isShiftPressed = false
   const dispatch = createEventDispatcher()
+
+  function stopMessage() {
+    dispatch('stop')
+  }
 
   function dispatchMessage() {
     if (question.trim() && !loading) {
@@ -83,19 +87,27 @@
             />
           </div>
 
-          <button
-            on:click={dispatchMessage}
-            disabled={loading}
-            class="p-3 pr-14 w-12 rounded-r-xl bg-neutral-500 group"
-          >
-            {#if !loading}
+          {#if !loading}
+            <button
+              on:click={dispatchMessage}
+              disabled={loading}
+              class="p-3 pr-14 w-12 rounded-r-xl bg-neutral-500 group"
+            >
               <PaperAirplaneIcon
                 class="text-white h-8 w-10 opacity-40 group-hover:opacity-95 duration-200"
               />
-            {:else}
-              <ArrowPathIcon class="h-8 w-10 text-white animate-spin" />
-            {/if}
-          </button>
+            </button>
+          {:else}
+            <button
+              on:click={stopMessage}
+              disabled={!loading}
+              class="p-3 pr-14 w-12 rounded-r-xl bg-neutral-500 group"
+            >
+              <StopIcon
+                class="text-white h-8 w-10 opacity-40 group-hover:opacity-95 duration-200"
+              />
+            </button>
+          {/if}
         </div>
 
         <ChatSettingsPopover bind:model {models} bind:temperature {loading} />
