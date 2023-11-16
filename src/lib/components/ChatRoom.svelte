@@ -84,12 +84,15 @@
       await invalidateAll()
       await goto(`/app`)
     })
+    $socketStore.on('answer-cancelled', async () => {
+      eventSource?.close()
+      loading = false
+    })
   }
 
   function leaveChat() {
     socketUsers = []
-    $socketStore.off('connected-users-changed')
-    $socketStore.off('users-typing-changed')
+    $socketStore.off('users-changed')
     $socketStore.off('streaming-response')
     $socketStore.off('message-deleted')
     $socketStore.off('chat-deleted')
@@ -133,6 +136,7 @@
   }
 
   function stopSubmit() {
+    $socketStore.emit('cancel-answer')
     eventSource?.close()
     loading = false
   }

@@ -76,6 +76,13 @@ export default function injectSocketIO(server) {
 
         io.to(chatId).emit('users-changed', users[chatId])
       })
+
+      socket.on('cancel-answer', () => {
+        connectUser(userId, chatId)
+        io.to(chatId).emit('users-changed', users[chatId])
+
+        socket.to(chatId).emit('answer-cancelled')
+      })
     })
 
     socket.on('disconnect', () => {
