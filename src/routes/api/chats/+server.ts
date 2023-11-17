@@ -142,57 +142,75 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
 
       const chatResponseReader = chatResponse.body?.getReader()
 
-      const readAndEnqueue = async () => {
+      async function procStream(
+        reader: ReadableStreamDefaultReader<Uint8Array>,
+        previousData = ''
+      ) {
         try {
-          if (!chatResponseReader) return
-
-          const { value, done } = await chatResponseReader.read()
+          const { value, done } = await reader.read()
 
           if (done) {
             controller.close()
             return
           }
 
-          const dataArray = decodeChunkData(value)
+          const combinedData = previousData + new TextDecoder().decode(value)
+          const parts = combinedData.split('\n\n')
+          const completeParts = parts.slice(0, -1)
+          const incompletePart = parts[parts.length - 1]
 
-          const modifiedDataArray = (
-            await Promise.all(
-              dataArray.map(async (data) => {
-                if (data === '[DONE]') {
-                  if (lastMessage?.answer) {
-                    await storeAnswer(lastMessage.id, lastMessage.answer)
-                  }
-                  return JSON.stringify({ state: 'DONE' })
-                }
+          for (const part of completeParts) {
+            if (part.startsWith('data: ')) {
+              const dataArray = decodeChunkData(new TextEncoder().encode(part))
+              const modifiedDataArray = (
+                await Promise.all(
+                  dataArray.map(async (data) => {
+                    if (data === '[DONE]') {
+                      return JSON.stringify({ state: 'DONE' })
+                    }
 
-                const parsedData = JSON.parse(data)
-                const delta = extractDelta(parsedData)
-                if (!delta) {
-                  return null
-                }
-                lastMessage.answer! += delta
+                    const parsedData = JSON.parse(data)
+                    const delta = extractDelta(parsedData)
+                    if (!delta) {
+                      return null
+                    }
+                    lastMessage.answer! += delta
 
-                return JSON.stringify({ state: 'PROCESSING', delta })
-              })
-            )
-          ).filter((x) => x !== null) as string[]
 
-          controller.enqueue(encodeChunkData(modifiedDataArray))
-        } catch (e) {
+                    if (lastMessage?.answer) {
+                      // We store the answer every time we get an update, we deliveratelly
+                      // do not wait for it to be completed so if the message is cancelled,
+                      // the part of the answer that took time enough to be generated is
+                      // stored eitherway.
+                      await storeAnswer(lastMessage.id, lastMessage.answer)
+                    }
+
+                    return JSON.stringify({ state: 'PROCESSING', delta })
+                  })
+                )
+              ).filter((x) => x !== null) as string[]
+              controller.enqueue(encodeChunkData(modifiedDataArray))
+            }
+          }
+
+          await procStream(reader, incompletePart)
+        } catch (error) {
           Sentry.captureException(error)
-          controller.enqueue(
-            encodeChunkData([
-              JSON.stringify({ state: 'ERROR', title: 'Request Error', body: error }),
-            ])
-          )
-          controller.close()
+          controller.error(error)
         }
-
-        await readAndEnqueue()
       }
 
-      await readAndEnqueue()
+      if (chatResponseReader) {
+        await procStream(chatResponseReader)
+      } else {
+        // Handle the case where chatResponseReader is not available
+        controller.close()
+      }
     },
+    async cancel(controller) {
+      console.log("CLOSED from SERVER");
+      controller.close()
+    }
   })
 
   return new Response(stream, {

@@ -88,12 +88,15 @@
       await invalidateAll()
       await goto(`/app`)
     })
+    $socketStore.on('answer-cancelled', async () => {
+      eventSource?.close()
+      loading = false
+    })
   }
 
   function leaveChat() {
     socketUsers = []
-    $socketStore.off('connected-users-changed')
-    $socketStore.off('users-typing-changed')
+    $socketStore.off('users-changed')
     $socketStore.off('streaming-response')
     $socketStore.off('message-deleted')
     $socketStore.off('chat-deleted')
@@ -134,6 +137,12 @@
     } finally {
       isDeleting = false
     }
+  }
+
+  function stopSubmit() {
+    $socketStore.emit('cancel-answer')
+    eventSource?.close()
+    loading = false
   }
 
   async function handleSubmit(
@@ -272,6 +281,7 @@
     {loading}
     bind:question
     on:message={handleSubmit}
+    on:stop={stopSubmit}
     on:focus={() => {
       $socketStore.emit('start-typing')
     }}

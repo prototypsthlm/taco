@@ -141,9 +141,9 @@ export type Model = {
 export const MODELS: Model[] = [
   {
     id: 'gpt-3.5-turbo',
-    input: 0.0015,
+    input: 0.001,
     output: 0.002,
-    maxTokens: 4_097,
+    maxTokens: 4_096,
     outputRoom: 500,
     label: 'GPT-3.5 Turbo',
     enabled: true,
@@ -173,6 +173,15 @@ export const MODELS: Model[] = [
     maxTokens: 32_768,
     outputRoom: 500,
     label: 'GPT-4 32k',
+    enabled: true,
+  },
+  {
+    id: 'gpt-4-1106-preview',
+    input: 0.01,
+    output: 0.03,
+    maxTokens: 128_000,
+    outputRoom: 500,
+    label: 'GPT-4 Turbo 128K',
     enabled: true,
   },
 ]
