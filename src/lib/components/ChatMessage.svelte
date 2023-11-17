@@ -12,10 +12,6 @@
   export let loading: boolean
   export let last = false
   export let isDeleting = false
-  export let answer: {
-    id: number
-    text: string
-  }[] = []
 
   const dispatch = createEventDispatcher()
 </script>
@@ -54,22 +50,12 @@
       </div>
       <div class="flex flex-col flex-grow">
         <span class="font-bold">{message.model}</span>
-        {#if message.answer && (!last || !loading)}
+        {#if message?.answer}
           <!-- We need to force prose-invert, which is the dark mode for the prose class due to not having a non dark option -->
           <div class="prose prose-invert overflow-x-hidden prose-pre:overflow-x-scroll">
             {#await markdownToHtml(message.answer) then parsedText}
               {@html parsedText}
             {/await}
-          </div>
-        {:else if answer && last && loading}
-          <!-- We need to force prose-invert, which is the dark mode for the prose class due to not having a non dark option -->
-          <div class="prose prose-invert overflow-x-hidden prose-pre:overflow-x-scroll">
-            {#each answer as a (a.id)}
-              {#await markdownToHtml(a.text) then parsedText}
-                {console.log(a.text, parsedText)}
-                {@html parsedText}
-              {/await}
-            {/each}
           </div>
         {:else}
           <div class="flex items-center justify-center space-x-2">

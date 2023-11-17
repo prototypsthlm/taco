@@ -36,10 +36,6 @@
   let socketUsers: SocketUser[] = []
 
   let question = ''
-  let answer: {
-    id: number
-    text: string
-  }[] = []
 
   function joinChat() {
     if (!chat) return
@@ -205,10 +201,6 @@
         if (chat && data.state === 'PROCESSING' && data.delta) {
           const lastMessage = chat.messages[chat.messages.length - 1]
           lastMessage.answer += data.delta
-          answer.push({
-            id: Math.random(),
-            text: data.delta,
-          })
           chat.messages[chat.messages.length - 1] = lastMessage
         }
 
@@ -259,7 +251,6 @@
               {loading}
               {message}
               {isDeleting}
-              bind:answer
               on:delete={() => {
                 deleteMessage(message.id)
               }}
