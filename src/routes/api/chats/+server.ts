@@ -176,12 +176,11 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
                     }
                     lastMessage.answer! += delta
 
-
                     if (lastMessage?.answer) {
-                      // We store the answer every time we get an update, we deliveratelly
+                      // We store the answer every time we get an update, we deliberately
                       // do not wait for it to be completed so if the message is cancelled,
                       // the part of the answer that took time enough to be generated is
-                      // stored eitherway.
+                      // stored either.
                       await storeAnswer(lastMessage.id, lastMessage.answer)
                     }
 
@@ -208,9 +207,8 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       }
     },
     async cancel(controller) {
-      console.log("CLOSED from SERVER");
       controller.close()
-    }
+    },
   })
 
   return new Response(stream, {
