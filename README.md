@@ -107,3 +107,13 @@ switch to another email provider by just switching out the provider in the email
 ## Contribution
 
 Your are very welcome to do any kind of contribution that being issue reporting, code contribution or feature requests! Please take a look into the issue section of this repo to make sure your request isn't already existing. If not feel free to create an issue and tag it with suiting labels.
+
+## About Prototyp
+
+Taco is maintained by [Prototyp](https://www.prototyp.se/en), a code lab building digital products for businesses breaking new ground.
+
+![Prototyp logo](https://github.com/prototypsthlm/taco/blob/dev/prototyp-logo.png?raw=true)
+
+### Looking to break new ground?
+
+Let us tell you more about our working methods, earlier cases, and how we can help you reach the next level together. We are always interested in new contacts and collaborations. [Get in touch](https://www.prototyp.se/en/contact) - and let’s grab a cup of coffee!
