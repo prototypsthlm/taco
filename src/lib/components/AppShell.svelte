@@ -60,11 +60,11 @@
             </TransitionChild>
             <!-- Sidebar component, swap this element with another sidebar if you like -->
             <div
-              class="h-screen flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 p-4 ring-1 ring-white/10"
+              class="h-screen flex grow flex-col overflow-y-auto bg-gray-900 p-3 ring-1 ring-white/10 gap-3"
             >
-              <div class="flex h-16 items-center">
-                <a class="text-white text-2xl text-left" href="/app">
-                  <TacoIcon class="h-10 dark text-4xl" />
+              <div class="flex items-center">
+                <a class="text-white text-2xl text-left block" href="/app">
+                  <TacoIcon class="h-10 text-4xl dark" />
                 </a>
               </div>
               <nav class="flex flex-1 flex-col overflow-hidden">
@@ -84,11 +84,11 @@
     class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r-2 border-gray-800"
   >
     <!-- Sidebar component, swap this element with another sidebar if you like -->
-    <nav class="flex flex-col justify-between gap-y-4 bg-gray-900 h-screen">
-      <a class="m-4" href="/app">
-        <TacoIcon class="text-4xl h-10 dark" />
+    <nav class="flex flex-col justify-between gap-3 bg-gray-900 h-screen p-3">
+      <a class="block" href="/app">
+        <TacoIcon class="h-10 text-4xl dark" />
       </a>
-      <div class=" mx-2 grow overflow-hidden">
+      <div class="grow overflow-hidden">
         <slot name="sidebar" />
       </div>
       <a
