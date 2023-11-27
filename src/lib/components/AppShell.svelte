@@ -58,13 +58,13 @@
                 </button>
               </div>
             </TransitionChild>
-            <!-- Sidebar component, swap this element with another sidebar if you like -->
+            <!-- Sidebar component, Mobile -->
             <div
               class="h-screen flex grow flex-col overflow-y-auto bg-gray-900 p-3 ring-1 ring-white/10 gap-3"
             >
               <div class="flex items-center">
-                <a class="text-white text-2xl text-left block" href="/app">
-                  <TacoIcon class="h-10 text-4xl dark" />
+                <a class="text-white text-2xl text-left block py-2" href="/app">
+                  <TacoIcon class="h-7 text-2xl dark" />
                 </a>
               </div>
               <nav class="flex flex-1 flex-col overflow-hidden">
@@ -83,10 +83,10 @@
   <div
     class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r-2 border-gray-800"
   >
-    <!-- Sidebar component, swap this element with another sidebar if you like -->
+    <!-- Sidebar component, Desktop -->
     <nav class="flex flex-col justify-between gap-3 bg-gray-900 h-screen p-3">
-      <a class="block" href="/app">
-        <TacoIcon class="h-10 text-4xl dark" />
+      <a class="block py-2" href="/app">
+        <TacoIcon class="h-7 text-2xl dark" />
       </a>
       <div class="grow overflow-hidden">
         <slot name="sidebar" />
