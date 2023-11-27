@@ -103,7 +103,7 @@
   </div>
 
   <div
-    class="sticky top-0 z-40 flex items-center gap-x-6 bg-gray-900 px-4 py-4 shadow-sm sm:px-6 lg:hidden"
+    class="sticky top-0 z-40 flex items-center justify-between gap-x-6 bg-gray-900 px-4 py-4 shadow-sm sm:px-6 lg:hidden"
   >
     <button
       type="button"
@@ -113,8 +113,12 @@
       <span class="sr-only">Open sidebar</span>
       <Bars3Icon class="h-6 w-6" aria-hidden="true" />
     </button>
-    <div class="flex-1 text-sm font-semibold leading-6 text-white">
-      <slot name="title" />
+    <div class="text-center">
+      <p class="text-gray-300">
+        Made with ❤️ by <a class="underline" href="https://www.prototyp.se/" target="_blank"
+          >Prototyp</a
+        >
+      </p>
     </div>
     <a href="/app/settings">
       <span class="sr-only">Your profile</span>
@@ -122,7 +126,15 @@
     </a>
   </div>
 
-  <main class="lg:ml-72 grow overflow-auto">
+  <main class="lg:ml-72 grow overflow-auto relative">
+    <div class="hidden lg:block absolute top-0 right-0 px-4 py-2">
+      <p class="text-gray-300">
+        Made with ❤️ by <a class="underline" href="https://www.prototyp.se/" target="_blank"
+          >Prototyp</a
+        >
+      </p>
+    </div>
+
     <slot name="main" />
   </main>
 </div>
