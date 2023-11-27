@@ -5,6 +5,9 @@ export default {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     extend: {
+      fontFamily: {
+        pacifico: ['Pacifico', 'cursive'],
+      },
       keyframes: {
         'fade-in-out': {
           '0%': { opacity: '0' },

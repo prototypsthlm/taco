@@ -34,7 +34,7 @@
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl text-center">
       <div class="text-5xl md:text-7xl mb-12 md:mb-4 flex justify-center">
-        <TacoIcon class="h-24 md:h-32 dark" />
+        <TacoIcon class="h-28 dark text-8xl" />
       </div>
       <h2 class="text-base font-semibold leading-7 text-indigo-400">Team AI Chat pOrtal</h2>
       <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">

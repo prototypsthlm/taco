@@ -64,7 +64,7 @@
             >
               <div class="flex h-16 items-center">
                 <a class="text-white text-2xl text-left" href="/app">
-                  <TacoIcon class="h-10 dark" />
+                  <TacoIcon class="h-10 dark text-4xl" />
                 </a>
               </div>
               <nav class="flex flex-1 flex-col overflow-hidden">
@@ -85,8 +85,8 @@
   >
     <!-- Sidebar component, swap this element with another sidebar if you like -->
     <nav class="flex flex-col justify-between gap-y-4 bg-gray-900 h-screen">
-      <a class="m-2" href="/app">
-        <TacoIcon class="text-2xl h-12 dark" />
+      <a class="m-4" href="/app">
+        <TacoIcon class="text-4xl h-10 dark" />
       </a>
       <div class=" mx-2 grow overflow-hidden">
         <slot name="sidebar" />
