@@ -16,7 +16,7 @@
   const dispatch = createEventDispatcher()
 </script>
 
-<div class="p-4 md:p-8 flex justify-center">
+<div class="p-4 md:p-8 flex justify-center max-w-full">
   <div class="max-w-screen-lg w-full flex gap-4 md:gap-8 text-neutral-100">
     <Avatar
       transition={false}
@@ -25,9 +25,9 @@
       dotDisconnectedClass="bottom-0 left-0 h-1.5 w-1.5 bg-gray-900 ring-[2.5px] ring-gray-900 ring-offset-2 ring-offset-gray-400"
       user={message.author}
     />
-    <div class="flex flex-col flex-grow">
+    <div class="flex flex-col flex-grow overflow-x-auto">
       <span class="font-bold">{message.author?.name}</span>
-      <div class="prose prose-invert prose-pre:overflow-x-scroll">
+      <div class="prose prose-invert prose-pre:overflow-x-auto">
         <Markdown source={message.question} />
       </div>
     </div>
@@ -46,11 +46,11 @@
       <div class="flex-shrink-0 h-10 w-10 bg-[#19c37c] rounded-xl flex items-center justify-center">
         <ChatGptIcon />
       </div>
-      <div class="flex flex-col flex-grow">
+      <div class="flex flex-col flex-grow overflow-x-auto">
         <span class="font-bold">{message.model}</span>
         {#if message?.answer}
           <!-- We need to force prose-invert, which is the dark mode for the prose class due to not having a non dark option -->
-          <div class="prose prose-invert overflow-x-hidden prose-pre:overflow-x-scroll">
+          <div class="prose prose-invert overflow-x-hidden prose-pre:overflow-x-auto">
             <Markdown source={message.answer} />
           </div>
         {:else}
