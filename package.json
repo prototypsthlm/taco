@@ -23,6 +23,7 @@
   "dependencies": {
     "@babeard/svelte-heroicons": "^2.0.0-rc.0",
     "@faker-js/faker": "^8.1.0",
+    "@magidoc/plugin-svelte-marked": "^4.1.2",
     "@playwright/test": "^1.35.1",
     "@prisma/client": "^5.4.2",
     "@rgossiaux/svelte-headlessui": "^2.0.0",
@@ -35,6 +36,7 @@
     "@types/bcryptjs": "^2.4.2",
     "@types/crypto-js": "^4.1.1",
     "@types/express": "^4.17.17",
+    "@types/marked": "^6.0.0",
     "@types/mjml": "^4.7.2",
     "@types/node": "^18.16.1",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
@@ -49,6 +51,7 @@
     "eslint-plugin-svelte": "^2.26.0",
     "express": "^4.18.2",
     "handlebars": "^4.7.8",
+    "marked": "^10.0.0",
     "mjml": "^4.14.1",
     "openai": "^3.3.0",
     "postcss": "^8.4.24",

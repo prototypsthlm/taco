@@ -4,7 +4,7 @@
   import type { Model } from '$lib/server/api/openai'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
   import { Models } from '$lib/types/models'
-  import { ArrowPathIcon, PaperAirplaneIcon, StopIcon } from '@babeard/svelte-heroicons/solid'
+  import { PaperAirplaneIcon, StopIcon } from '@babeard/svelte-heroicons/solid'
   import { createEventDispatcher, onMount, tick } from 'svelte'
   import autosize from 'svelte-autosize'
 

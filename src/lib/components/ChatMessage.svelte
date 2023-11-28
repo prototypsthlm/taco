@@ -3,10 +3,10 @@
   import Avatar from '$lib/components/Avatar.svelte'
   import ChatGptIcon from '$lib/components/icons/ChatGptIcon.svelte'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
-  import { markdownToHtml } from '$lib/utils/markdown.js'
   import { TrashIcon } from '@babeard/svelte-heroicons/outline'
   import { ArrowPathIcon } from '@babeard/svelte-heroicons/solid'
   import { createEventDispatcher } from 'svelte'
+  import Markdown from '@magidoc/plugin-svelte-marked'
 
   export let message: ChatWithRelations['messages'][number]
   export let loading: boolean
@@ -28,9 +28,7 @@
     <div class="flex flex-col flex-grow">
       <span class="font-bold">{message.author?.name}</span>
       <div class="prose prose-invert prose-pre:overflow-x-scroll">
-        {#await markdownToHtml(message.question) then parsedText}
-          {@html parsedText}
-        {/await}
+        <Markdown source={message.question} />
       </div>
     </div>
     <button disabled={isDeleting} class="text-white self-start" on:click={() => dispatch('delete')}>
@@ -53,9 +51,7 @@
         {#if message?.answer}
           <!-- We need to force prose-invert, which is the dark mode for the prose class due to not having a non dark option -->
           <div class="prose prose-invert overflow-x-hidden prose-pre:overflow-x-scroll">
-            {#await markdownToHtml(message.answer) then parsedText}
-              {@html parsedText}
-            {/await}
+            <Markdown source={message.answer} />
           </div>
         {:else}
           <div class="flex items-center justify-center space-x-2">

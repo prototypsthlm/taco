@@ -53,7 +53,7 @@
       socketUsersStore.set(updatedConnectedUsers)
     })
 
-    $socketStore.on('streaming-response', (data) => {
+    $socketStore.on('streaming-response', async (data) => {
       scrollToBottom()
 
       if (data.state === 'INITIAL' && data.chat) {
@@ -68,9 +68,7 @@
       }
 
       if (chat && data.state === 'DONE') {
-        loading = false
-        invalidateAll()
-        eventSource?.close()
+        await onAnswerEndCommon()
       }
       scrollToBottom()
     })
@@ -85,8 +83,7 @@
       await goto(`/app`)
     })
     $socketStore.on('answer-cancelled', async () => {
-      eventSource?.close()
-      loading = false
+      await onAnswerEndCommon()
     })
   }
 
@@ -135,10 +132,9 @@
     }
   }
 
-  function stopSubmit() {
+  async function stopSubmit() {
     $socketStore.emit('cancel-answer')
-    eventSource?.close()
-    loading = false
+    await onAnswerEndCommon()
   }
 
   async function handleSubmit(
@@ -163,8 +159,7 @@
       }),
     })
 
-    eventSource.addEventListener('error', (err: { data: string }) => {
-      loading = false
+    eventSource.addEventListener('error', async (err: { data: string }) => {
       Sentry.captureException(err)
 
       if (!err.data) {
@@ -176,6 +171,7 @@
       if (msg) {
         addFlashNotification(msg.title, msg.body, { type: 'ERROR' })
       }
+      await onAnswerEndCommon()
     })
 
     eventSource.addEventListener('message', async (e) => {
@@ -184,9 +180,8 @@
         const data = JSON.parse(e.data)
 
         if (data.state === 'ERROR') {
-          loading = false
           addFlashNotification(data.title, data.body, { type: 'ERROR' })
-          eventSource?.close()
+          await onAnswerEndCommon()
           return
         }
 
@@ -205,15 +200,13 @@
         }
 
         if (chat && data.state === 'DONE') {
-          loading = false
+          await onAnswerEndCommon()
           if ($page.url.pathname !== `/app/chats/${chat.id}`) {
             await goto(`/app/chats/${chat.id}`)
           }
-          await invalidateAll()
-          eventSource?.close()
         }
       } catch (err) {
-        loading = false
+        await onAnswerEndCommon()
         Sentry.captureException(err)
         console.error('eventSource.message.catch', { e, err })
       }
@@ -222,6 +215,12 @@
     })
 
     eventSource.stream()
+  }
+
+  async function onAnswerEndCommon() {
+    await invalidateAll()
+    eventSource?.close()
+    loading = false
   }
 </script>
 
