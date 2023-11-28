@@ -58,13 +58,13 @@
                 </button>
               </div>
             </TransitionChild>
-            <!-- Sidebar component, swap this element with another sidebar if you like -->
+            <!-- Sidebar component, Mobile -->
             <div
-              class="h-screen flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 p-4 ring-1 ring-white/10"
+              class="h-screen flex grow flex-col overflow-y-auto bg-gray-900 p-3 ring-1 ring-white/10 gap-3"
             >
-              <div class="flex h-16 items-center">
-                <a class="text-white text-2xl text-left" href="/app">
-                  <TacoIcon class="h-10 dark" />
+              <div class="flex items-center">
+                <a class="text-white text-2xl text-left block py-2" href="/app">
+                  <TacoIcon class="h-7 text-2xl dark" />
                 </a>
               </div>
               <nav class="flex flex-1 flex-col overflow-hidden">
@@ -83,12 +83,12 @@
   <div
     class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r-2 border-gray-800"
   >
-    <!-- Sidebar component, swap this element with another sidebar if you like -->
-    <nav class="flex flex-col justify-between gap-y-4 bg-gray-900 h-screen">
-      <a class="m-2" href="/app">
-        <TacoIcon class="text-2xl h-12 dark" />
+    <!-- Sidebar component, Desktop -->
+    <nav class="flex flex-col justify-between gap-3 bg-gray-900 h-screen p-3">
+      <a class="block py-2" href="/app">
+        <TacoIcon class="h-7 text-2xl dark" />
       </a>
-      <div class=" mx-2 grow overflow-hidden">
+      <div class="grow overflow-hidden">
         <slot name="sidebar" />
       </div>
       <a
@@ -103,7 +103,7 @@
   </div>
 
   <div
-    class="sticky top-0 z-40 flex items-center gap-x-6 bg-gray-900 px-4 py-4 shadow-sm sm:px-6 lg:hidden"
+    class="sticky top-0 z-40 flex items-center justify-between gap-x-6 bg-gray-900 px-4 py-4 shadow-sm sm:px-6 lg:hidden"
   >
     <button
       type="button"
@@ -113,8 +113,12 @@
       <span class="sr-only">Open sidebar</span>
       <Bars3Icon class="h-6 w-6" aria-hidden="true" />
     </button>
-    <div class="flex-1 text-sm font-semibold leading-6 text-white">
-      <slot name="title" />
+    <div class="text-center">
+      <p class="text-gray-300">
+        Made with ❤️ by <a class="underline" href="https://www.prototyp.se/" target="_blank"
+          >Prototyp</a
+        >
+      </p>
     </div>
     <a href="/app/settings">
       <span class="sr-only">Your profile</span>
@@ -122,7 +126,15 @@
     </a>
   </div>
 
-  <main class="lg:ml-72 grow overflow-auto">
+  <main class="lg:ml-72 grow overflow-auto relative">
+    <div class="hidden lg:block absolute top-0 right-0 px-4 py-2">
+      <p class="text-gray-300 text-xs">
+        Made with ❤️ by <a class="underline" href="https://www.prototyp.se/" target="_blank"
+          >Prototyp</a
+        >
+      </p>
+    </div>
+
     <slot name="main" />
   </main>
 </div>

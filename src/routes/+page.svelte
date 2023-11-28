@@ -1,28 +1,24 @@
 <script lang="ts">
-  import { KeyIcon, UserCircleIcon } from '@babeard/svelte-heroicons/solid'
-  import type { PageData } from './$types'
   import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
-  import ForkIcon from '$lib/components/icons/ForkIcon.svelte'
+  import { KeyIcon, CpuChipIcon, ChatBubbleLeftRightIcon } from '@babeard/svelte-heroicons/solid'
+  import type { PageData } from './$types'
 
   export let data: PageData
 
   const features = [
     {
-      name: 'LLM personalities',
-      description:
-        'Choose from a variety of LLM personalities to use in your chat. Soon you can also create your own LLM personality.',
-      icon: UserCircleIcon,
+      name: 'Cutting edge models',
+      description: 'Choose between OpenAl LLMs, including the latest GPT-4 TURBO 128K.',
+      icon: CpuChipIcon,
     },
     {
-      name: 'Forking chats',
-      description:
-        'Keep context of a chat by forking it. You can fork a chat at any point in time and continue the conversation in a new chat.',
-      icon: ForkIcon,
+      name: 'Group chats',
+      description: 'Share chats with team members and continue chatting with the LLM together.',
+      icon: ChatBubbleLeftRightIcon,
     },
     {
-      name: 'One API Key',
-      description:
-        'Use one API key for the whole team instead of every member using the ChatGPT website.',
+      name: 'A single OpenAl API key',
+      description: 'With Taco, your whole team shares a single Open Al account.',
       icon: KeyIcon,
     },
   ]
@@ -34,15 +30,19 @@
   <div class="mx-auto max-w-7xl px-6 lg:px-8">
     <div class="mx-auto max-w-2xl text-center">
       <div class="text-5xl md:text-7xl mb-12 md:mb-4 flex justify-center">
-        <TacoIcon class="h-24 md:h-32 dark" />
+        <TacoIcon class="h-28 dark text-8xl" />
       </div>
       <h2 class="text-base font-semibold leading-7 text-indigo-400">Team AI Chat pOrtal</h2>
       <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-        All in one solution for using LLMs
+        A free and open source ChatGPT frontend
       </p>
       <p class="mt-6 text-lg leading-8 text-gray-300">
-        Collaborate with your team LLMs together in one place. Get an advantage of useful features
-        to improve your productivity and collaboration between team members.
+        Invite your team and start collaborating using OpenAl's cutting-edge LLMs.
+      </p>
+      <p class="text-lg leading-8 text-gray-300">
+        Made with ❤️ by <a class="underline" href="https://www.prototyp.se/" target="_blank"
+          >Prototyp</a
+        >
       </p>
     </div>
     <div class="mx-auto mt-16 px-8 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
