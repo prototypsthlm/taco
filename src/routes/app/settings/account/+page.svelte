@@ -17,6 +17,7 @@
     method="post"
     action="?/personal"
     use:enhance={() => {
+      //<!-- aixo es llença a .ts actions:Actions-->
       return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
     }}
   >

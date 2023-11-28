@@ -13,7 +13,12 @@ export const actions: Actions = {
       const schema = z
         .object({
           name: z.string().min(1),
-          openAiApiKey: z.union([z.string(), z.undefined()]),
+          openAiApiKey: z.string().refine((key) => {
+            // OpenAI API keys typically start with 'sk-' and are 51 characters long
+            return key.startsWith('sk-') && key.length === 51;
+          }, {
+            message: "Invalid OpenAI API key format",
+          }),
         })
         .parse(fields)
 
