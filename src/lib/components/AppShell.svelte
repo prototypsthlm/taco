@@ -127,7 +127,7 @@
   </div>
 
   <main class="lg:ml-72 grow overflow-auto relative">
-    <div class="hidden lg:block absolute top-0 right-0 px-4 py-2">
+    <div class="hidden lg:block absolute top-0 right-0 px-4 py-2 z-50">
       <p class="text-gray-300 text-xs">
         Made with ❤️ by <a class="underline" href="https://www.prototyp.se/" target="_blank"
           >Prototyp</a
