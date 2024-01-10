@@ -197,17 +197,19 @@ export const countMessagesTokens = (messages: ChatCompletionRequestMessage[]) =>
 }
 
 export const retryWithExponentialBackoff = (
-  func: (...args: never[]) => Promise<Response>, // Adjusting the type to Promise<Response>
+  func: (...args: never[]) => Promise<Response>,
   {
-    initialDelay = 1000,
-    exponentialBase = 2,
-    jitter = true,
+    initialDelay = 100,
+    exponentialBase = 1.5,
     maxRetries = 10,
+    jitter = true,
+    jitterFactor = 0.1,
   }: {
     initialDelay?: number
     exponentialBase?: number
-    jitter?: boolean
     maxRetries?: number
+    jitter?: boolean
+    jitterFactor?: number
   } = {}
 ): ((...args: never[]) => Promise<Response>) => {
   const retry = async (args: never[], retriesLeft: number, delay: number): Promise<Response> => {
@@ -218,10 +220,10 @@ export const retryWithExponentialBackoff = (
     // console.log('Function returned with status:', response.status)
 
     if (response.status === 429 && retriesLeft > 0) {
-      // console.log('Waiting for', delay, 'milliseconds...')
+      // console.log(`Waiting for ${(delay / 1000).toFixed(2)} seconds...`)
 
       await new Promise((resolve) => setTimeout(resolve, delay))
-      // console.log('Waited for', delay, 'milliseconds...')
+      // console.log(`Waited for ${(delay / 1000).toFixed(2)} seconds...`)
 
       Sentry.captureException(
         new Error('retryWithExponentialBackoff OpenAI API Error: 429 Too many requests'),
@@ -230,17 +232,17 @@ export const retryWithExponentialBackoff = (
             retriesLeft,
             delay,
             exponentialBase,
-            jitter,
             maxRetries,
+            jitter,
+            jitterFactor,
           },
         }
       )
 
-      return retry(
-        args,
-        retriesLeft - 1,
-        delay * exponentialBase * (1 + (jitter ? Math.random() : 0))
-      )
+      const nextDelay =
+        delay * exponentialBase + (jitter ? delay * Math.random() * jitterFactor : 0)
+
+      return retry(args, retriesLeft - 1, nextDelay)
     }
     return response
   }
