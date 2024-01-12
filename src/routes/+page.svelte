@@ -28,7 +28,7 @@
     },
     {
       name: 'No training on your data',
-      description: "OpenAI won't use the information you provide to improve it's models.",
+      description: "OpenAI won't use the information you provide to improve its models.",
       icon: ShieldCheckIcon,
     },
   ]
