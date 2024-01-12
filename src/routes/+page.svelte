@@ -1,6 +1,11 @@
 <script lang="ts">
   import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
-  import { KeyIcon, CpuChipIcon, ChatBubbleLeftRightIcon } from '@babeard/svelte-heroicons/solid'
+  import {
+    KeyIcon,
+    CpuChipIcon,
+    ChatBubbleLeftRightIcon,
+    ShieldCheckIcon,
+  } from '@babeard/svelte-heroicons/solid'
   import type { PageData } from './$types'
 
   export let data: PageData
@@ -20,6 +25,11 @@
       name: 'A single OpenAl API key',
       description: 'With Taco, your whole team shares a single Open Al account.',
       icon: KeyIcon,
+    },
+    {
+      name: 'No training on your data',
+      description: "OpenAI won't use the information you provide to improve its models.",
+      icon: ShieldCheckIcon,
     },
   ]
 
@@ -46,7 +56,7 @@
       </p>
     </div>
     <div class="mx-auto mt-16 px-8 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-      <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+      <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-4">
         {#each features as feature}
           <div class="flex flex-col">
             <dt class="flex items-center gap-x-3 text-base font-semibold leading-7 text-white">
