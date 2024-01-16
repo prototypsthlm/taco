@@ -3,13 +3,16 @@
   import { page } from '$app/stores'
   import AvatarGroup from '$lib/components/AvatarGroup.svelte'
   import DeleteChatModal from '$lib/components/DeleteChatModal.svelte'
-  import ForkIcon from '$lib/components/icons/ForkIcon.svelte'
   import ModalConfirm from '$lib/components/ModalConfirm.svelte'
   import ShareChatModal from '$lib/components/ShareChatModal.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
   import { getTimeSince } from '$lib/utils/timeConverter'
-  import { ChatBubbleLeftIcon, UserGroupIcon } from '@babeard/svelte-heroicons/solid'
+  import {
+    Square2StackIcon,
+    ChatBubbleLeftIcon,
+    UserGroupIcon,
+  } from '@babeard/svelte-heroicons/solid'
 
   export let chat: UserWithUserTeamsActiveTeamAndChats['sharedChats'][number]['chat']
   const name = chat.name || 'New Chat'
@@ -37,6 +40,7 @@
         <ChatBubbleLeftIcon class="h-6 w-6 text-white flex-shrink-0" />
       {/if}
       <h3 class="flex-auto truncate text-sm font-semibold leading-6 text-white">{name}</h3>
+
       <time datetime={chat.updatedAt.toISOString()} class="flex-none text-xs text-gray-600"
         >{updatedAtShorthand}</time
       >
@@ -52,8 +56,8 @@
         </p>
         <ShareChatModal {user} {chat} />
         <ModalConfirm initialFocus={forkInput} on:confirm={() => forkForm.requestSubmit()}>
-          <button class="block" type="button" title="Fork it" slot="trigger">
-            <ForkIcon class="h-5 w-5 text-gray-500 hover:text-green-500 duration-200" />
+          <button class="block" type="button" title="Clone" slot="trigger">
+            <Square2StackIcon class="h-5 w-5 text-gray-500 hover:text-green-500 duration-200" />
           </button>
           <svelte:fragment slot="title">Do you want to fork the chat?</svelte:fragment>
           <svelte:fragment slot="body">
