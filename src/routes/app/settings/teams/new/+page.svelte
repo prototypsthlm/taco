@@ -11,7 +11,10 @@
   <div>
     <h2 class="text-base font-semibold leading-7 text-white">Create a new Team</h2>
     <p class="mt-1 text-sm leading-6 text-gray-400">
-      You can also specify the api key later in the settings.
+      You need an OpenAI API key to create a team. You can get one at <a
+        href="https://platform.openai.com"
+        target="_blank">https://platform.openai.com</a
+      >
     </p>
   </div>
 
@@ -39,7 +42,7 @@
       <Input
         value={form?.fields?.openAiApiKey}
         errors={form?.errors?.openAiApiKey}
-        label="OpenAI API Key"
+        label="OpenAI API Key*"
         id="openAiApiKey"
         name="openAiApiKey"
         type="text"
