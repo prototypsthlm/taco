@@ -59,7 +59,7 @@
           <button class="block" type="button" title="Clone" slot="trigger">
             <Square2StackIcon class="h-5 w-5 text-gray-500 hover:text-green-500 duration-200" />
           </button>
-          <svelte:fragment slot="title">Do you want to fork the chat?</svelte:fragment>
+          <svelte:fragment slot="title">Do you want to clone the chat?</svelte:fragment>
           <svelte:fragment slot="body">
             <form
               method="post"
@@ -69,7 +69,7 @@
               class="w-full"
             >
               <div class="mt-2 max-w-xl text-sm text-gray-500">
-                <p>Choose a name for the new forked chat.</p>
+                <p>Choose a name for the new cloned chat.</p>
               </div>
               <div class="mt-5 sm:flex sm:items-center">
                 <div class="w-full sm:max-w-xl flex">
@@ -80,15 +80,15 @@
                     name="newName"
                     id="newName"
                     class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="A new name for the forked chat."
-                    value={`Forked: ${name}`}
+                    placeholder="A new name for the cloned chat."
+                    value={`Cloned: ${name}`}
                   />
                 </div>
               </div>
               <input type="hidden" name="chatId" value={chat.id} />
             </form>
           </svelte:fragment>
-          <svelte:fragment slot="confirm">Fork</svelte:fragment>
+          <svelte:fragment slot="confirm">Clone</svelte:fragment>
         </ModalConfirm>
         <DeleteChatModal {chat} />
       </div>
