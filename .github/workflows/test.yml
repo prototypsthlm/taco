@@ -32,3 +32,4 @@ jobs:
           EMAIL_SENDER_SIGNATURE: 'test@tacoai.app'
           PUBLIC_SENTRY_DSN: 'SECRET'
           PUBLIC_SENTRY_ENV: 'test'
+          PUBLIC_SITE_URL: 'http://localhost:5173/'
