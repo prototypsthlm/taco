@@ -22,8 +22,8 @@
   $: href = `/app/chats/${chat.id}`
   $: isLinkActive = $page.url.href.endsWith(`/app/chats/${chat.id}`)
 
-  let forkForm: HTMLFormElement
-  let forkInput: HTMLInputElement
+  let cloneForm: HTMLFormElement
+  let cloneInput: HTMLInputElement
 </script>
 
 <a href={isLinkActive ? null : href} title={name} on:click={() => isSidebarOpen.set(false)}>
@@ -55,7 +55,7 @@
           {chat.roleContent}
         </p>
         <ShareChatModal {user} {chat} />
-        <ModalConfirm initialFocus={forkInput} on:confirm={() => forkForm.requestSubmit()}>
+        <ModalConfirm initialFocus={cloneInput} on:confirm={() => cloneForm.requestSubmit()}>
           <button class="block" type="button" title="Clone" slot="trigger">
             <Square2StackIcon class="h-5 w-5 text-gray-500 hover:text-green-500 duration-200" />
           </button>
@@ -63,8 +63,8 @@
           <svelte:fragment slot="body">
             <form
               method="post"
-              action="/app/chats/{chat.id}?/forkChat"
-              bind:this={forkForm}
+              action="/app/chats/{chat.id}?/cloneChat"
+              bind:this={cloneForm}
               use:enhance
               class="w-full"
             >
@@ -75,7 +75,7 @@
                 <div class="w-full sm:max-w-xl flex">
                   <label class="sr-only" for="newName">New Name</label>
                   <input
-                    bind:this={forkInput}
+                    bind:this={cloneInput}
                     type="text"
                     name="newName"
                     id="newName"

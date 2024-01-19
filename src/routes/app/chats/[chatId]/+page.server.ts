@@ -1,4 +1,4 @@
-import { forkChat, getChatWithRelationsById } from '$lib/server/entities/chat'
+import { cloneChat, getChatWithRelationsById } from '$lib/server/entities/chat'
 import { type Actions, fail, redirect } from '@sveltejs/kit'
 import { z } from 'zod'
 import type { PageServerLoad } from './$types'
@@ -6,7 +6,6 @@ import { getAvailableModels } from '$lib/server/api/openai'
 
 export const load: PageServerLoad = async ({ params, locals: { currentUser } }) => {
   const chatId = Number(params.chatId)
-
 
   if (!currentUser.activeUserTeam?.team) {
     throw redirect(303, '/app/settings/teams')
@@ -23,7 +22,7 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
 }
 
 export const actions: Actions = {
-  forkChat: async ({ locals: { currentUser }, request }) => {
+  cloneChat: async ({ locals: { currentUser }, request }) => {
     const fields = Object.fromEntries(await request.formData())
 
     const schema = z
@@ -40,7 +39,7 @@ export const actions: Actions = {
     }
 
     if (schema.success) {
-      const newChat = await forkChat(
+      const newChat = await cloneChat(
         schema.data.chatId,
         currentUser.id,
         currentUser.activeUserTeamId,
@@ -65,4 +64,3 @@ export const actions: Actions = {
 function getModels(): any {
   throw new Error('Function not implemented.')
 }
-
