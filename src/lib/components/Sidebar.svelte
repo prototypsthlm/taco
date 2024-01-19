@@ -13,26 +13,6 @@
     ...(user.activeUserTeam?.chats || []),
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
 
-  let renderedToday = false
-  let renderedYesterday = false
-  let renderedPreviousSevenDays = false
-  let renderedLastMonth = false
-
-  function didRender(name: string) {
-    if (name === 'today' && renderedToday === false) {
-      renderedToday = true
-      return true //render title
-    } else if (name == 'yesterday' && renderedYesterday === false) {
-      renderedYesterday = true
-      return true
-    } else if (name == 'previousSevenDays' && renderedPreviousSevenDays === false) {
-      renderedPreviousSevenDays = true
-      return true
-    } else {
-      return false
-    }
-  }
-
   const millisecondsPerSecond = 1000
   const secondsPerMinute = 60
   const minutesPerHour = 60
@@ -43,11 +23,36 @@
   const millisecondsPerHour = millisecondsPerMinute * minutesPerHour
   const millisecondsPerDay = millisecondsPerHour * hoursPerDay
   const millisecondsPerWeek = millisecondsPerDay * daysPerWeek
-  const millisecondsPerMonth = millisecondsPerDay * 31 * millisecondsPerDay //be more exact here with days in a month?
+  const millisecondsPerMonth = millisecondsPerDay * 31 * millisecondsPerDay
+  const previousSevenDays = millisecondsPerWeek
+  const lastThirtyDays = millisecondsPerDay * 30
+  const lastYear = millisecondsPerDay * 365
+
+  let renderedToday = false
+  let renderedYesterday = false
+  let renderedPreviousSevenDays = false
+  let renderedLastThirtyDays = false
+
+  function addTitle(name: string) {
+    if (name === 'today' && renderedToday === false) {
+      renderedToday = true
+      return true
+    } else if (name == 'yesterday' && renderedYesterday === false) {
+      renderedYesterday = true
+      return true
+    } else if (name == 'previousSevenDays' && renderedPreviousSevenDays === false) {
+      renderedPreviousSevenDays = true
+      return true
+    } else if (name == 'lastThirtyDays' && renderedLastThirtyDays === false) {
+      renderedLastThirtyDays = true
+      return true
+    } else {
+      return false
+    }
+  }
 
   const isToday = (date: Date) => {
     const now = new Date()
-    const dateTimestamp = date.getTime()
 
     return (
       date.getDate() === now.getDate() &&
@@ -55,37 +60,6 @@
       date.getFullYear() === now.getFullYear()
     )
   }
-
-  /* const isToday = (timestamp: number) => {
-
-
-    
-    const now = new Date()
-    const date = new Date(timestamp)
-
-    return (
-      date.getDate() === now.getDate() &&
-      date.getMonth() === now.getMonth() &&
-      date.getFullYear() === now.getFullYear()
-    )
-  } */
-
-  //      istoday(timesince(updatedAt))      "2024-01-19T11:08:06.738Z"
-
-  /*   const isYesterday = (timestamp: number) => {
-    const now = new Date()
-    const date = new Date(timestamp)
-
-    const yesterday = new Date(now)
-
-    yesterday.setDate(now.getDate() - 1)
-
-    return (
-      date.getDate() === yesterday.getDate() &&
-      date.getMonth() === yesterday.getMonth() &&
-      date.getFullYear() === yesterday.getFullYear()
-    )
-  } */
 
   const isYesterday = (date: Date) => {
     const now = new Date()
@@ -99,10 +73,6 @@
       date.getFullYear() === yesterday.getFullYear()
     )
   }
-
-  const previousSevenDays = millisecondsPerWeek
-  const lastMonth = millisecondsPerMonth
-  const lastYear = millisecondsPerDay * 365
 
   function timeSince(date: Date) {
     const now = new Date()
@@ -135,25 +105,25 @@
         <ul class="overflow-auto grow flex flex-col gap-2 pt-2">
           {#each chats as chat (chat.id)}
             {#if isToday(chat.updatedAt)}
-              {#if didRender('today')}
+              {#if addTitle('today')}
                 <p class="flex-none text-xs text-gray-600">Today</p>
               {/if}
               <ChatLink {chat} {user} />
             {:else if isYesterday(chat.updatedAt)}
-              {#if didRender('yesterday')}
+              {#if addTitle('yesterday')}
                 <p class="flex-none text-xs text-gray-600">Yesterday</p>
               {/if}
               <ChatLink {chat} {user} />
             {:else if millisecondsPerDay < timeSince(chat.updatedAt) && timeSince(chat.updatedAt) <= previousSevenDays}
-              {#if didRender('previousSevenDays')}
+              {#if addTitle('previousSevenDays')}
                 <p class="flex-none text-xs text-gray-600">Previous 7 Days</p>
               {/if}
               <ChatLink {chat} {user} />
-              <!-- {:else if previousSevenDays < timeSince(chat.updatedAt) && timeSince(chat.updatedAt) <= lastMonth}
-              {#if renderTitle('lastMonth')}
-                <p class="flex-none text-xs text-gray-600">Last Month</p>
+            {:else if previousSevenDays < timeSince(chat.updatedAt) && timeSince(chat.updatedAt) <= lastThirtyDays}
+              {#if addTitle('lastThirtyDays')}
+                <p class="flex-none text-xs text-gray-600">Previous 30 Days</p>
               {/if}
-              <ChatLink {chat} {user} /> -->
+              <ChatLink {chat} {user} />
             {/if}
           {/each}
         </ul>
