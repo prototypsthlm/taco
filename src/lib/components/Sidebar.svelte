@@ -26,12 +26,12 @@
   const millisecondsPerMonth = millisecondsPerDay * 31 * millisecondsPerDay
   const previousSevenDays = millisecondsPerWeek
   const lastThirtyDays = millisecondsPerDay * 30
-  const lastYear = millisecondsPerDay * 365
 
   let renderedToday = false
   let renderedYesterday = false
   let renderedPreviousSevenDays = false
   let renderedLastThirtyDays = false
+  let renderedLastYear = false
 
   function addTitle(name: string) {
     if (name === 'today' && renderedToday === false) {
@@ -46,9 +46,17 @@
     } else if (name == 'lastThirtyDays' && renderedLastThirtyDays === false) {
       renderedLastThirtyDays = true
       return true
+    } else if (name == 'lastYear' && renderedLastYear === false) {
+      renderedLastThirtyDays = true
+      return true
     } else {
       return false
     }
+  }
+  const isLastYear = (date: Date) => {
+    const now = new Date()
+
+    return date.getFullYear() === now.getFullYear() - 1
   }
 
   const isToday = (date: Date) => {
@@ -122,6 +130,11 @@
             {:else if previousSevenDays < timeSince(chat.updatedAt) && timeSince(chat.updatedAt) <= lastThirtyDays}
               {#if addTitle('lastThirtyDays')}
                 <p class="flex-none text-xs text-gray-600">Previous 30 Days</p>
+              {/if}
+              <ChatLink {chat} {user} />
+            {:else if isLastYear(chat.updatedAt)}
+              {#if addTitle('lastYear')}
+                <p class="flex-none text-xs text-gray-600">Last Year</p>
               {/if}
               <ChatLink {chat} {user} />
             {/if}
