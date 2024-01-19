@@ -131,7 +131,7 @@ export const deleteChat = (id: number) => {
   })
 }
 
-export const forkChat = async (
+export const cloneChat = async (
   chatId: number,
   userId: number,
   activeUserTeamId: number,
