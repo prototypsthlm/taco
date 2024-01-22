@@ -4,6 +4,16 @@
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
   import { ChevronRightIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
+  import {
+    getTimeSince,
+    isToday,
+    isLastYear,
+    isYesterday,
+    millisecondsPerDay,
+    previousSevenDays,
+    lastThirtyDays,
+    lastYear,
+  } from '$lib/utils/time'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
   $: chats = [
@@ -12,20 +22,6 @@
       .map((x) => x.chat) || []),
     ...(user.activeUserTeam?.chats || []),
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-
-  const millisecondsPerSecond = 1000
-  const secondsPerMinute = 60
-  const minutesPerHour = 60
-  const hoursPerDay = 24
-  const daysPerWeek = 7
-
-  const millisecondsPerMinute = millisecondsPerSecond * secondsPerMinute
-  const millisecondsPerHour = millisecondsPerMinute * minutesPerHour
-  const millisecondsPerDay = millisecondsPerHour * hoursPerDay
-  const millisecondsPerWeek = millisecondsPerDay * daysPerWeek
-  const millisecondsPerMonth = millisecondsPerDay * 31 * millisecondsPerDay
-  const previousSevenDays = millisecondsPerWeek
-  const lastThirtyDays = millisecondsPerDay * 30
 
   let renderedToday = false
   let renderedYesterday = false
@@ -52,39 +48,6 @@
     } else {
       return false
     }
-  }
-  const isLastYear = (date: Date) => {
-    const now = new Date()
-
-    return date.getFullYear() === now.getFullYear() - 1
-  }
-
-  const isToday = (date: Date) => {
-    const now = new Date()
-
-    return (
-      date.getDate() === now.getDate() &&
-      date.getMonth() === now.getMonth() &&
-      date.getFullYear() === now.getFullYear()
-    )
-  }
-
-  const isYesterday = (date: Date) => {
-    const now = new Date()
-    const yesterday = new Date(now)
-
-    yesterday.setDate(now.getDate() - 1)
-
-    return (
-      date.getDate() === yesterday.getDate() &&
-      date.getMonth() === yesterday.getMonth() &&
-      date.getFullYear() === yesterday.getFullYear()
-    )
-  }
-
-  function timeSince(date: Date) {
-    const now = new Date()
-    return now.getTime() - date.getTime()
   }
 </script>
 
@@ -122,19 +85,19 @@
                 <p class="flex-none text-xs text-gray-600">Yesterday</p>
               {/if}
               <ChatLink {chat} {user} />
-            {:else if millisecondsPerDay < timeSince(chat.updatedAt) && timeSince(chat.updatedAt) <= previousSevenDays}
+            {:else if millisecondsPerDay < getTimeSince(chat.updatedAt) && getTimeSince(chat.updatedAt) <= previousSevenDays}
               {#if addTitle('previousSevenDays')}
                 <p class="flex-none text-xs text-gray-600">Previous 7 Days</p>
               {/if}
               <ChatLink {chat} {user} />
-            {:else if previousSevenDays < timeSince(chat.updatedAt) && timeSince(chat.updatedAt) <= lastThirtyDays}
+            {:else if previousSevenDays < getTimeSince(chat.updatedAt) && getTimeSince(chat.updatedAt) <= lastThirtyDays}
               {#if addTitle('lastThirtyDays')}
                 <p class="flex-none text-xs text-gray-600">Previous 30 Days</p>
               {/if}
               <ChatLink {chat} {user} />
             {:else if isLastYear(chat.updatedAt)}
               {#if addTitle('lastYear')}
-                <p class="flex-none text-xs text-gray-600">Last Year</p>
+                <p class="flex-none text-xs text-gray-600">{lastYear}</p>
               {/if}
               <ChatLink {chat} {user} />
             {/if}
