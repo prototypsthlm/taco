@@ -27,7 +27,7 @@
     "@playwright/test": "^1.35.1",
     "@prisma/client": "^5.4.2",
     "@rgossiaux/svelte-headlessui": "^2.0.0",
-    "@sentry/sveltekit": "^7.73.0",
+    "@sentry/sveltekit": "^7.94.1",
     "@sveltejs/adapter-auto": "^2.0.0",
     "@sveltejs/adapter-node": "^1.2.4",
     "@sveltejs/kit": "^1.21.0",
