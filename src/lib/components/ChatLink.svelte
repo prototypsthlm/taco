@@ -8,8 +8,11 @@
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
   import { getTimeSinceToString } from '$lib/utils/time'
-  import { ChatBubbleLeftIcon, UserGroupIcon } from '@babeard/svelte-heroicons/solid'
-
+  import {
+    ChatBubbleLeftIcon,
+    UserGroupIcon,
+    Square2StackIcon,
+  } from '@babeard/svelte-heroicons/solid'
 
   export let chat: UserWithUserTeamsActiveTeamAndChats['sharedChats'][number]['chat']
   const name = chat.name || 'New Chat'

@@ -18,7 +18,7 @@ export function getTimeSince(date: Date) {
   return now.getTime() - date.getTime()
 }
 
-export function getTimeSinceString(date: Date) {
+export function getTimeSinceToString(date: Date) {
   const timeDifference = getTimeSince(date)
 
   if (timeDifference < millisecondsPerMinute) {
