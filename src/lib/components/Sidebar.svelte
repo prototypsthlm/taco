@@ -12,16 +12,75 @@
     millisecondsPerDay,
     previousSevenDays,
     lastThirtyDays,
-    lastYear,
   } from '$lib/utils/time'
+  import { onMount } from 'svelte'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
+
   $: chats = [
     ...(user?.sharedChats
       .filter((x) => x.chat.owner.teamId == user.activeUserTeam?.teamId)
       .map((x) => x.chat) || []),
     ...(user.activeUserTeam?.chats || []),
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+
+  /*   onMount(() => {
+    // Log the chats array when the component mounts
+    console.log('Chats:', chats)
+  })
+ */
+  //Chats: [0]= today, [200]= older ones
+
+  /*  //list of the chats but grouped according to last updated
+   const chatsGroupedByTime = () => {
+    let lists = {today:[],yesterday:[],lastMonth:[]}
+
+    return chats.forEach((chat) => {
+     isToday(chat.updatedAt) ? lists.today.push(chat)
+  } )
+} */
+
+  type ChatsAccumulator = {
+    today: any[]
+    yesterday: any[]
+    previousSevenDays: any[]
+    lastMonth: any[]
+    lastYear: any[]
+  }
+
+  $: chatsGroupedByTime = !chats
+    ? console.log('NO CHATS')
+    : chats?.reduce(
+        (ackumulator: ChatsAccumulator, chat) => {
+          if (isToday(chat.updatedAt)) {
+            ackumulator.today.push(chat)
+            console.log(ackumulator)
+          } else if (isYesterday(chat.updatedAt)) {
+            ackumulator.yesterday.push(chat)
+          } else if (
+            millisecondsPerDay < getTimeSince(chat.updatedAt) &&
+            getTimeSince(chat.updatedAt) <= previousSevenDays
+          ) {
+            ackumulator.previousSevenDays.push(chat)
+          } else if (
+            previousSevenDays < getTimeSince(chat.updatedAt) &&
+            getTimeSince(chat.updatedAt) <= lastThirtyDays
+          ) {
+            ackumulator.lastMonth.push(chat)
+          } else if (isLastYear(chat.updatedAt)) {
+            ackumulator.lastYear.push(chat)
+          }
+          return ackumulator
+        },
+        { today: [], yesterday: [], previousSevenDays: [], lastMonth: [], lastYear: [] }
+      )
+
+  onMount(() => {
+    // Log the chats array when the component mounts
+    console.log('Chats Grouped:', chatsGroupedByTime)
+  })
+
+  const lastYear = new Date().getFullYear() - 1
 
   let renderedToday = false
   let renderedYesterday = false
