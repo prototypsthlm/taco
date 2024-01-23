@@ -5,20 +5,17 @@ import { countTokens } from '$lib/server/utils/tokenizer'
 import { trim } from '$lib/utils/string'
 import type { Team } from '@prisma/client'
 import * as Sentry from '@sentry/sveltekit'
-import {
-  type ChatCompletionRequestMessage,
-  Configuration,
-  type CreateChatCompletionRequest,
-  OpenAIApi,
-} from 'openai'
-import { ChatCompletionRequestMessageRoleEnum } from 'openai/api'
+import OpenAI from 'openai'
+import type {
+  ChatCompletionCreateParams,
+  ChatCompletionMessageParam,
+  ChatCompletion,
+} from 'openai/resources'
 
 export const getClient = (encryptedApiKey: string) => {
-  const configuration = new Configuration({
+  return new OpenAI({
     apiKey: decryptApiKey(encryptedApiKey),
   })
-
-  return new OpenAIApi(configuration)
 }
 
 export const getAvailableModels = async (team: Team) => {
@@ -26,13 +23,13 @@ export const getAvailableModels = async (team: Team) => {
     throw new Error('API Error: Open AI API key is not set for team')
   }
   const client = getClient(team.openAiApiKey)
-  const res = await client.listModels()
+  const res = await client.models.list()
 
   return MODELS.map(
     (x) =>
       ({
         ...x,
-        enabled: res.data.data.some((y) => x.id === y.id),
+        enabled: res.data.some((y) => x.id === y.id),
       } as Model)
   )
 }
@@ -59,21 +56,21 @@ export const generateChatName = async (
 
   const client = getClient(chat?.owner?.team?.openAiApiKey)
 
-  const res = await client.createChatCompletion(
+  const res = (await client.chat.completions.create(
     transformChatToCompletionRequest(
       chat,
       newModel,
       newTemperature,
       'Main topic of the conversation in no more than 5 words'
     )
-  )
+  )) as ChatCompletion
 
-  if (!res.data.choices[0].message?.content) {
+  if (!res.choices[0].message?.content) {
     console.error('API Error: no content.')
     return
   }
 
-  let name = res.data.choices[0].message.content
+  let name = res.choices[0].message.content
 
   name = trim(name, '"').trim()
   name = trim(name, '.').trim()
@@ -88,33 +85,27 @@ export const transformChatToCompletionRequest = (
   newTemperature: number,
   newMessage?: string,
   stream = false
-): CreateChatCompletionRequest => {
-  const messages: ChatCompletionRequestMessage[] = chat.messages.flatMap((message) => {
-    const question = [
-      { role: ChatCompletionRequestMessageRoleEnum.User, content: message.question },
-    ]
-    const answer = message.answer
-      ? [{ role: ChatCompletionRequestMessageRoleEnum.Assistant, content: message.answer }]
-      : []
+): ChatCompletionCreateParams => {
+  const messages = chat.messages.flatMap((message) => {
+    const question = [{ role: 'user', content: message.question }]
+    const answer = message.answer ? [{ role: 'assistant', content: message.answer }] : []
     return [...question, ...answer]
-  })
+  }) as ChatCompletionMessageParam[]
 
-  const newMessageAsArray = newMessage
-    ? [
-        {
-          role: ChatCompletionRequestMessageRoleEnum.User,
-          content: newMessage,
-        },
-      ]
-    : []
+  const newMessageAsArray = (
+    newMessage
+      ? [
+          {
+            role: 'user',
+            content: newMessage,
+          },
+        ]
+      : []
+  ) as ChatCompletionMessageParam[]
 
   return {
     model: newModel,
-    messages: [
-      { role: ChatCompletionRequestMessageRoleEnum.System, content: chat.roleContent },
-      ...messages,
-      ...newMessageAsArray,
-    ],
+    messages: [{ role: 'system', content: chat.roleContent }, ...messages, ...newMessageAsArray],
     temperature: newTemperature,
     stream,
   }
@@ -190,7 +181,7 @@ export const getModel = (id?: string): Model => {
   return MODELS.find((x) => x.id === id) || MODELS[0]
 }
 
-export const countMessagesTokens = (messages: ChatCompletionRequestMessage[]) => {
+export const countMessagesTokens = (messages: ChatCompletionMessageParam[]) => {
   return (
     countTokens(messages.map((message) => `${message.role}: ${message.content}`).join('\n')) || 0
   )
