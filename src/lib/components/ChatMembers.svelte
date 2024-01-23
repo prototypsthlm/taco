@@ -51,7 +51,7 @@
 
 {#if chat?.sharedWith.length}
   <div transition:fade class="{$$props.class} border-b border-gray-200">
-    <ul role="list" class="divide-y divide-gray-200">
+    <ul class="divide-y divide-gray-200">
       {#each members as member (member.id)}
         <li transition:slide class="flex py-4">
           <Avatar
