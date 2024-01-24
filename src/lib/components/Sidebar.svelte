@@ -24,63 +24,66 @@
     ...(user.activeUserTeam?.chats || []),
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
 
-  /*   onMount(() => {
-    // Log the chats array when the component mounts
-    console.log('Chats:', chats)
-  })
- */
-  //Chats: [0]= today, [200]= older ones
-
-  /*  //list of the chats but grouped according to last updated
-   const chatsGroupedByTime = () => {
-    let lists = {today:[],yesterday:[],lastMonth:[]}
-
-    return chats.forEach((chat) => {
-     isToday(chat.updatedAt) ? lists.today.push(chat)
-  } )
-} */
-
   type ChatsAccumulator = {
     today: any[]
     yesterday: any[]
     previousSevenDays: any[]
     lastMonth: any[]
     lastYear: any[]
+    //aYearOrOlder: any[]
   }
 
-  $: chatsGroupedByTime = !chats
-    ? console.log('NO CHATS')
-    : chats?.reduce(
-        (ackumulator: ChatsAccumulator, chat) => {
-          if (isToday(chat.updatedAt)) {
-            ackumulator.today.push(chat)
-            console.log(ackumulator)
-          } else if (isYesterday(chat.updatedAt)) {
-            ackumulator.yesterday.push(chat)
-          } else if (
-            millisecondsPerDay < getTimeSince(chat.updatedAt) &&
-            getTimeSince(chat.updatedAt) <= previousSevenDays
-          ) {
-            ackumulator.previousSevenDays.push(chat)
-          } else if (
-            previousSevenDays < getTimeSince(chat.updatedAt) &&
-            getTimeSince(chat.updatedAt) <= lastThirtyDays
-          ) {
-            ackumulator.lastMonth.push(chat)
-          } else if (isLastYear(chat.updatedAt)) {
-            ackumulator.lastYear.push(chat)
-          }
-          return ackumulator
-        },
-        { today: [], yesterday: [], previousSevenDays: [], lastMonth: [], lastYear: [] }
-      )
+  $: chatsGroupedByTime = chats?.reduce(
+    (ackumulator: ChatsAccumulator, chat) => {
+      if (isToday(chat.updatedAt)) {
+        ackumulator.today.push(chat)
+      } else if (isYesterday(chat.updatedAt)) {
+        ackumulator.yesterday.push(chat)
+      } else if (
+        millisecondsPerDay < getTimeSince(chat.updatedAt) &&
+        getTimeSince(chat.updatedAt) <= previousSevenDays
+      ) {
+        ackumulator.previousSevenDays.push(chat)
+      } else if (
+        previousSevenDays < getTimeSince(chat.updatedAt) &&
+        getTimeSince(chat.updatedAt) <= lastThirtyDays
+      ) {
+        ackumulator.lastMonth.push(chat)
+      } else if (isLastYear(chat.updatedAt)) {
+        ackumulator.lastYear.push(chat)
+      }
+      return ackumulator
+    },
+    {
+      today: [],
+      yesterday: [],
+      previousSevenDays: [],
+      lastMonth: [],
+      lastYear: [],
+      //aYearOrOlder:[]
+    }
+  )
 
-  onMount(() => {
+  /*   onMount(() => {
     // Log the chats array when the component mounts
     console.log('Chats Grouped:', chatsGroupedByTime)
   })
+ */
+  //{:else if olderThanAYear? Then what year?}
 
   const lastYear = new Date().getFullYear() - 1
+
+  function getTitle(interval: string) {
+    const titleMap: { [key: string]: string } = {
+      today: 'Today',
+      yesterday: 'Yesterday',
+      previousSevenDays: 'Previous 7 Days',
+      lastMonth: 'Previous 30 Days',
+      lastYear: 'Last Year',
+    }
+
+    return titleMap[interval as keyof typeof titleMap] || interval
+  }
 
   let renderedToday = false
   let renderedYesterday = false
@@ -88,7 +91,7 @@
   let renderedLastThirtyDays = false
   let renderedLastYear = false
 
-  function addTitle(name: string) {
+  function hasNoTitle(name: string) {
     if (name === 'today' && renderedToday === false) {
       renderedToday = true
       return true
@@ -98,7 +101,7 @@
     } else if (name == 'previousSevenDays' && renderedPreviousSevenDays === false) {
       renderedPreviousSevenDays = true
       return true
-    } else if (name == 'lastThirtyDays' && renderedLastThirtyDays === false) {
+    } else if (name == 'lastMonth' && renderedLastThirtyDays === false) {
       renderedLastThirtyDays = true
       return true
     } else if (name == 'lastYear' && renderedLastYear === false) {
@@ -133,32 +136,14 @@
       </a>
       {#if chats.length}
         <ul class="overflow-auto grow flex flex-col gap-2 pt-2">
-          {#each chats as chat (chat.id)}
-            {#if isToday(chat.updatedAt)}
-              {#if addTitle('today')}
-                <p class="flex-none text-xs text-gray-600">Today</p>
-              {/if}
-              <ChatLink {chat} {user} />
-            {:else if isYesterday(chat.updatedAt)}
-              {#if addTitle('yesterday')}
-                <p class="flex-none text-xs text-gray-600">Yesterday</p>
-              {/if}
-              <ChatLink {chat} {user} />
-            {:else if millisecondsPerDay < getTimeSince(chat.updatedAt) && getTimeSince(chat.updatedAt) <= previousSevenDays}
-              {#if addTitle('previousSevenDays')}
-                <p class="flex-none text-xs text-gray-600">Previous 7 Days</p>
-              {/if}
-              <ChatLink {chat} {user} />
-            {:else if previousSevenDays < getTimeSince(chat.updatedAt) && getTimeSince(chat.updatedAt) <= lastThirtyDays}
-              {#if addTitle('lastThirtyDays')}
-                <p class="flex-none text-xs text-gray-600">Previous 30 Days</p>
-              {/if}
-              <ChatLink {chat} {user} />
-            {:else if isLastYear(chat.updatedAt)}
-              {#if addTitle('lastYear')}
-                <p class="flex-none text-xs text-gray-600">{lastYear}</p>
-              {/if}
-              <ChatLink {chat} {user} />
+          {#each Object.entries(chatsGroupedByTime) as [interval, chats]}
+            {#if chats.length > 0}
+              {#each chats as chat}
+                {#if hasNoTitle(interval)}
+                  <p class="flex-none text-xs text-gray-600">{getTitle(interval)}</p>
+                {/if}
+                <ChatLink {chat} {user} />
+              {/each}
             {/if}
           {/each}
         </ul>
