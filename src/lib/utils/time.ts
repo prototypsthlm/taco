@@ -11,6 +11,8 @@ export const millisecondsPerWeek = millisecondsPerDay * daysPerWeek
 export const previousSevenDays = millisecondsPerWeek
 export const lastThirtyDays = millisecondsPerDay * 30
 
+export const currentYear = new Date().getFullYear()
+
 export function getTimeSince(date: Date) {
   const now = new Date()
   return now.getTime() - date.getTime()

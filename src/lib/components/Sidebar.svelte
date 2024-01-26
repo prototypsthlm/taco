@@ -12,8 +12,8 @@
     millisecondsPerDay,
     previousSevenDays,
     lastThirtyDays,
+    currentYear,
   } from '$lib/utils/time'
-  import { onMount } from 'svelte'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
 
@@ -25,12 +25,11 @@
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
 
   type ChatsAccumulator = {
+    [key: string]: any[]
     today: any[]
     yesterday: any[]
     previousSevenDays: any[]
     lastMonth: any[]
-    lastYear: any[]
-    //aYearOrOlder: any[]
   }
 
   $: chatsGroupedByTime = chats?.reduce(
@@ -49,8 +48,12 @@
         getTimeSince(chat.updatedAt) <= lastThirtyDays
       ) {
         ackumulator.lastMonth.push(chat)
-      } else if (isLastYear(chat.updatedAt)) {
-        ackumulator.lastYear.push(chat)
+      } else if (chat.updatedAt.getFullYear() >= currentYear) {
+        const year = chat.updatedAt.getFullYear()
+        if (!ackumulator[year]) {
+          ackumulator[year] = []
+        }
+        ackumulator[year].push(chat)
       }
       return ackumulator
     },
@@ -59,58 +62,33 @@
       yesterday: [],
       previousSevenDays: [],
       lastMonth: [],
-      lastYear: [],
-      //aYearOrOlder:[]
     }
   )
 
-  /*   onMount(() => {
-    // Log the chats array when the component mounts
-    console.log('Chats Grouped:', chatsGroupedByTime)
-  })
- */
-  //{:else if olderThanAYear? Then what year?}
-
-  const lastYear = new Date().getFullYear() - 1
-
-  function getTitle(interval: string) {
+  function getTitle(interval: any) {
     const titleMap: { [key: string]: string } = {
       today: 'Today',
       yesterday: 'Yesterday',
       previousSevenDays: 'Previous 7 Days',
       lastMonth: 'Previous 30 Days',
-      lastYear: 'Last Year',
     }
-
-    return titleMap[interval as keyof typeof titleMap] || interval
+    return typeof interval === 'number' ? interval : titleMap[interval]
   }
 
-  let renderedToday = false
-  let renderedYesterday = false
-  let renderedPreviousSevenDays = false
-  let renderedLastThirtyDays = false
-  let renderedLastYear = false
+  const renderedTitles: { [key: string]: boolean } = {}
 
-  function hasNoTitle(name: string) {
-    if (name === 'today' && renderedToday === false) {
-      renderedToday = true
-      return true
-    } else if (name == 'yesterday' && renderedYesterday === false) {
-      renderedYesterday = true
-      return true
-    } else if (name == 'previousSevenDays' && renderedPreviousSevenDays === false) {
-      renderedPreviousSevenDays = true
-      return true
-    } else if (name == 'lastMonth' && renderedLastThirtyDays === false) {
-      renderedLastThirtyDays = true
-      return true
-    } else if (name == 'lastYear' && renderedLastYear === false) {
-      renderedLastThirtyDays = true
+  function renderTitle(name: any) {
+    if (!renderedTitles[name]) {
+      renderedTitles[name] = true
       return true
     } else {
       return false
     }
   }
+
+  const currentDate = new Date()
+  const twoYearsAgo = new Date(currentDate)
+  twoYearsAgo.setFullYear(currentDate.getFullYear() - 2)
 </script>
 
 <aside class="flex flex-col grow overflow-hidden h-full">
@@ -139,7 +117,7 @@
           {#each Object.entries(chatsGroupedByTime) as [interval, chats]}
             {#if chats.length > 0}
               {#each chats as chat}
-                {#if hasNoTitle(interval)}
+                {#if renderTitle(interval)}
                   <p class="flex-none text-xs text-gray-600">{getTitle(interval)}</p>
                 {/if}
                 <ChatLink {chat} {user} />
