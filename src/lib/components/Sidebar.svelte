@@ -35,30 +35,30 @@
   }
 
   $: chatsGroupedByTime = chats?.reduce(
-    (ackumulator: ChatsAccumulator, chat) => {
+    (chatLists: ChatsAccumulator, chat) => {
       if (isToday(chat.updatedAt)) {
-        //!ackumulator['today'] ? (ackumulator['today'] = []) : ackumulator['today'].push(chat)
-        ackumulator.today.push(chat)
+        //!chatLists['today'] ? (chatLists['today'] = []) : chatLists['today'].push(chat)
+        chatLists.today.push(chat)
       } else if (isYesterday(chat.updatedAt)) {
-        ackumulator.yesterday.push(chat)
+        chatLists.yesterday.push(chat)
       } else if (
         millisecondsPerDay < getTimeSince(chat.updatedAt) &&
         getTimeSince(chat.updatedAt) <= previousSevenDays
       ) {
-        ackumulator.previousSevenDays.push(chat)
+        chatLists.previousSevenDays.push(chat)
       } else if (
         previousSevenDays < getTimeSince(chat.updatedAt) &&
         getTimeSince(chat.updatedAt) <= lastThirtyDays
       ) {
-        ackumulator.lastMonth.push(chat)
+        chatLists.lastMonth.push(chat)
       } else if (chat.updatedAt.getFullYear() >= currentYear) {
         const year = chat.updatedAt.getFullYear()
-        if (!ackumulator[year]) {
-          ackumulator[year] = []
+        if (!chatLists[year]) {
+          chatLists[year] = []
         }
-        ackumulator[year].push(chat)
+        chatLists[year].push(chat)
       }
-      return ackumulator
+      return chatLists
     },
     {
       today: [],
