@@ -17,6 +17,8 @@
 
   export let user: UserWithUserTeamsActiveTeamAndChats
 
+  const renderedTitles: { [key: string]: boolean } = {}
+
   $: chats = [
     ...(user?.sharedChats
       .filter((x) => x.chat.owner.teamId == user.activeUserTeam?.teamId)
@@ -35,6 +37,7 @@
   $: chatsGroupedByTime = chats?.reduce(
     (ackumulator: ChatsAccumulator, chat) => {
       if (isToday(chat.updatedAt)) {
+        //!ackumulator['today'] ? (ackumulator['today'] = []) : ackumulator['today'].push(chat)
         ackumulator.today.push(chat)
       } else if (isYesterday(chat.updatedAt)) {
         ackumulator.yesterday.push(chat)
@@ -75,8 +78,6 @@
     return typeof interval === 'number' ? interval : titleMap[interval]
   }
 
-  const renderedTitles: { [key: string]: boolean } = {}
-
   function renderTitle(name: any) {
     if (!renderedTitles[name]) {
       renderedTitles[name] = true
@@ -85,10 +86,6 @@
       return false
     }
   }
-
-  const currentDate = new Date()
-  const twoYearsAgo = new Date(currentDate)
-  twoYearsAgo.setFullYear(currentDate.getFullYear() - 2)
 </script>
 
 <aside class="flex flex-col grow overflow-hidden h-full">
