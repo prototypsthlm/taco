@@ -26,7 +26,7 @@
     ...(user.activeUserTeam?.chats || []),
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
 
-  type ChatsAccumulator = {
+  type ChatLists = {
     [key: string]: any[]
     today: any[]
     yesterday: any[]
@@ -35,7 +35,7 @@
   }
 
   $: chatsGroupedByTime = chats?.reduce(
-    (chatLists: ChatsAccumulator, chat) => {
+    (chatLists: ChatLists, chat) => {
       if (isToday(chat.updatedAt)) {
         //!chatLists['today'] ? (chatLists['today'] = []) : chatLists['today'].push(chat)
         chatLists.today.push(chat)
