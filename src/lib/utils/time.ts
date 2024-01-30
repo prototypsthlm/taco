@@ -13,24 +13,49 @@ export const lastThirtyDays = millisecondsPerDay * 30
 
 export const currentYear = new Date().getFullYear()
 
-export function getTimeSince(date: Date) {
+export function millisecondsSince(date: Date) {
   const now = new Date()
-  return now.getTime() - date.getTime()
+  return date > now ? 0 : now.getTime() - date.getTime()
 }
 
-export function getTimeSinceToString(date: Date) {
-  const timeDifference = getTimeSince(date)
+export function timeSince(date: Date) {
+  const timeDifference = millisecondsSince(date)
+  while (timeDifference != 0) {
+    if (timeDifference < millisecondsPerMinute) {
+      return `${Math.floor(timeDifference / millisecondsPerSecond)}s`
+    } else if (timeDifference < millisecondsPerHour) {
+      return `${Math.floor(timeDifference / millisecondsPerMinute)}m`
+    } else if (timeDifference < millisecondsPerDay) {
+      return `${Math.floor(timeDifference / millisecondsPerHour)}h`
+    } else if (timeDifference < millisecondsPerWeek) {
+      return `${Math.floor(timeDifference / millisecondsPerDay)}d`
+    } else {
+      return `${Math.floor(timeDifference / millisecondsPerWeek)}w`
+    }
+  }
+  return 0
+}
 
-  if (timeDifference < millisecondsPerMinute) {
-    return `${Math.floor(timeDifference / millisecondsPerSecond)}s`
-  } else if (timeDifference < millisecondsPerHour) {
-    return `${Math.floor(timeDifference / millisecondsPerMinute)}m`
-  } else if (timeDifference < millisecondsPerDay) {
-    return `${Math.floor(timeDifference / millisecondsPerHour)}h`
-  } else if (timeDifference < millisecondsPerWeek) {
-    return `${Math.floor(timeDifference / millisecondsPerDay)}d`
+export function categorizeDate(date: Date) {
+  if (isToday(date)) {
+    return 'today'
+  } else if (isYesterday(date)) {
+    return 'yesterday'
+  } else if (
+    millisecondsPerDay < millisecondsSince(date) &&
+    millisecondsSince(date) <= previousSevenDays
+  ) {
+    return 'previousSevenDays'
+  } else if (
+    previousSevenDays < millisecondsSince(date) &&
+    millisecondsSince(date) <= lastThirtyDays
+  ) {
+    return 'lastMonth'
+  } else if (date.getFullYear() >= currentYear) {
+    const year = date.getFullYear()
+    return year.toString()
   } else {
-    return `${Math.floor(timeDifference / millisecondsPerWeek)}w`
+    return 'undefined'
   }
 }
 

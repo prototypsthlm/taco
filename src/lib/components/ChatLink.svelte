@@ -7,7 +7,7 @@
   import ShareChatModal from '$lib/components/ShareChatModal.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
-  import { getTimeSinceToString } from '$lib/utils/time'
+  import { timeSince } from '$lib/utils/time'
   import {
     ChatBubbleLeftIcon,
     UserGroupIcon,
@@ -18,7 +18,7 @@
   const name = chat.name || 'New Chat'
   export let user: UserWithUserTeamsActiveTeamAndChats
 
-  $: updatedAtShorthand = getTimeSinceToString(chat.updatedAt)
+  $: updatedAtShorthand = timeSince(chat.updatedAt)
   $: href = `/app/chats/${chat.id}`
   $: isLinkActive = $page.url.href.endsWith(`/app/chats/${chat.id}`)
 

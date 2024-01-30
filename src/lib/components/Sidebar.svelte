@@ -4,20 +4,9 @@
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
   import { ChevronRightIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
-  import {
-    getTimeSince,
-    isToday,
-    isLastYear,
-    isYesterday,
-    millisecondsPerDay,
-    previousSevenDays,
-    lastThirtyDays,
-    currentYear,
-  } from '$lib/utils/time'
+  import { categorizeDate } from '$lib/utils/time'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
-
-  const renderedTitles: { [key: string]: boolean } = {}
 
   $: chats = [
     ...(user?.sharedChats
@@ -27,46 +16,17 @@
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
 
   type ChatLists = {
-    [key: string]: any[]
-    today: any[]
-    yesterday: any[]
-    previousSevenDays: any[]
-    lastMonth: any[]
+    [key: string | 'number']: any[]
   }
 
-  $: chatsGroupedByTime = chats?.reduce(
-    (chatLists: ChatLists, chat) => {
-      if (isToday(chat.updatedAt)) {
-        //!chatLists['today'] ? (chatLists['today'] = []) : chatLists['today'].push(chat)
-        chatLists.today.push(chat)
-      } else if (isYesterday(chat.updatedAt)) {
-        chatLists.yesterday.push(chat)
-      } else if (
-        millisecondsPerDay < getTimeSince(chat.updatedAt) &&
-        getTimeSince(chat.updatedAt) <= previousSevenDays
-      ) {
-        chatLists.previousSevenDays.push(chat)
-      } else if (
-        previousSevenDays < getTimeSince(chat.updatedAt) &&
-        getTimeSince(chat.updatedAt) <= lastThirtyDays
-      ) {
-        chatLists.lastMonth.push(chat)
-      } else if (chat.updatedAt.getFullYear() >= currentYear) {
-        const year = chat.updatedAt.getFullYear()
-        if (!chatLists[year]) {
-          chatLists[year] = []
-        }
-        chatLists[year].push(chat)
-      }
-      return chatLists
-    },
-    {
-      today: [],
-      yesterday: [],
-      previousSevenDays: [],
-      lastMonth: [],
+  $: chatsGroupedByTime = chats?.reduce((chatLists: ChatLists, chat) => {
+    const category = categorizeDate(chat.updatedAt)
+    if (!chatLists[category]) {
+      chatLists[category] = []
     }
-  )
+    chatLists[category].push(chat)
+    return chatLists
+  }, {})
 
   function getTitle(interval: any) {
     const titleMap: { [key: string]: string } = {
@@ -76,15 +36,6 @@
       lastMonth: 'Previous 30 Days',
     }
     return typeof interval === 'number' ? interval : titleMap[interval]
-  }
-
-  function renderTitle(name: any) {
-    if (!renderedTitles[name]) {
-      renderedTitles[name] = true
-      return true
-    } else {
-      return false
-    }
   }
 </script>
 
@@ -113,10 +64,8 @@
         <ul class="overflow-auto grow flex flex-col gap-2 pt-2">
           {#each Object.entries(chatsGroupedByTime) as [interval, chats]}
             {#if chats.length > 0}
+              <p class="flex-none text-xs text-gray-600">{getTitle(interval)}</p>
               {#each chats as chat}
-                {#if renderTitle(interval)}
-                  <p class="flex-none text-xs text-gray-600">{getTitle(interval)}</p>
-                {/if}
                 <ChatLink {chat} {user} />
               {/each}
             {/if}

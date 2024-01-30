@@ -8,7 +8,6 @@ const dateFromLastYear = new Date(
   currentDate.getDate()
 )
 
-//Chat with date from last year
 describe(isLastYear, () => {
   it('returns true for a date from the previous year'),
     () => {
