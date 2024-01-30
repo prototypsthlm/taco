@@ -53,7 +53,7 @@ export const categorizeDate = (date: Date) => {
     return 'lastMonth'
   } else if (date.getFullYear() >= currentYear) {
     const year = date.getFullYear()
-    return year.toString()
+    return year
   } else {
     return 'undefined'
   }
