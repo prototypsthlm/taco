@@ -13,12 +13,12 @@ export const lastThirtyDays = millisecondsPerDay * 30
 
 export const currentYear = new Date().getFullYear()
 
-export function millisecondsSince(date: Date) {
+export const millisecondsSince = (date: Date) => {
   const now = new Date()
   return date > now ? 0 : now.getTime() - date.getTime()
 }
 
-export function timeSince(date: Date) {
+export const timeSince = (date: Date) => {
   const timeDifference = millisecondsSince(date)
   while (timeDifference != 0) {
     if (timeDifference < millisecondsPerMinute) {
@@ -36,7 +36,7 @@ export function timeSince(date: Date) {
   return 0
 }
 
-export function categorizeDate(date: Date) {
+export const categorizeDate = (date: Date) => {
   if (isToday(date)) {
     return 'today'
   } else if (isYesterday(date)) {

@@ -8,16 +8,16 @@
 
   export let user: UserWithUserTeamsActiveTeamAndChats
 
+  type ChatLists = {
+    [key: string | 'number']: any[]
+  }
+
   $: chats = [
     ...(user?.sharedChats
       .filter((x) => x.chat.owner.teamId == user.activeUserTeam?.teamId)
       .map((x) => x.chat) || []),
     ...(user.activeUserTeam?.chats || []),
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-
-  type ChatLists = {
-    [key: string | 'number']: any[]
-  }
 
   $: chatsGroupedByTime = chats?.reduce((chatLists: ChatLists, chat) => {
     const category = categorizeDate(chat.updatedAt)
@@ -28,7 +28,7 @@
     return chatLists
   }, {})
 
-  function getTitle(interval: any) {
+  const getTitle = (interval: any) => {
     const titleMap: { [key: string]: string } = {
       today: 'Today',
       yesterday: 'Yesterday',
