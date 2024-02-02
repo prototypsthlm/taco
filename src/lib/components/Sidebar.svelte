@@ -9,7 +9,7 @@
   export let user: UserWithUserTeamsActiveTeamAndChats
 
   type ChatLists = {
-    [key: string | 'number']: any[]
+    [key: string | number]: any[]
   }
 
   $: chats = [

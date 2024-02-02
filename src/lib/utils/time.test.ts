@@ -35,6 +35,6 @@ describe(categorizeDate, () => {
     },
     it('returns "undefined" '),
     () => {
-      expect(categorizeDate(twoYearsAhead)).toBe('undefined')
+      expect(categorizeDate(twoYearsAhead)).toBe('futureDate')
     }
 })
