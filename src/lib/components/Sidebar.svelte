@@ -3,8 +3,14 @@
   import Gravatar from '$lib/components/Gravatar.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
-  import { ChevronRightIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
+  import {
+    ChevronRightIcon,
+    PlusIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+  } from '@babeard/svelte-heroicons/solid'
   import { categorizeDate } from '$lib/utils/time'
+  import { onMount } from 'svelte'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
 
@@ -37,6 +43,25 @@
     }
     return typeof interval === 'number' ? interval : titleMap[interval]
   }
+
+  type ChatListState = {
+    [key: string | number]: boolean
+  }
+
+  $: chatListState = () => {
+    const keys = Object.keys(chatsGroupedByTime)
+    const keysObject: ChatListState = keys.reduce((ack, key) => {
+      ack[key] = ['today', 'yesterday', 'previousSevenDays'].includes(key)
+      return ack
+    }, {} as ChatListState)
+    return keysObject
+  }
+
+  $: currentChatState = chatListState()
+  function toggleIsOpen(interval: any) {
+    currentChatState[interval] = !currentChatState[interval]
+    return currentChatState
+  }
 </script>
 
 <aside class="flex flex-col grow overflow-hidden h-full">
@@ -64,9 +89,26 @@
         <ul class="overflow-auto grow flex flex-col gap-2 pt-2">
           {#each Object.entries(chatsGroupedByTime) as [interval, chats]}
             {#if chats.length > 0}
-              <p class="flex-none text-xs text-gray-600">{getTitle(interval)}</p>
+              <div class="flex relative items-center">
+                <p class="flex-none text-xs text-gray-600">{getTitle(interval)}</p>
+                <div class="right-0 absolute">
+                  {#if currentChatState[interval]}
+                    <ChevronUpIcon
+                      class="h-3 w-3 text-white"
+                      on:click={() => toggleIsOpen(interval)}
+                    />
+                  {:else}
+                    <ChevronDownIcon
+                      class="h-3 w-3 text-white"
+                      on:click={() => toggleIsOpen(interval)}
+                    />
+                  {/if}
+                </div>
+              </div>
               {#each chats as chat}
-                <ChatLink {chat} {user} />
+                <div class={currentChatState[interval] ? '' : 'hidden'}>
+                  <ChatLink {chat} {user} />
+                </div>
               {/each}
             {/if}
           {/each}
