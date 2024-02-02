@@ -10,12 +10,14 @@
     ChevronUpIcon,
   } from '@babeard/svelte-heroicons/solid'
   import { categorizeDate } from '$lib/utils/time'
-  import { onMount } from 'svelte'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
 
   type ChatLists = {
     [key: string | number]: any[]
+  }
+  type KeyObject = {
+    [key: string | number]: boolean
   }
 
   $: chats = [
@@ -44,23 +46,20 @@
     return typeof interval === 'number' ? interval : titleMap[interval]
   }
 
-  type ChatListState = {
-    [key: string | number]: boolean
-  }
-
-  $: chatListState = () => {
+  $: getCurrentCategoryKeys = () => {
     const keys = Object.keys(chatsGroupedByTime)
-    const keysObject: ChatListState = keys.reduce((ack, key) => {
-      ack[key] = ['today', 'yesterday', 'previousSevenDays'].includes(key)
-      return ack
-    }, {} as ChatListState)
+    const keysObject: KeyObject = keys.reduce((keysObjectAcc, key) => {
+      keysObjectAcc[key] = ['today', 'yesterday', 'previousSevenDays'].includes(key)
+      return keysObjectAcc
+    }, {} as KeyObject)
     return keysObject
   }
 
-  $: currentChatState = chatListState()
-  function toggleIsOpen(interval: any) {
-    currentChatState[interval] = !currentChatState[interval]
-    return currentChatState
+  $: currentCategoryState = getCurrentCategoryKeys()
+
+  function toggleCategoryState(interval: any) {
+    currentCategoryState[interval] = !currentCategoryState[interval]
+    return currentCategoryState
   }
 </script>
 
@@ -92,21 +91,21 @@
               <div class="flex relative items-center">
                 <p class="flex-none text-xs text-gray-600">{getTitle(interval)}</p>
                 <div class="right-0 absolute">
-                  {#if currentChatState[interval]}
+                  {#if currentCategoryState[interval]}
                     <ChevronUpIcon
                       class="h-3 w-3 text-white"
-                      on:click={() => toggleIsOpen(interval)}
+                      on:click={() => toggleCategoryState(interval)}
                     />
                   {:else}
                     <ChevronDownIcon
                       class="h-3 w-3 text-white"
-                      on:click={() => toggleIsOpen(interval)}
+                      on:click={() => toggleCategoryState(interval)}
                     />
                   {/if}
                 </div>
               </div>
               {#each chats as chat}
-                <div class={currentChatState[interval] ? '' : 'hidden'}>
+                <div class={currentCategoryState[interval] ? '' : 'hidden'}>
                   <ChatLink {chat} {user} />
                 </div>
               {/each}
