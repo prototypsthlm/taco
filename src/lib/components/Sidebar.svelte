@@ -9,6 +9,7 @@
     ChevronDownIcon,
     ChevronUpIcon,
   } from '@babeard/svelte-heroicons/solid'
+
   import { categorizeDate } from '$lib/utils/time'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
@@ -19,6 +20,7 @@
   type KeyObject = {
     [key: string | number]: boolean
   }
+
 
   $: chats = [
     ...(user?.sharedChats
@@ -61,6 +63,7 @@
     currentCategoryState[interval] = !currentCategoryState[interval]
     return currentCategoryState
   }
+
 </script>
 
 <aside class="flex flex-col grow overflow-hidden h-full">
@@ -108,6 +111,7 @@
                 <div class={currentCategoryState[interval] ? '' : 'hidden'}>
                   <ChatLink {chat} {user} />
                 </div>
+
               {/each}
             {/if}
           {/each}

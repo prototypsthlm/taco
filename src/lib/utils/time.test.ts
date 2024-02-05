@@ -33,7 +33,8 @@ describe(categorizeDate, () => {
     () => {
       expect(categorizeDate(currentDate)).toBe('today')
     },
-    it('returns "undefined" '),
+
+    it('returns "futureDate" '),
     () => {
       expect(categorizeDate(twoYearsAhead)).toBe('futureDate')
     }

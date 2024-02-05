@@ -52,13 +52,13 @@ export const categorizeDate = (date: Date): string | number => {
     millisecondsSince(date) <= lastThirtyDays
   ) {
     return 'lastMonth'
-  } else if (date.getFullYear() >= currentYear) {
+
+  } else if (date.getFullYear() <= currentYear) {
     const year = date.getFullYear()
     return year
-  } else if (now > date) {
-    return 'futureDate'
   } else {
-    return ''
+    return 'futureDate'
+
   }
 }
 
