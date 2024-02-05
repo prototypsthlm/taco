@@ -4,14 +4,39 @@
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
   import { ChevronRightIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
+  import { categorizeDate } from '$lib/utils/time'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
+
+  type ChatLists = {
+    [key: string | number]: any[]
+  }
+
   $: chats = [
     ...(user?.sharedChats
       .filter((x) => x.chat.owner.teamId == user.activeUserTeam?.teamId)
       .map((x) => x.chat) || []),
     ...(user.activeUserTeam?.chats || []),
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+
+  $: chatsGroupedByTime = chats?.reduce((chatLists: ChatLists, chat) => {
+    const category = categorizeDate(chat.updatedAt)
+    if (!chatLists[category]) {
+      chatLists[category] = []
+    }
+    chatLists[category].push(chat)
+    return chatLists
+  }, {})
+
+  const getTitle = (interval: any) => {
+    const titleMap: { [key: string]: string } = {
+      today: 'Today',
+      yesterday: 'Yesterday',
+      previousSevenDays: 'Previous 7 Days',
+      lastMonth: 'Previous 30 Days',
+    }
+    return typeof interval === 'number' ? interval : titleMap[interval]
+  }
 </script>
 
 <aside class="flex flex-col grow overflow-hidden h-full">
@@ -37,8 +62,13 @@
       </a>
       {#if chats.length}
         <ul class="overflow-auto grow flex flex-col gap-2 pt-2">
-          {#each chats as chat (chat.id)}
-            <ChatLink {chat} {user} />
+          {#each Object.entries(chatsGroupedByTime) as [interval, chats]}
+            {#if chats.length > 0}
+              <p class="flex-none text-xs text-gray-600">{getTitle(interval)}</p>
+              {#each chats as chat}
+                <ChatLink {chat} {user} />
+              {/each}
+            {/if}
           {/each}
         </ul>
       {/if}
