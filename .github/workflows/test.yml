@@ -32,6 +32,7 @@ jobs:
       PUBLIC_SENTRY_ENV: test
       PUBLIC_SITE_URL: http://localhost:5173/
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/db
+      NODE_ENV: test
 
     steps:
       - name: Checkout repository

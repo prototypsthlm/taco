@@ -13,7 +13,7 @@
     "lint": "prettier --plugin-search-dir . --check . && eslint .",
     "format": "prettier --plugin-search-dir . --write .",
     "test": "dotenv -e .env.test -- prisma migrate deploy && npm run test:integration && npm run test:unit",
-    "test:integration": "dotenv -e .env.test -- playwright test --headed --debug",
+    "test:integration": "dotenv -e .env.test -- playwright test",
     "test:unit": "vitest",
     "seed": "prisma db seed"
   },
