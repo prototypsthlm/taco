@@ -9,6 +9,29 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      POSTMARK_API_KEY: SECRET
+      PUBLIC_SITE_NAME: TACO [TEST]
+      EMAIL_SENDER_SIGNATURE: test@tacoai.app
+      PUBLIC_SENTRY_DSN: SECRET
+      PUBLIC_SENTRY_ENV: test
+      PUBLIC_SITE_URL: http://localhost:5173/
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/db
 
     steps:
       - name: Checkout repository
@@ -25,12 +48,8 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install
 
+      - name: Run Prisma migrations
+        run: npx prisma migrate deploy
+
       - name: Run tests
         run: npm test
-        env:
-          POSTMARK_API_KEY: 'SECRET'
-          PUBLIC_SITE_NAME: 'TACO [TEST]'
-          EMAIL_SENDER_SIGNATURE: 'test@tacoai.app'
-          PUBLIC_SENTRY_DSN: 'SECRET'
-          PUBLIC_SENTRY_ENV: 'test'
-          PUBLIC_SITE_URL: 'http://localhost:5173/'
