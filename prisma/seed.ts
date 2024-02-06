@@ -1,8 +1,9 @@
 import { faker } from '@faker-js/faker'
 import { PrismaClient, Role } from '@prisma/client'
-import bcrypt from 'bcryptjs'
+import { hashSync } from 'bcryptjs'
 import { encrypt } from '../src/lib/server/utils/crypto'
 import { Models } from '../src/lib/types/models'
+import { cleanDatabase } from './helpers'
 
 const prisma = new PrismaClient()
 
@@ -14,17 +15,7 @@ async function seed() {
   const email = 'user@prototyp.se'
   const teamName = 'Prototyp'
 
-  const tables: { tablename: string }[] = await prisma.$queryRawUnsafe(
-    `SELECT tablename
-     FROM pg_catalog.pg_tables
-     WHERE schemaname != 'pg_catalog'
-       AND schemaname != 'information_schema'
-       AND tablename != '_prisma_migrations';`
-  )
-
-  for (const { tablename } of tables) {
-    await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${tablename}" RESTART IDENTITY CASCADE;`)
-  }
+  await cleanDatabase(prisma)
 
   const team1 = await prisma.team.create({
     data: {
@@ -42,7 +33,7 @@ async function seed() {
       name: 'user1',
       password: {
         create: {
-          hash: await bcrypt.hash('password', 10),
+          hash: hashSync('password', 10),
         },
       },
       userTeams: {
@@ -63,7 +54,7 @@ async function seed() {
       name: 'user2',
       password: {
         create: {
-          hash: await bcrypt.hash('password', 10),
+          hash: hashSync('password', 10),
         },
       },
       userTeams: {
@@ -85,7 +76,7 @@ async function seed() {
         name: `user${i}`,
         password: {
           create: {
-            hash: bcrypt.hashSync('password', 10), // Note: Synchronously hashing password for simplicity
+            hash: hashSync('password', 10),
           },
         },
         userTeams: {
