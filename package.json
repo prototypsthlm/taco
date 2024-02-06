@@ -13,7 +13,7 @@
     "lint": "prettier --plugin-search-dir . --check . && eslint .",
     "format": "prettier --plugin-search-dir . --write .",
     "test": "dotenv -e .env.test -- prisma migrate deploy && npm run test:integration && npm run test:unit",
-    "test:integration": "playwright test --headed",
+    "test:integration": "dotenv -e .env.test -- playwright test --headed --debug",
     "test:unit": "vitest",
     "seed": "prisma db seed"
   },
@@ -21,7 +21,7 @@
     "@babeard/svelte-heroicons": "^2.0.0-rc.0",
     "@faker-js/faker": "^8.1.0",
     "@magidoc/plugin-svelte-marked": "^4.1.2",
-    "@playwright/test": "^1.35.1",
+    "@playwright/test": "^1.41.2",
     "@prisma/client": "^5.4.2",
     "@rgossiaux/svelte-headlessui": "^2.0.0",
     "@sentry/sveltekit": "^7.73.0",
