@@ -16,7 +16,7 @@ test.describe('Feature that interacts with the DB', () => {
 
     await page.getByText('Sign up').click()
 
-    await page.waitForURL('/app/settings/teams', { timeout: 60000, waitUntil: 'networkidle' })
+    // await page.waitForURL('/app/settings/teams', { timeout: 60000, waitUntil: 'networkidle' })
 
     await expect(page).toHaveURL('/app/settings/teams')
   })
