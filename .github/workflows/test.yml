@@ -53,7 +53,7 @@ jobs:
         run: npx prisma migrate deploy
 
       - name: Run tests
-        run: npm test
+        run: NODE_ENV=test npx playwright test
 
       - uses: actions/upload-artifact@v3
         if: always()

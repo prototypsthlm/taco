@@ -23,7 +23,8 @@ test.describe('Feature that interacts with the DB', () => {
     console.log('END-BEFORE')
     console.log('END-BEFORE')
     console.log('END-BEFORE')
-    await page.waitForURL('/app/settings/teams', { timeout: 60000, waitUntil: 'networkidle' })
+
+    await page.waitForURL('/app/settings/teams')
 
     console.log('INI-AFTER')
     console.log('INI-AFTER')
