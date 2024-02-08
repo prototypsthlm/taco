@@ -16,23 +16,7 @@ test.describe('Feature that interacts with the DB', () => {
 
     await page.getByText('Sign up').click()
 
-    console.log('INI-BEFORE')
-    console.log('INI-BEFORE')
-    console.log('INI-BEFORE')
-    console.log(await page.content())
-    console.log('END-BEFORE')
-    console.log('END-BEFORE')
-    console.log('END-BEFORE')
-
     await page.waitForURL('/app/settings/teams')
-
-    console.log('INI-AFTER')
-    console.log('INI-AFTER')
-    console.log('INI-AFTER')
-    console.log(await page.content())
-    console.log('END-AFTER')
-    console.log('END-AFTER')
-    console.log('END-AFTER')
 
     await expect(page).toHaveURL('/app/settings/teams')
   })
