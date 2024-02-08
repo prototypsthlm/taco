@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { PrismaClient, Role } from '@prisma/client'
-import { hashSync } from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 import { encrypt } from '../src/lib/server/utils/crypto'
 import { Models } from '../src/lib/types/models'
 import { cleanDatabase } from './helpers'
@@ -33,7 +33,7 @@ async function seed() {
       name: 'user1',
       password: {
         create: {
-          hash: hashSync('password', 10),
+          hash: bcrypt.hashSync('password', 10),
         },
       },
       userTeams: {
@@ -54,7 +54,7 @@ async function seed() {
       name: 'user2',
       password: {
         create: {
-          hash: hashSync('password', 10),
+          hash: bcrypt.hashSync('password', 10),
         },
       },
       userTeams: {
@@ -76,7 +76,7 @@ async function seed() {
         name: `user${i}`,
         password: {
           create: {
-            hash: hashSync('password', 10),
+            hash: bcrypt.hashSync('password', 10),
           },
         },
         userTeams: {
