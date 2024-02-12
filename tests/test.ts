@@ -1,6 +1,23 @@
 import { expect, test } from '@playwright/test'
+import { cleanDatabase } from '../prisma/helpers'
 
-test('index page has expected h1', async ({ page }) => {
-  await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'TACO' })).toBeVisible()
+test.describe('Feature that interacts with the DB', () => {
+  test.beforeEach(async () => {
+    await cleanDatabase()
+  })
+
+  test('should perform a test that touches the database', async ({ page }) => {
+    await page.goto('/signup')
+
+    await page.getByLabel('Name').fill('Test User')
+    await page.getByLabel('Email').fill('testuser@example.com')
+    await page.getByLabel('Password', { exact: true }).fill('password123')
+    await page.getByLabel('Confirm Password').fill('password123')
+
+    await page.getByText('Sign up').click()
+
+    await page.waitForURL('/app/settings/teams')
+
+    await expect(page).toHaveURL('/app/settings/teams')
+  })
 })
