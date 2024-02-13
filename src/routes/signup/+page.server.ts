@@ -4,10 +4,15 @@ import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
 import { fail, redirect } from '@sveltejs/kit'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { RECAPTCHA_SECRET_KEY } from '$env/static/private'
 
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
+    const secretKey = RECAPTCHA_SECRET_KEY
     const fields = Object.fromEntries(await request.formData())
+
+    let recaptchaResult
+
     try {
       const schema = z
         .object({
@@ -15,6 +20,7 @@ export const actions: Actions = {
           email: z.string().email().toLowerCase(),
           password: z.string().min(6),
           confirmPassword: z.string().min(6),
+          'g-recaptcha-response': z.string(),
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: "Passwords don't match",
@@ -22,14 +28,32 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      const user = await createUser(schema.name, schema.email, schema.password)
+      const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `secret=${secretKey}&response=${schema['g-recaptcha-response']}`,
+      })
+      recaptchaResult = await recaptchaResponse.json()
 
-      await createUserSessionAndCookie(user.id, cookies)
+      if (
+        !schema['g-recaptcha-response'] ||
+        (recaptchaResult.success && recaptchaResult.score > 0.5)
+      ) {
+        const user = await createUser(schema.name, schema.email, schema.password)
 
-      if (user.password?.verificationToken) {
-        await sendVerifyUserEmail(user, url.origin, user.password.verificationToken)
+        await createUserSessionAndCookie(user.id, cookies)
+        if (user.password?.verificationToken) {
+          await sendVerifyUserEmail(user, url.origin, user.password.verificationToken)
+        } else {
+          throw new Error('User verification token not found')
+        }
       } else {
-        throw new Error('User verification token not found')
+        return {
+          status: 400,
+          body: { success: false, message: 'Verification failed' },
+        }
       }
     } catch (error) {
       if (error instanceof ZodError) {
@@ -47,7 +71,6 @@ export const actions: Actions = {
           },
         })
       }
-
       return fail(500, {
         fields,
         error: `${error}`,

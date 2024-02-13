@@ -4,12 +4,26 @@
   import Input from '$lib/components/Input.svelte'
   import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
   import type { ActionData } from './$types'
+  import { PUBLIC_RECAPTCHA_SITE_KEY } from '$env/static/public'
 
   export let form: ActionData
+
+  let recaptchaToken: string | null = null
+
+  function onSubmit() {
+    window.grecaptcha.ready(async function () {
+      recaptchaToken = await window.grecaptcha.execute(PUBLIC_RECAPTCHA_SITE_KEY, {
+        action: 'submit',
+      })
+    })
+  }
 </script>
 
 <svelte:head>
   <title>Signup</title>
+  <script
+    src={`https://www.google.com/recaptcha/api.js?render=${PUBLIC_RECAPTCHA_SITE_KEY}`}
+  ></script>
 </svelte:head>
 
 <div
@@ -33,6 +47,8 @@
         title={form?.error || form?.success}
       />
       <form
+        on:submit={onSubmit}
+        id="signup"
         class="space-y-6"
         method="POST"
         novalidate
@@ -74,6 +90,8 @@
           name="confirmPassword"
           type="password"
         />
+
+        <input type="hidden" name="g-recaptcha-response" bind:value={recaptchaToken} />
 
         <div>
           <button
