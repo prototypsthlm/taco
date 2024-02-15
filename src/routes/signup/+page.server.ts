@@ -4,13 +4,11 @@ import type { Actions } from './$types'
 import { z, ZodError } from 'zod'
 import { fail, redirect } from '@sveltejs/kit'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
-import { RECAPTCHA_SECRET_KEY } from '$env/static/private'
+import { recaptchaResponse } from '$lib/utils/recaptcha'
 
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
-    const secretKey = RECAPTCHA_SECRET_KEY
     const fields = Object.fromEntries(await request.formData())
-
     let recaptchaResult
 
     try {
@@ -28,14 +26,7 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `secret=${secretKey}&response=${schema['g-recaptcha-response']}`,
-      })
-      recaptchaResult = await recaptchaResponse.json()
+      recaptchaResult = await recaptchaResponse(schema['g-recaptcha-response'])
 
       if (
         !schema['g-recaptcha-response'] ||
