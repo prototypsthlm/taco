@@ -9,7 +9,7 @@ import { recaptchaResponse } from '$lib/utils/recaptcha'
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
     const fields = Object.fromEntries(await request.formData())
-    let recaptchaResult
+    let recapatchaVerification
 
     try {
       const schema = z
@@ -18,7 +18,7 @@ export const actions: Actions = {
           email: z.string().email().toLowerCase(),
           password: z.string().min(6),
           confirmPassword: z.string().min(6),
-          'g-recaptcha-response': z.string(),
+          recaptchaResponse: z.string(),
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: "Passwords don't match",
@@ -26,12 +26,9 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      recaptchaResult = await recaptchaResponse(schema['g-recaptcha-response'])
+      recapatchaVerification = await recaptchaResponse(schema.recaptchaResponse)
 
-      if (
-        !schema['g-recaptcha-response'] ||
-        (recaptchaResult.success && recaptchaResult.score > 0.5)
-      ) {
+      if (recapatchaVerification) {
         const user = await createUser(schema.name, schema.email, schema.password)
 
         await createUserSessionAndCookie(user.id, cookies)

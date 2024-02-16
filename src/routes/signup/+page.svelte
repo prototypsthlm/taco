@@ -91,7 +91,7 @@
           type="password"
         />
 
-        <input type="hidden" name="g-recaptcha-response" bind:value={recaptchaToken} />
+        <input type="hidden" name="recaptchaResponse" bind:value={recaptchaToken} />
 
         <div>
           <button
