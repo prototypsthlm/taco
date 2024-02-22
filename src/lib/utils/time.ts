@@ -36,8 +36,7 @@ export const timeSince = (date: Date) => {
   }
 }
 
-//returrn an objecct with  { key: "today", label: "Today", isOpen: true }
-export const categorizeDate = (chat: any): Chat | {} => {
+export const categorizeDate = (date: Date): string | number => {
   const now = new Date()
   if (isToday(date)) {
     return 'today'
