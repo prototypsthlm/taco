@@ -11,16 +11,19 @@
   } from '@babeard/svelte-heroicons/solid'
 
   import { categorizeDate } from '$lib/utils/time'
+  import { onMount } from 'svelte'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
 
-  type ChatLists = {
-    [key: string | number]: any[]
+  type ChatObject = {
+    [key: string]: any[]
+    label: string
+    isOpen: boolean
   }
+
   type KeyObject = {
     [key: string | number]: boolean
   }
-
 
   $: chats = [
     ...(user?.sharedChats
@@ -29,14 +32,26 @@
     ...(user.activeUserTeam?.chats || []),
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
 
-  $: chatsGroupedByTime = chats?.reduce((chatLists: ChatLists, chat) => {
-    const category = categorizeDate(chat.updatedAt)
-    if (!chatLists[category]) {
-      chatLists[category] = []
+  //BEFORE: {today:[],yesterday:[]...}
+  //Should return a list of objects like so: [{today:[chat1,chat2,chat3],label:Today, isOpen:true},{...}]
+  $: chatsGroupedByTime = chats?.reduce((chatObjects: ChatObject[], chat) => {
+    const category = categorizeDate(chat.updatedAt).category
+    const label = categorizeDate(chat.updatedAt).label
+    const isOpen = categorizeDate(chat.updatedAt).isOpen
+    // Check if an object with the same category already exists in chatObjects
+    const found = chatObjects.find((object) => object.label === 'today')
+    if (found) {
+      chatObjects[label] = label
     }
-    chatLists[category].push(chat)
-    return chatLists
-  }, {})
+    return chatObjects
+    //where category matches in chatData:
+    //push chat there
+    //return chatData
+  }, [])
+
+  onMount(() => {
+    console.log('chatObjects', chatsGroupedByTime)
+  })
 
   const getTitle = (interval: any) => {
     const titleMap: { [key: string]: string } = {
@@ -63,7 +78,6 @@
     currentCategoryState[interval] = !currentCategoryState[interval]
     return currentCategoryState
   }
-
 </script>
 
 <aside class="flex flex-col grow overflow-hidden h-full">
@@ -111,7 +125,6 @@
                 <div class={currentCategoryState[interval] ? '' : 'hidden'}>
                   <ChatLink {chat} {user} />
                 </div>
-
               {/each}
             {/if}
           {/each}

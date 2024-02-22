@@ -36,29 +36,28 @@ export const timeSince = (date: Date) => {
   }
 }
 
-export const categorizeDate = (date: Date): string | number => {
-  const now = new Date()
+export const categorizeDate = (
+  date: Date
+): { category: string; label: string; isOpen: boolean } => {
   if (isToday(date)) {
-    return 'today'
+    return { category: 'today', label: 'Today', isOpen: true }
   } else if (isYesterday(date)) {
-    return 'yesterday'
+    return { category: 'yesterday', label: 'Yesterday', isOpen: true }
   } else if (
     millisecondsPerDay < millisecondsSince(date) &&
     millisecondsSince(date) <= previousSevenDays
   ) {
-    return 'previousSevenDays'
+    return { category: 'previousSevenDays', label: 'Previous 7 Days', isOpen: true }
   } else if (
     previousSevenDays < millisecondsSince(date) &&
     millisecondsSince(date) <= lastThirtyDays
   ) {
-    return 'lastMonth'
-
+    return { category: 'lastMonth', label: 'Previous 30 Days', isOpen: true }
   } else if (date.getFullYear() <= currentYear) {
-    const year = date.getFullYear()
-    return year
+    const year = date.getFullYear().toString()
+    return { category: year, label: year, isOpen: true }
   } else {
-    return 'futureDate'
-
+    return { category: 'futureDate', label: 'Future Date', isOpen: false }
   }
 }
 

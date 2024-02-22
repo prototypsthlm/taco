@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@babeard/svelte-heroicons": "^2.0.0-rc.0",
-    "@faker-js/faker": "^8.1.0",
     "@magidoc/plugin-svelte-marked": "^4.1.2",
     "@playwright/test": "^1.35.1",
     "@prisma/client": "^5.4.2",
@@ -78,5 +77,8 @@
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.0"
   }
 }
