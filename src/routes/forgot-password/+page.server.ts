@@ -4,6 +4,7 @@ import { generateSecureRandomToken } from '$lib/server/utils/crypto'
 import { fail } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
+import { verifyRecaptcha } from '$lib/utils/recaptcha.server'
 
 export const actions: Actions = {
   default: async ({ request, url }) => {
@@ -12,8 +13,11 @@ export const actions: Actions = {
       const schema = z
         .object({
           email: z.string().email().toLowerCase(),
+          recaptchaToken: z.string().min(1),
         })
         .parse(fields)
+
+      await verifyRecaptcha(schema.recaptchaToken)
 
       let user = await getUserByEmail(schema.email)
 
