@@ -44,7 +44,6 @@
         novalidate
         use:enhance={async ({ formData }) => {
           const recaptchaToken = await executeRecaptcha(window.grecaptcha)
-          console.log('recaptchaToken', recaptchaToken)
           formData.append('recaptchaToken', recaptchaToken)
           return async ({ update }) => {
             return update({ reset: false })
