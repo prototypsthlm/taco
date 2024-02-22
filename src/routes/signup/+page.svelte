@@ -1,22 +1,13 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import Alert from '$lib/components/Alert.svelte'
-  import Input from '$lib/components/Input.svelte'
   import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
+  import Input from '$lib/components/Input.svelte'
+  import { executeRecaptcha } from '$lib/utils/recaptcha.client'
   import type { ActionData } from './$types'
   import { PUBLIC_RECAPTCHA_SITE_KEY } from '$env/static/public'
 
   export let form: ActionData
-
-  let recaptchaToken: string | null = null
-
-  function onSubmit() {
-    window.grecaptcha.ready(async function () {
-      recaptchaToken = await window.grecaptcha.execute(PUBLIC_RECAPTCHA_SITE_KEY, {
-        action: 'submit',
-      })
-    })
-  }
 </script>
 
 <svelte:head>
@@ -47,13 +38,16 @@
         title={form?.error || form?.success}
       />
       <form
-        on:submit={onSubmit}
         id="signup"
         class="space-y-6"
         method="POST"
         novalidate
-        use:enhance={() => {
-          return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
+        use:enhance={async ({ formData }) => {
+          const recaptchaToken = await executeRecaptcha(window.grecaptcha)
+          formData.append('recaptchaToken', recaptchaToken)
+          return async ({ update }) => {
+            return update({ reset: false })
+          }
         }}
       >
         <Input
@@ -90,9 +84,6 @@
           name="confirmPassword"
           type="password"
         />
-
-        <input type="hidden" name="recaptchaResponse" bind:value={recaptchaToken} />
-
         <div>
           <button
             type="submit"

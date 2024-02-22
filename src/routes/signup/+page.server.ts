@@ -1,15 +1,14 @@
 import { sendVerifyUserEmail } from '$lib/email/mailer'
 import { createUser, createUserSessionAndCookie } from '$lib/server/entities/user'
-import type { Actions } from './$types'
-import { z, ZodError } from 'zod'
-import { fail, redirect } from '@sveltejs/kit'
+import { verifyRecaptcha } from '$lib/utils/recaptcha.server'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
-import { recaptchaResponse } from '$lib/utils/recaptcha'
+import { fail, redirect } from '@sveltejs/kit'
+import { z, ZodError } from 'zod'
+import type { Actions } from './$types'
 
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
     const fields = Object.fromEntries(await request.formData())
-    let recapatchaVerification
 
     try {
       const schema = z
@@ -18,7 +17,7 @@ export const actions: Actions = {
           email: z.string().email().toLowerCase(),
           password: z.string().min(6),
           confirmPassword: z.string().min(6),
-          recaptchaResponse: z.string(),
+          recaptchaToken: z.string().min(1),
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: "Passwords don't match",
@@ -26,22 +25,18 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      recapatchaVerification = await recaptchaResponse(schema.recaptchaResponse)
+      await verifyRecaptcha(schema.recaptchaToken)
 
-      if (recapatchaVerification) {
-        const user = await createUser(schema.name, schema.email, schema.password)
+      const user = await createUser(schema.name, schema.email, schema.password)
 
-        await createUserSessionAndCookie(user.id, cookies)
-        if (user.password?.verificationToken) {
-          await sendVerifyUserEmail(user, url.origin, user.password.verificationToken)
-        } else {
-          throw new Error('User verification token not found')
-        }
+      await createUserSessionAndCookie(user.id, cookies)
+      if (user.password?.verificationToken) {
+        await sendVerifyUserEmail(user, url.origin, user.password.verificationToken)
       } else {
-        return {
-          status: 400,
-          body: { success: false, message: 'Verification failed' },
-        }
+        return fail(500, {
+          fields,
+          error: 'User verification token not found',
+        })
       }
     } catch (error) {
       if (error instanceof ZodError) {
