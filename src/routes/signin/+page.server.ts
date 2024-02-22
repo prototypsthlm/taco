@@ -11,7 +11,6 @@ import type { Actions } from './$types'
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
     const fields = Object.fromEntries(await request.formData())
-    console.log('fields', fields)
     try {
       const schema = await z
         .object({
