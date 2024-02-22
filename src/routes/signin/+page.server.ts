@@ -6,16 +6,20 @@ import {
 import { fail, redirect } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
+import { recaptchaResponse } from '$lib/utils/recaptcha'
 
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
     const fields = Object.fromEntries(await request.formData())
+    let recapatchaVerification
+
     try {
       const schema = await z
         .object({
           email: z.string().email(),
           password: z.string().min(1),
           remember: z.preprocess((value) => value === 'on', z.boolean()),
+          recaptchaResponse: z.string(),
         })
         .refine(async (data) => doesCredentialsMatch(data.email, data.password), {
           message: 'Wrong credentials',
@@ -23,16 +27,19 @@ export const actions: Actions = {
         })
         .parseAsync(fields)
 
-      const user = await getUserByEmail(schema.email)
+      recapatchaVerification = await recaptchaResponse(schema.recaptchaResponse)
+      if (recapatchaVerification) {
+        const user = await getUserByEmail(schema.email)
 
-      if (!user) {
-        return fail(401, {
-          fields,
-          error: 'There is no user with that email address',
-        })
+        if (!user) {
+          return fail(401, {
+            fields,
+            error: 'There is no user with that email address',
+          })
+        }
+
+        await createUserSessionAndCookie(user.id, cookies, schema.remember)
       }
-
-      await createUserSessionAndCookie(user.id, cookies, schema.remember)
     } catch (error) {
       if (error instanceof ZodError) {
         const errors = error.flatten().fieldErrors
