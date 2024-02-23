@@ -9,20 +9,15 @@
     ChevronDownIcon,
     ChevronUpIcon,
   } from '@babeard/svelte-heroicons/solid'
-
   import { categorizeDate } from '$lib/utils/time'
-  import { onMount } from 'svelte'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
 
   type ChatObject = {
-    [key: string]: any[]
+    chats: any[]
+    key: string
     label: string
     isOpen: boolean
-  }
-
-  type KeyObject = {
-    [key: string | number]: boolean
   }
 
   $: chats = [
@@ -32,52 +27,21 @@
     ...(user.activeUserTeam?.chats || []),
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
 
-  //BEFORE: {today:[],yesterday:[]...}
-  //Should return a list of objects like so: [{today:[chat1,chat2,chat3],label:Today, isOpen:true},{...}]
   $: chatsGroupedByTime = chats?.reduce((chatObjects: ChatObject[], chat) => {
-    const category = categorizeDate(chat.updatedAt).category
-    const label = categorizeDate(chat.updatedAt).label
-    const isOpen = categorizeDate(chat.updatedAt).isOpen
-    // Check if an object with the same category already exists in chatObjects
-    const found = chatObjects.find((object) => object.label === 'today')
-    if (found) {
-      chatObjects[label] = label
+    const { key, label, isOpen } = categorizeDate(chat.updatedAt)
+    const foundObject = chatObjects.find((obj) => obj.key === key)
+    if (foundObject != undefined) {
+      foundObject.chats.push(chat)
+    } else {
+      chatObjects.push({
+        key: key,
+        label: label,
+        isOpen: isOpen,
+        chats: [chat],
+      })
     }
     return chatObjects
-    //where category matches in chatData:
-    //push chat there
-    //return chatData
   }, [])
-
-  onMount(() => {
-    console.log('chatObjects', chatsGroupedByTime)
-  })
-
-  const getTitle = (interval: any) => {
-    const titleMap: { [key: string]: string } = {
-      today: 'Today',
-      yesterday: 'Yesterday',
-      previousSevenDays: 'Previous 7 Days',
-      lastMonth: 'Previous 30 Days',
-    }
-    return typeof interval === 'number' ? interval : titleMap[interval]
-  }
-
-  $: getCurrentCategoryKeys = () => {
-    const keys = Object.keys(chatsGroupedByTime)
-    const keysObject: KeyObject = keys.reduce((keysObjectAcc, key) => {
-      keysObjectAcc[key] = ['today', 'yesterday', 'previousSevenDays'].includes(key)
-      return keysObjectAcc
-    }, {} as KeyObject)
-    return keysObject
-  }
-
-  $: currentCategoryState = getCurrentCategoryKeys()
-
-  function toggleCategoryState(interval: any) {
-    currentCategoryState[interval] = !currentCategoryState[interval]
-    return currentCategoryState
-  }
 </script>
 
 <aside class="flex flex-col grow overflow-hidden h-full">
@@ -103,26 +67,26 @@
       </a>
       {#if chats.length}
         <ul class="overflow-auto grow flex flex-col gap-2 pt-2">
-          {#each Object.entries(chatsGroupedByTime) as [interval, chats]}
-            {#if chats.length > 0}
+          {#each chatsGroupedByTime as chatGroup}
+            {#if chatGroup.chats.length > 0}
               <div class="flex relative items-center">
-                <p class="flex-none text-xs text-gray-600">{getTitle(interval)}</p>
+                <p class="flex-none text-xs text-gray-600">{chatGroup.label}</p>
                 <div class="right-0 absolute">
-                  {#if currentCategoryState[interval]}
+                  {#if chatGroup.isOpen}
                     <ChevronUpIcon
                       class="h-3 w-3 text-white"
-                      on:click={() => toggleCategoryState(interval)}
+                      on:click={() => (chatGroup.isOpen = !chatGroup.isOpen)}
                     />
                   {:else}
                     <ChevronDownIcon
                       class="h-3 w-3 text-white"
-                      on:click={() => toggleCategoryState(interval)}
+                      on:click={() => (chatGroup.isOpen = !chatGroup.isOpen)}
                     />
                   {/if}
                 </div>
               </div>
-              {#each chats as chat}
-                <div class={currentCategoryState[interval] ? '' : 'hidden'}>
+              {#each chatGroup.chats as chat}
+                <div class={chatGroup.isOpen ? '' : 'hidden'}>
                   <ChatLink {chat} {user} />
                 </div>
               {/each}
