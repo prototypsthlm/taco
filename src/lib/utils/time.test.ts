@@ -33,4 +33,5 @@ describe(categorizeDate, () => {
     it('returns "futureDate" ', () => {
       expect(categorizeDate(twoYearsAhead)).toBe('futureDate')
     })
+
 })
