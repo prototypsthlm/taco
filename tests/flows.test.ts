@@ -3,9 +3,10 @@ import { faker } from '@faker-js/faker'
 import { cleanDatabase } from '../prisma/helpers'
 import { PrismaClient, Role } from '@prisma/client'
 import { encrypt } from '../src/lib/server/utils/crypto'
+import pkg from 'bcryptjs'
+
 const { hashSync } = pkg
 const prisma = new PrismaClient()
-import pkg from 'bcryptjs'
 
 type Team = {
   id: number
@@ -15,12 +16,10 @@ type Team = {
   updatedAt: Date
 }
 
-//create the team before the user and user before chat
-
-async function createTeam() {
+async function createTeam(name: string) {
   return await prisma.team.create({
     data: {
-      name: 'Test Team',
+      name: name,
       openAiApiKey:
         process.env.OPENAI_API_KEY && process.env.SECRET_KEY
           ? encrypt(process.env.OPENAI_API_KEY, process.env.SECRET_KEY)
@@ -52,6 +51,15 @@ async function createUser(team: Team) {
     },
   })
 }
+
+export const getTeamByName = async (name: string) => {
+  return prisma.team.findUnique({
+    where: {
+      name,
+    },
+  })
+}
+
 /* 
 async function createChat() {
   await prisma.chat.create({
@@ -101,7 +109,7 @@ test.describe('app flow tests', () => {
     await expect(page).toHaveURL('/app/settings/teams')
   }),
     test('login flow', async ({ page }) => {
-      let team = await createTeam()
+      let team = await createTeam('Test Team')
       let user = await createUser(team)
 
       await page.goto('/')
@@ -115,5 +123,40 @@ test.describe('app flow tests', () => {
       await page.waitForURL('/app/settings/teams')
 
       await expect(page).toHaveURL('/app/settings/teams')
+    }),
+    test('create a team', async ({ page }) => {
+      let team = await createTeam('Test Team')
+      let user = await createUser(team)
+      let teamFromDb
+
+      //log in
+      await page.goto('/')
+      await page.getByText('Sign in').click()
+      await expect(page).toHaveURL('/signin')
+
+      await page.getByLabel('Email').fill(user.email)
+      await page.getByLabel('Password', { exact: true }).fill('password')
+      await page.getByRole('button').click()
+
+      await page.waitForURL('/app/settings/teams')
+
+      await expect(page).toHaveURL('/app/settings/teams')
+
+      //close popup
+      await page.getByRole('button', { name: /Close/i }).click()
+
+      //create new team
+      await page.getByText('New Team').click()
+      await expect(page).toHaveURL('/app/settings/teams/new')
+
+      await page.getByLabel('Name*').fill('Test Team 2')
+      await page.getByLabel('OpenAI API Key*').fill(process.env.OPENAI_API_KEY || '')
+      await page.getByRole('button').click()
+
+      await page.waitForTimeout(1000)
+      teamFromDb = await getTeamByName('Test Team 2')
+
+      await page.waitForURL(`app/settings/teams/${teamFromDb?.id}`)
+      await expect(page).toHaveURL(`app/settings/teams/${teamFromDb?.id}`)
     })
 })
