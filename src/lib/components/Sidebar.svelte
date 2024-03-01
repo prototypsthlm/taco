@@ -3,13 +3,22 @@
   import Gravatar from '$lib/components/Gravatar.svelte'
   import type { UserWithUserTeamsActiveTeamAndChats } from '$lib/server/entities/user'
   import { isSidebarOpen } from '$lib/stores/general'
-  import { ChevronRightIcon, PlusIcon } from '@babeard/svelte-heroicons/solid'
+  import {
+    ChevronRightIcon,
+    PlusIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+  } from '@babeard/svelte-heroicons/solid'
+
   import { categorizeDate } from '$lib/utils/time'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
 
-  type ChatLists = {
-    [key: string | number]: any[]
+  type ChatObject = {
+    chats: any[]
+    key: string
+    label: string
+    isOpen: boolean
   }
 
   $: chats = [
@@ -19,24 +28,21 @@
     ...(user.activeUserTeam?.chats || []),
   ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
 
-  $: chatsGroupedByTime = chats?.reduce((chatLists: ChatLists, chat) => {
-    const category = categorizeDate(chat.updatedAt)
-    if (!chatLists[category]) {
-      chatLists[category] = []
+  $: chatsGroupedByTime = chats?.reduce((chatObjects: ChatObject[], chat) => {
+    const { key, label, isOpen } = categorizeDate(chat.updatedAt)
+    const foundObject = chatObjects.find((obj) => obj.key === key)
+    if (foundObject) {
+      foundObject.chats.push(chat)
+    } else {
+      chatObjects.push({
+        key: key,
+        label: label,
+        isOpen: isOpen,
+        chats: [chat],
+      })
     }
-    chatLists[category].push(chat)
-    return chatLists
-  }, {})
-
-  const getTitle = (interval: any) => {
-    const titleMap: { [key: string]: string } = {
-      today: 'Today',
-      yesterday: 'Yesterday',
-      previousSevenDays: 'Previous 7 Days',
-      lastMonth: 'Previous 30 Days',
-    }
-    return typeof interval === 'number' ? interval : titleMap[interval]
-  }
+    return chatObjects
+  }, [])
 </script>
 
 <aside class="flex flex-col grow overflow-hidden h-full">
@@ -62,11 +68,28 @@
       </a>
       {#if chats.length}
         <ul class="overflow-auto grow flex flex-col gap-2 pt-2">
-          {#each Object.entries(chatsGroupedByTime) as [interval, chats]}
-            {#if chats.length > 0}
-              <p class="flex-none text-xs text-gray-600">{getTitle(interval)}</p>
-              {#each chats as chat}
-                <ChatLink {chat} {user} />
+          {#each chatsGroupedByTime as chatGroup}
+            {#if chatGroup.chats.length > 0}
+              <div class="flex relative items-center">
+                <p class="flex-none text-xs text-gray-600">{chatGroup.label}</p>
+                <div class="right-0 absolute">
+                  {#if chatGroup.isOpen}
+                    <ChevronUpIcon
+                      class="h-3 w-3 text-white"
+                      on:click={() => (chatGroup.isOpen = !chatGroup.isOpen)}
+                    />
+                  {:else}
+                    <ChevronDownIcon
+                      class="h-3 w-3 text-white"
+                      on:click={() => (chatGroup.isOpen = !chatGroup.isOpen)}
+                    />
+                  {/if}
+                </div>
+              </div>
+              {#each chatGroup.chats as chat}
+                <div class={chatGroup.isOpen ? '' : 'hidden'}>
+                  <ChatLink {chat} {user} />
+                </div>
               {/each}
             {/if}
           {/each}
