@@ -31,7 +31,7 @@
   $: chatsGroupedByTime = chats?.reduce((chatObjects: ChatObject[], chat) => {
     const { key, label, isOpen } = categorizeDate(chat.updatedAt)
     const foundObject = chatObjects.find((obj) => obj.key === key)
-    if (foundObject != undefined) {
+    if (foundObject) {
       foundObject.chats.push(chat)
     } else {
       chatObjects.push({

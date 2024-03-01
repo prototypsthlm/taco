@@ -53,7 +53,7 @@ export const categorizeDate = (date: Date): { key: string; label: string; isOpen
     return { key: 'lastMonth', label: 'Previous 30 Days', isOpen: true }
   } else if (date.getFullYear() <= currentYear) {
     const year = date.getFullYear().toString()
-    return { key: year, label: year, isOpen: true }
+    return { key: year, label: year, isOpen: false }
   } else {
     return { key: 'futureDate', label: 'Future Date', isOpen: false }
   }

@@ -13,6 +13,8 @@ twoYearsAgo.setFullYear(currentDate.getFullYear() - 2)
 const twoYearsAhead = new Date(currentDate)
 twoYearsAhead.setFullYear(currentDate.getFullYear() + 2)
 
+const twoYearsAgoYear = twoYearsAgo.getFullYear().toString()
+
 describe(isLastYear, () => {
   it('returns true for a date from the previous year', () => {
     expect(isLastYear(dateFromLastYear)).toBe(true)
@@ -25,13 +27,24 @@ describe(isLastYear, () => {
 
 describe(categorizeDate, () => {
   it('returns the year two years ago', () => {
-    expect(categorizeDate(twoYearsAgo)).toBe(2022)
+    expect(categorizeDate(twoYearsAgo)).toMatchObject({
+      key: twoYearsAgoYear,
+      label: twoYearsAgoYear,
+      isOpen: false,
+    })
   }),
     it('returns "today" ', () => {
-      expect(categorizeDate(currentDate)).toBe('today')
+      expect(categorizeDate(currentDate)).toMatchObject({
+        key: 'today',
+        label: 'Today',
+        isOpen: true,
+      })
     }),
     it('returns "futureDate" ', () => {
-      expect(categorizeDate(twoYearsAhead)).toBe('futureDate')
+      expect(categorizeDate(twoYearsAhead)).toMatchObject({
+        key: 'futureDate',
+        label: 'Future Date',
+        isOpen: false,
+      })
     })
-
 })
