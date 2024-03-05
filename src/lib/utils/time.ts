@@ -37,7 +37,6 @@ export const timeSince = (date: Date) => {
 }
 
 export const categorizeDate = (date: Date): string | number => {
-  const now = new Date()
   if (isToday(date)) {
     return 'today'
   } else if (isYesterday(date)) {
