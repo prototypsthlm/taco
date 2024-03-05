@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@babeard/svelte-heroicons": "^2.0.0-rc.0",
-    "@faker-js/faker": "^8.1.0",
     "@magidoc/plugin-svelte-marked": "^4.1.2",
     "@playwright/test": "^1.41.2",
     "@prisma/client": "^5.4.2",
@@ -66,8 +65,8 @@
     "svelte-check": "^3.0.1",
     "tailwindcss": "^3.3.2",
     "tiktoken": "^1.0.10",
-    "ts-node": "^10.9.1",
     "tslib": "^2.4.1",
+    "tsx": "^4.7.0",
     "typescript": "^5.1.6",
     "vite": "^4.5.2",
     "vitest": "^0.32.2",
@@ -75,5 +74,8 @@
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.0"
   }
 }

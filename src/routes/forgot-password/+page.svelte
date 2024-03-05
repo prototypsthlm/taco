@@ -4,12 +4,17 @@
   import Input from '$lib/components/Input.svelte'
   import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
   import type { ActionData } from './$types'
+  import { PUBLIC_RECAPTCHA_SITE_KEY } from '$env/static/public'
+  import { executeRecaptcha } from '$lib/utils/recaptcha.client'
 
   export let form: ActionData
 </script>
 
 <svelte:head>
   <title>Forgot Password</title>
+  <script
+    src={`https://www.google.com/recaptcha/api.js?render=${PUBLIC_RECAPTCHA_SITE_KEY}`}
+  ></script>
 </svelte:head>
 
 <div
@@ -37,8 +42,12 @@
         class="space-y-6 mt-4"
         method="POST"
         novalidate
-        use:enhance={() => {
-          return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
+        use:enhance={async ({ formData }) => {
+          const recaptchaToken = await executeRecaptcha(window.grecaptcha)
+          formData.append('recaptchaToken', recaptchaToken)
+          return async ({ update }) => {
+            return update({ reset: false })
+          }
         }}
       >
         <Input

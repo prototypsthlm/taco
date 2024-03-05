@@ -25,14 +25,17 @@ jobs:
           --health-retries 5
 
     env:
-      POSTMARK_API_KEY: SECRET
+      POSTMARK_API_KEY: ${{ secrets.POSTMARK_API_KEY }}
       PUBLIC_SITE_NAME: TACO [TEST]
       EMAIL_SENDER_SIGNATURE: test@tacoai.app
-      PUBLIC_SENTRY_DSN: SECRET
+      PUBLIC_SENTRY_DSN: ${{ secrets.PUBLIC_SENTRY_DSN }}
       PUBLIC_SENTRY_ENV: test
       PUBLIC_SITE_URL: http://localhost:5173/
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/db
       NODE_ENV: test
+      PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.PUBLIC_RECAPTCHA_SITE_KEY }}
+      RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
+
 
     steps:
       - name: Checkout repository
@@ -53,11 +56,4 @@ jobs:
         run: npx prisma migrate deploy
 
       - name: Run tests
-        run: NODE_ENV=test npx playwright test
-
-      - uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+        run: npm test
