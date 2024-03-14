@@ -49,6 +49,17 @@
         class="dark col-span-full"
         placeholder=""
       />
+
+      <Input
+        value={form?.fields?.ollamaBaseUrl}
+        errors={form?.errors?.ollamaBaseUrl}
+        label="Ollama Base URL"
+        id="ollamaBaseUrl"
+        name="ollamaBaseUrl"
+        type="text"
+        class="dark col-span-full"
+        placeholder=""
+      />
     </div>
 
     <div class="mt-8 flex">

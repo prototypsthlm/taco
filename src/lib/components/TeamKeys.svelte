@@ -22,6 +22,14 @@
   >
     <Input
       class="dark col-span-full"
+      name="name"
+      placeholder="Name"
+      disabled={userTeam.role === 'MEMBER'}
+      value={form?.fields?.name ?? team.name}
+      errors={form?.errors?.name}
+    />
+    <Input
+      class="dark col-span-full"
       name="openAiApiKey"
       placeholder="OpenAI API Key"
       disabled={userTeam.role === 'MEMBER'}
@@ -30,11 +38,11 @@
     />
     <Input
       class="dark col-span-full"
-      name="name"
-      placeholder="Name"
+      name="ollamaBaseUrl"
+      placeholder="Ollama Base URL"
       disabled={userTeam.role === 'MEMBER'}
-      value={form?.fields?.name ?? team.name}
-      errors={form?.errors?.name}
+      value={form?.fields?.ollamaBaseUrl ?? team.ollamaBaseUrl}
+      errors={form?.errors?.ollamaBaseUrl}
     />
   </InputGroup>
 </form>

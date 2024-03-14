@@ -62,8 +62,9 @@ model UserSession {
 model Team {
   id Int @id @default(autoincrement())
 
-  name         String  @unique
-  openAiApiKey String?
+  name          String  @unique
+  openAiApiKey  String?
+  ollamaBaseUrl String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
