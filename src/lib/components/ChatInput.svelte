@@ -89,6 +89,7 @@
 
           {#if !loading}
             <button
+              name="send"
               on:click={dispatchMessage}
               disabled={loading}
               class="p-3 pr-14 w-12 rounded-r-xl bg-neutral-500 group"

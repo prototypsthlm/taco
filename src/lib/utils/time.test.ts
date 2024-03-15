@@ -8,6 +8,7 @@ const dateFromLastYear = new Date(
   currentDate.getDate()
 )
 const twoYearsAgo = new Date(currentDate)
+
 twoYearsAgo.setFullYear(currentDate.getFullYear() - 2)
 
 const twoYearsAhead = new Date(currentDate)
