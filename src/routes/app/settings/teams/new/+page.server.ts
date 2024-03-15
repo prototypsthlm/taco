@@ -13,19 +13,18 @@ export const actions: Actions = {
       const schema = z
         .object({
           name: z.string().min(1),
-          openAiApiKey: z.string().refine(
-            (key) => {
-              // OpenAI API keys typically start with 'sk-' and are 51 characters long
-              return key.startsWith('sk-') && key.length === 51
-            },
-            {
-              message: 'Invalid OpenAI API key format',
-            }
-          ),
-          ollamaBaseUrl: z.string(),
+          openAiApiKey: z.string().optional(),
+          ollamaBaseUrl: z.string().optional(),
+        })
+        .superRefine(({ openAiApiKey, ollamaBaseUrl }, refinementContext) => {
+          if (!openAiApiKey && !ollamaBaseUrl) {
+            return refinementContext.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Please provide an API Key or Ollama Url',
+            })
+          }
         })
         .parse(fields)
-      console.log('URL', schema.ollamaBaseUrl)
       const team = await getTeamByName(schema.name)
 
       if (team) {
@@ -35,7 +34,11 @@ export const actions: Actions = {
         })
       }
 
-      newTeam = await createTeam(schema.name, schema.openAiApiKey, schema.ollamaBaseUrl ?? null)
+      newTeam = await createTeam(
+        schema.name,
+        schema.openAiApiKey ?? null,
+        schema.ollamaBaseUrl ?? null
+      )
       await createUserTeam(locals.currentUser.id, newTeam.id, Role.OWNER)
     } catch (error) {
       if (error instanceof ZodError) {
