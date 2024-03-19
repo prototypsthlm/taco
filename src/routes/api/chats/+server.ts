@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       id: z.union([z.preprocess(Number, z.number()), z.undefined()]),
       role: z.union([z.string(), z.undefined()]),
       question: z.string(),
-      model: z.enum(MODELS.map((x) => x.id) as [string, ...string[]]),
+      model: z.string().min(1),
       temperature: z.number().refine((value) => 0 <= value && value <= 2, {
         message: 'Temperature must be a number between 0 and 2 (inclusive)',
       }),
@@ -87,7 +87,25 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   }
 
   const chatRequest = retryWithExponentialBackoff(async () => {
-    return fetch('https://api.openai.com/v1/chat/completions', {
+    const isOpenAiModel = !!MODELS.find((model) => {
+      return model.id === schema.data.model
+    })
+
+    if (!currentUser.activeUserTeam) {
+      throw error(
+        422,
+        JSON.stringify({
+          title: `User needs an active team`,
+          body: `Please select an active team`,
+        })
+      )
+    }
+
+    const apiUrl = isOpenAiModel
+      ? 'https://api.openai.com'
+      : `${currentUser.activeUserTeam?.team.ollamaBaseUrl}`
+
+    return fetch(`${apiUrl}/v1/chat/completions`, {
       headers: {
         Authorization: `Bearer ${decryptApiKey(openAiApiKey)}`,
         'Content-Type': 'application/json',
@@ -100,16 +118,19 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
   const inputTokenCount = countMessagesTokens(chatRequestBody.messages)
   const newQuestionTokenCount = countTokens(`"user": "${schema.data.question}"`)
   const modelSettings = getModel(schema.data.model)
-  const tokenLimit = modelSettings.maxTokens - modelSettings.outputRoom
 
-  if (inputTokenCount > tokenLimit) {
-    throw error(
-      422,
-      JSON.stringify({
-        title: `Token Limit of Exceeded`,
-        body: `Current messages are ${inputTokenCount} tokens and the limit is ${tokenLimit} tokens. Please reduce the length of your next question (${newQuestionTokenCount} tokens) or remove some previous messages.`,
-      })
-    )
+  if (modelSettings) {
+    const tokenLimit = modelSettings.maxTokens - modelSettings.outputRoom
+
+    if (inputTokenCount > tokenLimit) {
+      throw error(
+        422,
+        JSON.stringify({
+          title: `Token Limit of Exceeded`,
+          body: `Current messages are ${inputTokenCount} tokens and the limit is ${tokenLimit} tokens. Please reduce the length of your next question (${newQuestionTokenCount} tokens) or remove some previous messages.`,
+        })
+      )
+    }
   }
 
   const stream = new ReadableStream({
@@ -123,7 +144,6 @@ export const POST: RequestHandler = async ({ request, fetch, locals: { currentUs
       ) // We save the question (request + response) in the chat.
       const lastMessage = chat.messages[chat.messages.length - 1]
       lastMessage.answer = ''
-
       controller.enqueue(encodeChunkData([JSON.stringify({ state: 'INITIAL', chat })]))
 
       const chatResponse = await chatRequest()

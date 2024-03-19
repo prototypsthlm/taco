@@ -49,14 +49,14 @@ export const getAvailableModels = async (team: Team) => {
   }
   if (team.openAiApiKey) {
     allModelsFromOpenAi = [...allModelsFromOpenAi, ...(await getOpenAiModels(team.openAiApiKey))]
-    MODELS.map(
+    const updatedModels = MODELS.map(
       (x) =>
         ({
           ...x,
           enabled: allModelsFromOpenAi.some((y) => x.id === y.id),
         } as Model)
     )
-    availableModels = MODELS
+    availableModels = updatedModels
   }
   if (team.ollamaBaseUrl) {
     availableModels = [...availableModels, ...(await getOllamaModelsList(team.ollamaBaseUrl))]
@@ -207,8 +207,8 @@ export const MODELS: Model[] = [
   },
 ]
 
-export const getModel = (id?: string): Model => {
-  return MODELS.find((x) => x.id === id) || MODELS[0]
+export const getModel = (id?: string): Model | undefined => {
+  return MODELS.find((x) => x.id === id)
 }
 
 export const countMessagesTokens = (messages: ChatCompletionMessageParam[]) => {
