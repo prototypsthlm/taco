@@ -3,8 +3,6 @@ name: Run Tests
 on:
   push:
     branches: [dev]
-  push:
-    branches: [dev]
   pull_request:
     branches: [dev]
 
@@ -37,7 +35,6 @@ jobs:
       NODE_ENV: test
       PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.PUBLIC_RECAPTCHA_SITE_KEY }}
       RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
-
 
     steps:
       - name: Checkout repository
