@@ -11,8 +11,15 @@ import type {
   ChatCompletionMessageParam,
   ChatCompletion,
 } from 'openai/resources'
+import OpenAI from 'openai'
+import type {
+  ChatCompletionCreateParams,
+  ChatCompletionMessageParam,
+  ChatCompletion,
+} from 'openai/resources'
 
 export const getClient = (encryptedApiKey: string) => {
+  return new OpenAI({
   return new OpenAI({
     apiKey: decryptApiKey(encryptedApiKey),
   })
