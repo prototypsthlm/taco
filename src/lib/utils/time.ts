@@ -36,6 +36,7 @@ export const timeSince = (date: Date) => {
   }
 }
 
+
 export const categorizeDate = (date: Date): { key: string; label: string; isOpen: boolean } => {
   if (isToday(date)) {
     return { key: 'today', label: 'Today', isOpen: true }
@@ -45,6 +46,7 @@ export const categorizeDate = (date: Date): { key: string; label: string; isOpen
     millisecondsPerDay < millisecondsSince(date) &&
     millisecondsSince(date) <= previousSevenDays
   ) {
+
     return { key: 'previousSevenDays', label: 'Previous 7 Days', isOpen: true }
   } else if (
     previousSevenDays < millisecondsSince(date) &&
