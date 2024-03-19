@@ -9,8 +9,6 @@
     ChevronDownIcon,
     ChevronUpIcon,
   } from '@babeard/svelte-heroicons/solid'
-
-
   import { categorizeDate } from '$lib/utils/time'
 
   export let user: UserWithUserTeamsActiveTeamAndChats
