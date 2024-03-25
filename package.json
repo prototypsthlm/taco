@@ -73,7 +73,6 @@
     "zod": "^3.21.4"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.0"
