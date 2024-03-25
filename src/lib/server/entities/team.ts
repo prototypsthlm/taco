@@ -2,7 +2,12 @@ import { prisma } from '$lib/server/prisma'
 import { encrypt } from '$lib/server/utils/crypto'
 import type { Prisma } from '@prisma/client'
 
-export const updateTeam = async (id: number, name: string, openAiApiKey: string | null) => {
+export const updateTeam = async (
+  id: number,
+  name: string,
+  openAiApiKey?: string,
+  ollamaBaseUrl?: string
+) => {
   if (!process.env.SECRET_KEY) {
     throw new Error('You must have SECRET_KEY set in your env.')
   }
@@ -14,6 +19,7 @@ export const updateTeam = async (id: number, name: string, openAiApiKey: string 
     data: {
       name,
       openAiApiKey: apiKey,
+      ollamaBaseUrl: ollamaBaseUrl,
     },
   })
 }
@@ -42,7 +48,7 @@ export const getTeamByIdWithMembers = async (id: number) =>
     },
   })
 
-export const createTeam = async (name: string, openAiApiKey: string | null) => {
+export const createTeam = async (name: string, openAiApiKey?: string, ollamaBaseUrl?: string) => {
   if (!process.env.SECRET_KEY) {
     throw new Error('You must have SECRET_KEY set in your env.')
   }
@@ -53,6 +59,7 @@ export const createTeam = async (name: string, openAiApiKey: string | null) => {
     data: {
       name,
       openAiApiKey: apiKey,
+      ollamaBaseUrl: ollamaBaseUrl,
     },
   })
 }

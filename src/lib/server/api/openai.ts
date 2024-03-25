@@ -17,21 +17,51 @@ export const getClient = (encryptedApiKey: string) => {
     apiKey: decryptApiKey(encryptedApiKey),
   })
 }
+const getOpenAiModels = async (openAiApiKey: string): Promise<any[]> => {
+  const client = getClient(openAiApiKey)
+  const res = await client.models.list()
+  return res.data
+}
+
+export const getOllamaModelsList = async (ollamaBaseUrl: string) => {
+  const res = await fetch(`${ollamaBaseUrl}/api/tags`)
+  const data = await res.json()
+  let modelList: Model[] = []
+  data.models.map((model: any) => {
+    modelList.push({
+      id: model.name,
+      input: 0.001,
+      output: 0.002,
+      maxTokens: 4_096,
+      outputRoom: 500,
+      label: model.name,
+      enabled: true,
+    })
+  })
+  return modelList
+}
 
 export const getAvailableModels = async (team: Team) => {
-  if (!team.openAiApiKey) {
+  let availableModels: Model[] = []
+  let allModelsFromOpenAi: any[] = []
+  if (!team.openAiApiKey && !team.ollamaBaseUrl) {
     throw new Error('API Error: Open AI API key is not set for team')
   }
-  const client = getClient(team.openAiApiKey)
-  const res = await client.models.list()
-
-  return MODELS.map(
-    (x) =>
-      ({
-        ...x,
-        enabled: res.data.some((y) => x.id === y.id),
-      } as Model)
-  )
+  if (team.openAiApiKey) {
+    allModelsFromOpenAi = [...allModelsFromOpenAi, ...(await getOpenAiModels(team.openAiApiKey))]
+    const updatedModels = MODELS.map(
+      (x) =>
+        ({
+          ...x,
+          enabled: allModelsFromOpenAi.some((y) => x.id === y.id),
+        } as Model)
+    )
+    availableModels = updatedModels
+  }
+  if (team.ollamaBaseUrl) {
+    availableModels = [...availableModels, ...(await getOllamaModelsList(team.ollamaBaseUrl))]
+  }
+  return availableModels
 }
 
 export const generateChatName = async (
@@ -177,8 +207,8 @@ export const MODELS: Model[] = [
   },
 ]
 
-export const getModel = (id?: string): Model => {
-  return MODELS.find((x) => x.id === id) || MODELS[0]
+export const getModel = (id?: string): Model | undefined => {
+  return MODELS.find((x) => x.id === id)
 }
 
 export const countMessagesTokens = (messages: ChatCompletionMessageParam[]) => {

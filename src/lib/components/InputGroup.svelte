@@ -30,6 +30,9 @@
         type={(form?.error && 'error') || (form?.success && 'success')}
         title={form?.error || form?.success}
       />
+      {#each form?.formErrors || [] as error}
+        <Alert type="error" title={error} />
+      {/each}
     </div>
   </div>
 </div>

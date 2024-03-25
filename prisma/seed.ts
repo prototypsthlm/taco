@@ -1,12 +1,11 @@
 import { faker } from '@faker-js/faker'
 import { PrismaClient, Role } from '@prisma/client'
-import pkg from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 import { encrypt } from '../src/lib/server/utils/crypto'
 import { Models } from '../src/lib/types/models'
 import { cleanDatabase } from './helpers'
 
 const prisma = new PrismaClient()
-const { hashSync } = pkg
 
 async function seed() {
   if (process.env.DEPLOYMENT_ENV !== 'staging' && process.env.DEPLOYMENT_ENV !== 'development') {
