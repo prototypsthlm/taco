@@ -17,7 +17,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: db
         ports:
-          - 5432:5432
+          - 0432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -31,7 +31,7 @@ jobs:
       PUBLIC_SENTRY_DSN: ${{ secrets.PUBLIC_SENTRY_DSN }}
       PUBLIC_SENTRY_ENV: test
       PUBLIC_SITE_URL: http://localhost:5173/
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/db
+      DATABASE_URL: postgresql://postgres:postgres@localhost:0432/db
       NODE_ENV: test
       PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.PUBLIC_RECAPTCHA_SITE_KEY }}
       RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
@@ -56,4 +56,4 @@ jobs:
         run: npx prisma migrate deploy
 
       - name: Run tests
-        run: npm test
+        run: npx playwright test

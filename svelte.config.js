@@ -13,7 +13,7 @@ export default {
     // See https://kit.svelte.dev/docs/adapters for more information about adapters.
     adapter: adapter(),
     csrf: {
-      checkOrigin: process.env.NODE_ENV !== 'test',
+      checkOrigin: false,
     },
   },
 }
