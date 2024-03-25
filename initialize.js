@@ -1,6 +1,29 @@
 import * as crypto from 'crypto'
 import * as fs from 'fs'
 
+// Function to generate a random secret key using crypto module
+const generateSecretKey = () => {
+  const randomBytes = crypto.randomBytes(32)
+  return randomBytes.toString('hex')
+}
+
+// Function to update the .env file with a new SECRET_KEY
+const updateEnvFile = (filePath, envContents) => {
+  // Generate a new secret key
+  const newSecretKey = generateSecretKey()
+
+  // Add or update the SECRET_KEY entry in the contents
+  let updatedContents = ''
+  if (envContents.includes('SECRET_KEY=')) {
+    updatedContents = envContents.replace(/(SECRET_KEY=).*/, `$1${newSecretKey}`)
+  } else {
+    updatedContents = `${envContents.trim()}\nSECRET_KEY=${newSecretKey}`
+  }
+
+  // Write the updated .env file
+  fs.writeFileSync(filePath, updatedContents)
+}
+
 // Check if the script is running in a local environment
 if (process.env.NODE_ENV !== 'development') {
   console.log('Script can only be run in a local environment.')
@@ -34,26 +57,3 @@ if (fs.existsSync(envPath)) {
 }
 
 console.log('.env file updated successfully with a new SECRET_KEY.')
-
-// Function to update the .env file with a new SECRET_KEY
-const updateEnvFile = (filePath, envContents) => {
-  // Generate a new secret key
-  const newSecretKey = generateSecretKey()
-
-  // Add or update the SECRET_KEY entry in the contents
-  let updatedContents = ''
-  if (envContents.includes('SECRET_KEY=')) {
-    updatedContents = envContents.replace(/(SECRET_KEY=).*/, `$1${newSecretKey}`)
-  } else {
-    updatedContents = `${envContents.trim()}\nSECRET_KEY=${newSecretKey}`
-  }
-
-  // Write the updated .env file
-  fs.writeFileSync(filePath, updatedContents)
-}
-
-// Function to generate a random secret key using crypto module
-const generateSecretKey = () => {
-  const randomBytes = crypto.randomBytes(32)
-  return randomBytes.toString('hex')
-}
