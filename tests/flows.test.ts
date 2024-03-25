@@ -63,7 +63,9 @@ test.describe('app flow tests', () => {
     const password = faker.internet.password()
 
     await page.goto('/')
+    await page.waitForURL('/')
     await page.getByText('Register').click()
+    await page.waitForURL('/signup')
     await expect(page).toHaveURL('/signup')
 
     await page.getByLabel('Name').fill(name)
@@ -71,7 +73,7 @@ test.describe('app flow tests', () => {
     await page.getByLabel('Password', { exact: true }).fill(password)
     await page.getByLabel('Confirm Password').fill(password)
 
-    await page.getByText('Sign up').click()
+    await page.getByRole('button', { name: 'Sign up' }).click()
 
     await page.waitForURL('/app/settings/teams')
 
@@ -83,12 +85,13 @@ test.describe('app flow tests', () => {
     const user = await createUser(team)
 
     await page.goto('/')
+    await page.waitForURL('/')
     await page.getByText('Sign in').click()
     await expect(page).toHaveURL('/signin')
 
     await page.getByLabel('Email').fill(user.email)
     await page.getByLabel('Password', { exact: true }).fill('password')
-    await page.getByRole('button').click()
+    await page.getByRole('button', { name: 'Sign in' }).click()
 
     await page.waitForURL('/app/settings/teams')
 
@@ -101,12 +104,13 @@ test.describe('app flow tests', () => {
 
     //log in
     await page.goto('/')
+    await page.waitForURL('/')
     await page.getByText('Sign in').click()
     await expect(page).toHaveURL('/signin')
 
     await page.getByLabel('Email').fill(user.email)
     await page.getByLabel('Password', { exact: true }).fill('password')
-    await page.getByRole('button').click()
+    await page.getByRole('button', { name: 'Sign in' }).click()
 
     await page.waitForURL('/app/settings/teams')
 
@@ -117,11 +121,12 @@ test.describe('app flow tests', () => {
 
     //create new team
     await page.getByText('New Team').click()
+    await page.waitForURL('/app/settings/teams/new')
     await expect(page).toHaveURL('/app/settings/teams/new')
 
     await page.getByLabel('Name*').fill('Test Team 2')
     await page.getByLabel('OpenAI API Key*').fill(process.env.OPENAI_API_KEY || '')
-    await page.getByRole('button', { name: /Create/i }).click()
+    await page.getByText('Save').click()
 
     await page.waitForURL(new RegExp('app/settings/teams/\\d+'))
     await expect(page).toHaveURL(new RegExp('app/settings/teams/\\d+'))
@@ -133,12 +138,15 @@ test.describe('app flow tests', () => {
 
     //log in
     await page.goto('/')
+    await page.waitForURL('/')
     await page.getByText('Sign in').click()
+    await page.waitForURL('/signin')
     await expect(page).toHaveURL('/signin')
 
     await page.getByLabel('Email').fill(user.email)
     await page.getByLabel('Password', { exact: true }).fill('password')
-    await page.getByRole('button').click()
+    await page.getByRole('button', { name: 'Sign in' }).click()
+    await page.waitForURL('/app/settings/teams')
 
     await page.waitForURL('/app/settings/teams')
 
