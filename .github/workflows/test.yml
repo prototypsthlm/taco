@@ -35,6 +35,7 @@ jobs:
       NODE_ENV: test
       PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.PUBLIC_RECAPTCHA_SITE_KEY }}
       RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
+      ORIGIN: ${{ secrets.ORIGIN }}
 
     steps:
       - name: Checkout repository

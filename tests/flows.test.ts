@@ -1,9 +1,9 @@
-import { expect, test } from '@playwright/test'
 import { faker } from '@faker-js/faker'
-import { cleanDatabase } from '../prisma/helpers'
+import { expect, test } from '@playwright/test'
 import { PrismaClient, Role } from '@prisma/client'
-import { encrypt } from '../src/lib/server/utils/crypto'
 import pkg from 'bcryptjs'
+import { cleanDatabase } from '../prisma/helpers'
+import { encrypt } from '../src/lib/server/utils/crypto'
 
 const { hashSync } = pkg
 const prisma = new PrismaClient()
@@ -17,7 +17,7 @@ type Team = {
 }
 
 async function createTeam(name: string) {
-  return await prisma.team.create({
+  return prisma.team.create({
     data: {
       name: name,
       openAiApiKey:
@@ -30,7 +30,7 @@ async function createTeam(name: string) {
 
 async function createUser(team: Team) {
   const email = 'user@prototyp.se'
-  return await prisma.user.create({
+  return prisma.user.create({
     data: {
       email,
       name: 'Test1',
@@ -76,82 +76,85 @@ test.describe('app flow tests', () => {
     await page.waitForURL('/app/settings/teams')
 
     await expect(page).toHaveURL('/app/settings/teams')
-  }),
-    test('login flow', async ({ page }) => {
-      let team = await createTeam('Test Team')
-      let user = await createUser(team)
+  })
 
-      await page.goto('/')
-      await page.getByText('Sign in').click()
-      await expect(page).toHaveURL('/signin')
+  test('login flow', async ({ page }) => {
+    const team = await createTeam('Test Team')
+    const user = await createUser(team)
 
-      await page.getByLabel('Email').fill(user.email)
-      await page.getByLabel('Password', { exact: true }).fill('password')
-      await page.getByRole('button').click()
+    await page.goto('/')
+    await page.getByText('Sign in').click()
+    await expect(page).toHaveURL('/signin')
 
-      await page.waitForURL('/app/settings/teams')
+    await page.getByLabel('Email').fill(user.email)
+    await page.getByLabel('Password', { exact: true }).fill('password')
+    await page.getByRole('button').click()
 
-      await expect(page).toHaveURL('/app/settings/teams')
-    }),
-    test('create a team', async ({ page }) => {
-      let team = await createTeam('Test Team')
-      let user = await createUser(team)
+    await page.waitForURL('/app/settings/teams')
 
-      //log in
-      await page.goto('/')
-      await page.getByText('Sign in').click()
-      await expect(page).toHaveURL('/signin')
+    await expect(page).toHaveURL('/app/settings/teams')
+  })
 
-      await page.getByLabel('Email').fill(user.email)
-      await page.getByLabel('Password', { exact: true }).fill('password')
-      await page.getByRole('button').click()
+  test('create a team', async ({ page }) => {
+    const team = await createTeam('Test Team')
+    const user = await createUser(team)
 
-      await page.waitForURL('/app/settings/teams')
+    //log in
+    await page.goto('/')
+    await page.getByText('Sign in').click()
+    await expect(page).toHaveURL('/signin')
 
-      await expect(page).toHaveURL('/app/settings/teams')
+    await page.getByLabel('Email').fill(user.email)
+    await page.getByLabel('Password', { exact: true }).fill('password')
+    await page.getByRole('button').click()
 
-      //close popup
-      await page.getByRole('button', { name: /Close/i }).click()
+    await page.waitForURL('/app/settings/teams')
 
-      //create new team
-      await page.getByText('New Team').click()
-      await expect(page).toHaveURL('/app/settings/teams/new')
+    await expect(page).toHaveURL('/app/settings/teams')
 
-      await page.getByLabel('Name*').fill('Test Team 2')
-      await page.getByLabel('OpenAI API Key*').fill(process.env.OPENAI_API_KEY || '')
-      await page.getByRole('button', { name: /Create/i }).click()
+    //close popup
+    await page.getByRole('button', { name: /Close/i }).click()
 
-      await page.waitForURL(new RegExp('app/settings/teams/\\d+'))
-      await expect(page).toHaveURL(new RegExp('app/settings/teams/\\d+'))
-    }),
-    test('create a chat', async ({ page }) => {
-      let team = await createTeam('Test Team')
-      let user = await createUser(team)
+    //create new team
+    await page.getByText('New Team').click()
+    await expect(page).toHaveURL('/app/settings/teams/new')
 
-      //log in
-      await page.goto('/')
-      await page.getByText('Sign in').click()
-      await expect(page).toHaveURL('/signin')
+    await page.getByLabel('Name*').fill('Test Team 2')
+    await page.getByLabel('OpenAI API Key*').fill(process.env.OPENAI_API_KEY || '')
+    await page.getByRole('button', { name: /Create/i }).click()
 
-      await page.getByLabel('Email').fill(user.email)
-      await page.getByLabel('Password', { exact: true }).fill('password')
-      await page.getByRole('button').click()
+    await page.waitForURL(new RegExp('app/settings/teams/\\d+'))
+    await expect(page).toHaveURL(new RegExp('app/settings/teams/\\d+'))
+  })
 
-      await page.waitForURL('/app/settings/teams')
+  test('create a chat', async ({ page }) => {
+    const team = await createTeam('Test Team')
+    const user = await createUser(team)
 
-      await expect(page).toHaveURL('/app/settings/teams')
-      //select a team
-      await page.getByRole('button', { name: /Select/i }).click()
-      await page.waitForURL('/app')
-      await expect(page).toHaveURL('/app')
+    //log in
+    await page.goto('/')
+    await page.getByText('Sign in').click()
+    await expect(page).toHaveURL('/signin')
 
-      //type
-      await page.getByRole('textbox').fill('Dis a test chat')
-      //send
-      await page.locator('button[name="send"]').click()
+    await page.getByLabel('Email').fill(user.email)
+    await page.getByLabel('Password', { exact: true }).fill('password')
+    await page.getByRole('button').click()
 
-      await page.waitForTimeout(1000)
-      await page.waitForURL(new RegExp('/app/chats/\\d+'))
-      await expect(page).toHaveURL(new RegExp('/app/chats/\\d+'))
-    })
+    await page.waitForURL('/app/settings/teams')
+
+    await expect(page).toHaveURL('/app/settings/teams')
+    //select a team
+    await page.getByRole('button', { name: /Select/i }).click()
+    await page.waitForURL('/app')
+    await expect(page).toHaveURL('/app')
+
+    //type
+    await page.getByRole('textbox').fill('Dis a test chat')
+    //send
+    await page.locator('button[name="send"]').click()
+
+    await page.waitForTimeout(1000)
+    await page.waitForURL(new RegExp('/app/chats/\\d+'))
+    await expect(page).toHaveURL(new RegExp('/app/chats/\\d+'))
+  })
 })
