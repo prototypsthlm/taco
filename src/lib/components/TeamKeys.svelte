@@ -31,7 +31,8 @@
     <Input
       class="dark col-span-full"
       name="openAiApiKey"
-      placeholder="OpenAI API Key"
+      label="OpenAI API Key"
+      placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
       disabled={userTeam.role === 'MEMBER'}
       value={form?.fields?.openAiApiKey ?? team.openAiApiKey}
       errors={form?.errors?.openAiApiKey}
@@ -39,7 +40,8 @@
     <Input
       class="dark col-span-full"
       name="ollamaBaseUrl"
-      placeholder="Ollama Base URL"
+      label="Ollama Base URL"
+      placeholder="https://some-ollama-server.app"
       disabled={userTeam.role === 'MEMBER'}
       value={form?.fields?.ollamaBaseUrl ?? team.ollamaBaseUrl}
       errors={form?.errors?.ollamaBaseUrl}

@@ -5,12 +5,9 @@ import type { Prisma } from '@prisma/client'
 export const updateTeam = async (
   id: number,
   name: string,
-  openAiApiKey: string,
-  ollamaBaseUrl: string | null
+  openAiApiKey?: string,
+  ollamaBaseUrl?: string
 ) => {
-  if (!openAiApiKey && !ollamaBaseUrl) {
-    throw new Error('Please provide an Api Key or Ollama Url')
-  }
   if (!process.env.SECRET_KEY) {
     throw new Error('You must have SECRET_KEY set in your env.')
   }
@@ -51,14 +48,7 @@ export const getTeamByIdWithMembers = async (id: number) =>
     },
   })
 
-export const createTeam = async (
-  name: string,
-  openAiApiKey: string | null,
-  ollamaBaseUrl: string | null
-) => {
-  if (!openAiApiKey && !ollamaBaseUrl) {
-    throw new Error('Please provide an Api Key or Ollama Url')
-  }
+export const createTeam = async (name: string, openAiApiKey?: string, ollamaBaseUrl?: string) => {
   if (!process.env.SECRET_KEY) {
     throw new Error('You must have SECRET_KEY set in your env.')
   }

@@ -13,14 +13,22 @@ export const actions: Actions = {
       const schema = z
         .object({
           name: z.string().min(1),
-          openAiApiKey: z.string().optional(),
-          ollamaBaseUrl: z.string().optional(),
+          openAiApiKey: z
+            .string()
+            .refine((key) => key === '' || (key.startsWith('sk-') && key.length === 51), {
+              message: 'Invalid OpenAI API key format',
+            }),
+          ollamaBaseUrl: z
+            .string()
+            .refine((val) => val === '' || z.string().url().safeParse(val).success, {
+              message: 'Invalid URL format',
+            }),
         })
         .superRefine(({ openAiApiKey, ollamaBaseUrl }, refinementContext) => {
           if (!openAiApiKey && !ollamaBaseUrl) {
-            return refinementContext.addIssue({
+            refinementContext.addIssue({
               code: z.ZodIssueCode.custom,
-              message: 'Please provide an API Key or Ollama Url',
+              message: 'Please provide an API Key or Ollama URL',
             })
           }
         })
@@ -34,19 +42,16 @@ export const actions: Actions = {
         })
       }
 
-      newTeam = await createTeam(
-        schema.name,
-        schema.openAiApiKey ?? null,
-        schema.ollamaBaseUrl ?? null
-      )
+      newTeam = await createTeam(schema.name, schema.openAiApiKey, schema.ollamaBaseUrl)
       await createUserTeam(locals.currentUser.id, newTeam.id, Role.OWNER)
     } catch (error) {
       if (error instanceof ZodError) {
-        const errors = error.flatten().fieldErrors
+        const errors = error.flatten()
 
         return fail(422, {
           fields,
-          errors,
+          errors: errors.fieldErrors,
+          formErrors: errors.formErrors,
         })
       }
 

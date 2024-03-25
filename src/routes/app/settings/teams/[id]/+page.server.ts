@@ -54,16 +54,25 @@ export const actions: Actions = {
       const schema = z
         .object({
           name: z.string().min(1),
-          openAiApiKey: z.string().refine(
-            (key) => {
-              // OpenAI API keys typically start with 'sk-' and are 51 characters long
-              return key.startsWith('sk-') && key.length === 51
-            },
-            {
+          openAiApiKey: z
+            .string()
+            .refine((key) => key === '' || (key.startsWith('sk-') && key.length === 51), {
               message: 'Invalid OpenAI API key format',
-            }
-          ),
-          ollamaBaseUrl: z.string(),
+            }),
+          ollamaBaseUrl: z
+            .string()
+            .refine((val) => val === '' || z.string().url().safeParse(val).success, {
+              message: 'Invalid URL format',
+            }),
+        })
+        .superRefine(({ openAiApiKey, ollamaBaseUrl }, refinementContext) => {
+          if (!openAiApiKey && !ollamaBaseUrl) {
+            refinementContext.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Please provide an API Key or Ollama URL',
+              fatal: true,
+            })
+          }
         })
         .parse(fields)
 
@@ -86,7 +95,7 @@ export const actions: Actions = {
         })
       }
 
-      await updateTeam(teamId, schema.name, schema.openAiApiKey, schema.ollamaBaseUrl ?? null)
+      await updateTeam(teamId, schema.name, schema.openAiApiKey, schema.ollamaBaseUrl)
 
       return {
         keySection: {
@@ -95,12 +104,13 @@ export const actions: Actions = {
       }
     } catch (error) {
       if (error instanceof ZodError) {
-        const errors = error.flatten().fieldErrors
+        const errors = error.flatten()
 
         return fail(422, {
           keySection: {
             fields,
-            errors,
+            errors: errors.fieldErrors,
+            formErrors: errors.formErrors,
           },
         })
       }
