@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+data:
+  NODE_ENV: "development"
+  DEPLOYMENT_ENV: "development"
+  PUBLIC_SITE_NAME: "TACO [LOCAL]"
+  PUBLIC_SITE_URL: "http://localhost:5173" # adjust to the real k8s service URL
+  PUBLIC_RECAPTCHA_SITE_KEY: "6LeoJ20pAAAAAMIcr0BJN8JzhG6_eW6s79YNzSRy"

@@ -15,7 +15,8 @@
     "test": "dotenv -e .env.test -- prisma migrate deploy && npm run test:integration && npm run test:unit",
     "test:integration": "dotenv -e .env.test -- playwright test",
     "test:unit": "vitest",
-    "seed": "prisma db seed"
+    "seed": "prisma db seed",
+    "container": "npx prisma migrate deploy && node server.js"
   },
   "dependencies": {
     "@babeard/svelte-heroicons": "^2.0.0-rc.0",
