@@ -17,7 +17,7 @@
 >
   <InputGroup
     header="Create a new Team"
-    description={`You need an OpenAI API key to create a team. You can get one at <a href="https://platform.openai.com" target="_blank">https://platform.openai.com</a>`}
+    description={`You need an OpenAI API key to create a team. You can get one at <a href="https://platform.openai.com" target="_blank" class="text-blue-500 underline hover:text-blue-700">https://platform.openai.com</a>`}
     {form}
   >
     <Input
