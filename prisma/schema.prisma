@@ -131,6 +131,8 @@ model Message {
 
   author   User @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   authorId Int
+
+  encrypted   Boolean @default(false)
 }
 
 model Invitation {

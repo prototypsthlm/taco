@@ -29,8 +29,8 @@ export const getUserBySessionId = (sessionId: string) =>
     include: {
       activeUserTeam: {
         include: {
-          team: true
-        }
+          team: true,
+        },
       },
     },
   })

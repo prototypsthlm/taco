@@ -7,9 +7,9 @@ import type { Team } from '@prisma/client'
 import * as Sentry from '@sentry/sveltekit'
 import OpenAI from 'openai'
 import type {
+  ChatCompletion,
   ChatCompletionCreateParams,
   ChatCompletionMessageParam,
-  ChatCompletion,
 } from 'openai/resources'
 
 export const getClient = (encryptedApiKey: string) => {
@@ -26,7 +26,7 @@ const getOpenAiModels = async (openAiApiKey: string): Promise<any[]> => {
 export const getOllamaModelsList = async (ollamaBaseUrl: string) => {
   const res = await fetch(`${ollamaBaseUrl}/api/tags`)
   const data = await res.json()
-  let modelList: Model[] = []
+  const modelList: Model[] = []
   data.models.map((model: any) => {
     modelList.push({
       id: model.name,
