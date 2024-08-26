@@ -12,7 +12,7 @@
   }
 </script>
 
-<div class="flex gap-6 items-center">
+<div class="flex gap-6 items-center {$$props.class}">
   <button
     on:click={handleClick}
     type="button"

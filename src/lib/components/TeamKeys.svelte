@@ -43,9 +43,7 @@
         testApiKey = event.detail.target?.value
       }}
     />
-    <div class="col-span-full">
-      <TestApiButton {testApiKey} />
-    </div>
+    <TestApiButton class="col-span-full" {testApiKey} />
     <Input
       class="dark col-span-full"
       name="ollamaBaseUrl"
