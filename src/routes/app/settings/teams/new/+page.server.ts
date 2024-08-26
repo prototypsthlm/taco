@@ -13,11 +13,7 @@ export const actions: Actions = {
       const schema = z
         .object({
           name: z.string().min(1),
-          openAiApiKey: z
-            .string()
-            .refine((key) => key === '' || (key.startsWith('sk-') && key.length === 51), {
-              message: 'Invalid OpenAI API key format',
-            }),
+          openAiApiKey: z.string().optional(),
           ollamaBaseUrl: z
             .string()
             .refine((val) => val === '' || z.string().url().safeParse(val).success, {

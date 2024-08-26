@@ -2,9 +2,11 @@
   import { enhance } from '$app/forms'
   import Input from '$lib/components/Input.svelte'
   import InputGroup from '$lib/components/InputGroup.svelte'
+  import TestApiButton from '$lib/components/TestAPIButton.svelte'
   import type { ActionData } from './$types'
 
   export let form: ActionData
+  let testApiKey: string = ''
 </script>
 
 <form
@@ -40,7 +42,13 @@
       type="text"
       class="dark col-span-full"
       placeholder=""
+      on:input={(event) => {
+        testApiKey = event.detail.target.value
+      }}
     />
+    <div class="col-span-full">
+      <TestApiButton {testApiKey} />
+    </div>
 
     <Input
       value={form?.fields?.ollamaBaseUrl}
