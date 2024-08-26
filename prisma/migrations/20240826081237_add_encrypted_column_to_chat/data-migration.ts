@@ -14,6 +14,7 @@ async function main() {
     })
     for (const chat of unencryptedChats) {
       const key = process.env.SECRET_KEY
+
       if (!key) {
         throw new Error('SECRET_KEY is not set')
       }
@@ -29,6 +30,7 @@ async function main() {
         where: { id: chat.id },
         data: {
           encrypted: true,
+          name: chat.name ? encrypt(chat.name, key) : null,
           messages: {
             updateMany: encryptedMessages.map((message) => ({
               where: { id: message.id },
