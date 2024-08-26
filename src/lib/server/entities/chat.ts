@@ -1,28 +1,67 @@
 import { prisma } from '$lib/server/prisma'
-import { decrypt, encrypt } from '$lib/server/utils/crypto'
-import type { Prisma } from '.prisma/client'
+import { Message, Prisma } from '@prisma/client'
+import { decryptString, encryptString } from '../utils/crypto'
 
-export type ChatWithRelations = Prisma.PromiseReturnType<typeof getChatWithRelationsById>
+export const decryptMessages = (messages: Message[]): Message[] => {
+  try {
+    const decryptedMessages = messages.map((message) => {
+      return {
+        ...message,
+        question: decryptString(message.question),
+        answer: message.answer ? decryptString(message.answer) : null,
+      }
+    })
 
-const encryptMessage = (message: string) => {
-  const secretKey = process.env.SECRET_KEY
-
-  if (!secretKey) {
-    throw new Error('Secret key not found')
+    return decryptedMessages
+  } catch (error) {
+    throw new Error('Error decrypting chat')
   }
-
-  return encrypt(message, secretKey)
 }
 
-const decryptMessage = (message: string) => {
-  const secretKey = process.env.SECRET_KEY
+export const encryptMessages = (messages: Message[]): Message[] => {
+  try {
+    const encryptedMessages = messages.map((message) => {
+      return {
+        ...message,
+        question: encryptString(message.question),
+        answer: message.answer ? encryptString(message.answer) : null,
+      }
+    })
 
-  if (!secretKey) {
-    throw new Error('Secret key not found')
+    return encryptedMessages
+  } catch (error) {
+    throw new Error('Error encrypting chat')
   }
-
-  return decrypt(message, secretKey)
 }
+
+export type ChatWithOwner = Prisma.ChatGetPayload<{
+  include: {
+    owner: {
+      include: {
+        user: true
+        team: true
+      }
+    }
+  }
+}>
+
+export type ChatWithMessages = Prisma.ChatGetPayload<{
+  include: {
+    messages: true
+  }
+}>
+
+export type ChatWithSharedWith = Prisma.ChatGetPayload<{
+  include: {
+    sharedWith: {
+      include: {
+        user: true
+      }
+    }
+  }
+}>
+
+export type ChatWithRelations = ChatWithOwner & ChatWithMessages & ChatWithSharedWith
 
 export const getChatWithRelationsById = async (id: number) => {
   const response = await prisma.chat.findUniqueOrThrow({
@@ -49,23 +88,13 @@ export const getChatWithRelationsById = async (id: number) => {
     },
   })
 
-  const decryptedMessages = response.messages.map((message) => {
-    if (!message.encrypted) {
-      return message
-    }
-    return {
-      ...message,
-      question: decryptMessage(message.question),
-      answer: message.answer ? decryptMessage(message.answer) : null,
-    }
-  })
-
-  const responseWithDecryptedMessages = {
+  const decrypted = {
     ...response,
-    messages: decryptedMessages,
+    name: response.name ? decryptString(response.name) : null,
+    messages: decryptMessages(response.messages),
   }
 
-  return responseWithDecryptedMessages
+  return decrypted
 }
 
 export const createChat = (userTeamId: number, role = 'You are a helpful assistant.') => {
@@ -73,6 +102,7 @@ export const createChat = (userTeamId: number, role = 'You are a helpful assista
     data: {
       ownerId: userTeamId,
       roleContent: role,
+      encrypted: true,
     },
     include: {
       owner: {
@@ -96,22 +126,20 @@ export const createChat = (userTeamId: number, role = 'You are a helpful assista
   })
 }
 
-export const addQuestionToChat = (
+export const addQuestionToChat = async (
   id: number,
   model: string,
   temperature: number,
   question: string,
   userId: number
 ) => {
-  const encryptedQuestion = encryptMessage(question)
+  const encryptedQuestion = encryptString(question)
 
-  return prisma.chat.update({
-    // Filtres:
+  const updateResponse = await prisma.chat.update({
     where: { id },
-    // Given data:
     data: {
-      model, // Save the model in the chat, so we get the last session selected model if connecting from elsewhere
-      temperature: temperature.toString(), // Save the temperature in the chat, so we get the last session selected temperature if connecting from elsewhere
+      model,
+      temperature: temperature.toString(),
       messages: {
         create: {
           question: encryptedQuestion,
@@ -121,7 +149,6 @@ export const addQuestionToChat = (
         },
       },
     },
-    // Data that is expected to receive in return:
     include: {
       owner: {
         include: {
@@ -142,10 +169,18 @@ export const addQuestionToChat = (
       },
     },
   })
+
+  const decrypted = {
+    ...updateResponse,
+    name: updateResponse.name ? decryptString(updateResponse.name) : null,
+    messages: decryptMessages(updateResponse.messages),
+  }
+
+  return decrypted
 }
 
 export const storeAnswer = (id: number, answer: string) => {
-  const encryptedAnswer = encryptMessage(answer)
+  const encryptedAnswer = encryptString(answer)
   return prisma.message.update({
     where: {
       id,
@@ -157,11 +192,12 @@ export const storeAnswer = (id: number, answer: string) => {
 }
 
 export const setChatName = (id: number, name: string) => {
+  const encryptedName = encryptString(name)
   return prisma.chat.update({
     where: {
       id,
     },
-    data: { name },
+    data: { name: encryptedName },
   })
 }
 
@@ -188,6 +224,7 @@ export const cloneChat = async (
       model: chat.model,
       temperature: chat.temperature.toString(),
       roleContent: chat.roleContent,
+      encrypted: chat.encrypted,
       messages: {
         create: chat.messages.map((x) => ({
           question: x.question,
@@ -222,7 +259,19 @@ export const getAllTeamChats = async (id: number) => {
     },
   })
 
-  return response
+  const decryptedChats = response.map((chat) => {
+    if (chat.encrypted) {
+      return {
+        ...chat,
+        name: chat.name ? decryptString(chat.name) : null,
+        messages: decryptMessages(chat.messages),
+      }
+    }
+
+    return chat
+  })
+
+  return decryptedChats
 }
 
 export const shareChatWithUsers = async (id: number, emails: string[]) => {

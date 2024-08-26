@@ -1,7 +1,7 @@
 import { dev } from '$app/environment'
 import { createNotification, markVerifyNotificationAsRead } from '$lib/server/entities/notification'
 import { prisma } from '$lib/server/prisma'
-import { generateSecureRandomToken } from '$lib/server/utils/crypto'
+import { decryptString, generateSecureRandomToken } from '$lib/server/utils/crypto'
 import type { Prisma } from '@prisma/client'
 import { NotificationType, Role } from '@prisma/client'
 import type { Cookies } from '@sveltejs/kit'
@@ -158,8 +158,8 @@ export const changeActiveUserTeam = (userId: number, userTeamId: number) =>
 export type UserWithUserTeamsActiveTeamAndChats = Prisma.PromiseReturnType<
   typeof getUserWithUserTeamsActiveTeamAndChatsById
 >
-export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) =>
-  prisma.user.findUniqueOrThrow({
+export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) => {
+  const response = await prisma.user.findUniqueOrThrow({
     where: { id },
     include: {
       userTeams: {
@@ -221,6 +221,35 @@ export const getUserWithUserTeamsActiveTeamAndChatsById = async (id: number) =>
       },
     },
   })
+
+  const decryptedActiveUserTeamChats = response.activeUserTeam
+    ? response.activeUserTeam.chats.map((chat) => {
+        return {
+          ...chat,
+          name: chat.name ? decryptString(chat.name) : null,
+        }
+      })
+    : null
+
+  const decryptedSharedChats = response.sharedChats.map((sharedChat) => {
+    return {
+      ...sharedChat,
+      chat: {
+        ...sharedChat.chat,
+        name: sharedChat.chat.name ? decryptString(sharedChat.chat.name) : null,
+      },
+    }
+  })
+
+  return {
+    ...response,
+    activeUserTeam: {
+      ...response.activeUserTeam,
+      chats: decryptedActiveUserTeamChats,
+    },
+    sharedChats: decryptedSharedChats,
+  }
+}
 
 export const isUserAdmin = async (teamId: number, userId: number) => {
   const userTeam = await prisma.userTeam.findUnique({
