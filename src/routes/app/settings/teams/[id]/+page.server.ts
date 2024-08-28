@@ -14,6 +14,7 @@ import { error, fail } from '@sveltejs/kit'
 import { randomUUID } from 'crypto'
 import { z, ZodError } from 'zod'
 import type { Actions, PageServerLoad } from './$types'
+import { getAvailableModels } from '$lib/server/api/openai'
 
 export const load: PageServerLoad = async ({ params, locals: { currentUser } }) => {
   const user = await getUserWithUserTeamsById(currentUser.id)
@@ -25,6 +26,7 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
   if (!userTeam) throw error(404, "Doesn't belong to this team or the team doesn't exist")
 
   const team = await getTeamByIdWithMembers(teamId)
+  const availableModels = await getAvailableModels(team)
 
   if (team?.openAiApiKey) {
     if (userTeam?.role === Role.MEMBER) {
@@ -43,6 +45,7 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
     team,
     chatCount: countTeamChats(userTeam.teamId),
     invitations,
+    availableModels,
   }
 }
 
