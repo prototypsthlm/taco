@@ -5,6 +5,8 @@
   import TeamKeys from '$lib/components/TeamKeys.svelte'
   import TeamInvitationList from '$lib/components/TeamInvitationList.svelte'
 
+  import TeamDefaultModel from '$lib/components/TeamDefaultModel.svelte'
+
   export let data: PageData
   export let form: ActionData
 
@@ -22,4 +24,5 @@
   <TeamKeys userTeam={data.userTeam} team={data.team} form={form?.keySection} />
   <TeamInvitationList invitations={data.invitations} {isAdmin} form={form?.invitationSection} />
   <TeamMemberList team={data.team} userTeam={data.userTeam} form={form?.userSection} />
+  <TeamDefaultModel models={data.availableModels} />
 </div>
