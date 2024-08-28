@@ -39,11 +39,11 @@ export const encryptString = (message: string) => {
 }
 
 export const decryptString = (message: string) => {
-  const key = process.env.SECRET_KEY
+  const secretKey = process.env.SECRET_KEY
 
-  if (!key) {
+  if (!secretKey) {
     throw new Error('Secret key not found')
   }
 
-  return decrypt(message, key)
+  return decrypt(message, secretKey)
 }
