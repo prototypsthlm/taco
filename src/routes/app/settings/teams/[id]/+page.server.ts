@@ -276,7 +276,7 @@ export const actions: Actions = {
 
     return {
       modelSection: {
-        success: 'Model updated successfully.',
+        success: 'Team model updated successfully.',
       },
     }
   },
