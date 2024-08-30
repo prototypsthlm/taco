@@ -24,5 +24,7 @@
   <TeamKeys userTeam={data.userTeam} team={data.team} form={form?.keySection} />
   <TeamInvitationList invitations={data.invitations} {isAdmin} form={form?.invitationSection} />
   <TeamMemberList team={data.team} userTeam={data.userTeam} form={form?.userSection} />
-  <TeamDefaultModel bind:model models={data.availableModels} />
+  {#if isAdmin}
+    <TeamDefaultModel bind:model models={data.availableModels} form={form?.modelSection} />
+  {/if}
 </div>
