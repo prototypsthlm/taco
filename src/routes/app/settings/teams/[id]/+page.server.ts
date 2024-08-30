@@ -5,7 +5,12 @@ import {
   getInvitationById,
   getInvitationsByTeamId,
 } from '$lib/server/entities/invitation'
-import { getTeamByIdWithMembers, getTeamByName, updateTeam } from '$lib/server/entities/team'
+import {
+  getTeamByIdWithMembers,
+  getTeamByName,
+  updateTeam,
+  updateTeamModel,
+} from '$lib/server/entities/team'
 import { getUserWithUserTeamsById, isUserAdmin, isUserInTeam } from '$lib/server/entities/user'
 import { getUserTeamById, removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
 import { decrypt } from '$lib/server/utils/crypto'
@@ -52,6 +57,7 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
 export const actions: Actions = {
   updateTeamDetails: async ({ request, params, locals }) => {
     const fields = Object.fromEntries(await request.formData())
+    console.log(fields)
     const teamId = Number(params.id)
     try {
       const schema = z
@@ -249,6 +255,28 @@ export const actions: Actions = {
     return {
       invitationSection: {
         success: `Invitation with id ${invitationId} successfully deleted.`,
+      },
+    }
+  },
+  updateTeamModel: async ({ request, params, locals }) => {
+    const teamId = Number(params.id)
+    const fields = Object.fromEntries(await request.formData())
+    const model = fields.model.toString()
+
+    const requestingUserId = locals.currentUser.id
+    if (!(await isUserAdmin(teamId, requestingUserId))) {
+      return fail(401, {
+        modelSection: {
+          error: 'You are no admin of this team.',
+        },
+      })
+    }
+
+    await updateTeamModel(teamId, model)
+
+    return {
+      modelSection: {
+        success: 'Model updated successfully.',
       },
     }
   },
