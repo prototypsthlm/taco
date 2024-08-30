@@ -9,7 +9,7 @@
 
   export let data: PageData
   export let form: ActionData
-
+  let model = data.team.teamModel
   $: isAdmin = data.userTeam.role !== 'MEMBER'
 </script>
 
@@ -24,5 +24,5 @@
   <TeamKeys userTeam={data.userTeam} team={data.team} form={form?.keySection} />
   <TeamInvitationList invitations={data.invitations} {isAdmin} form={form?.invitationSection} />
   <TeamMemberList team={data.team} userTeam={data.userTeam} form={form?.userSection} />
-  <TeamDefaultModel models={data.availableModels} />
+  <TeamDefaultModel bind:model models={data.availableModels} />
 </div>
