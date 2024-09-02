@@ -28,7 +28,11 @@
           <SmallCards
             {loading}
             bind:value={model}
-            options={models.map((x) => ({ value: x.id, label: x.label, enabled: x.enabled }))}
+            options={models.map((model) => ({
+              value: model.id,
+              label: model.label,
+              enabled: model.enabled,
+            }))}
             heading="Model"
             groupLabel="Choose a model option"
             class="mb-4"
