@@ -24,6 +24,15 @@ export const updateTeam = async (
   })
 }
 
+export const updateTeamModel = async (id: number, model: string) => {
+  return prisma.team.update({
+    where: { id },
+    data: {
+      teamModel: model,
+    },
+  })
+}
+
 export const getTeamByName = async (name: string) => {
   return prisma.team.findUnique({
     where: {

@@ -205,6 +205,15 @@ export const MODELS: Model[] = [
     label: 'GPT-4 Turbo 128K',
     enabled: true,
   },
+  {
+    id: 'gpt-4o',
+    input: 0.03,
+    output: 0.06,
+    maxTokens: 4_096,
+    outputRoom: 500,
+    label: 'GPT-4o',
+    enabled: true,
+  },
 ]
 
 export const getModel = (id?: string): Model | undefined => {
