@@ -135,7 +135,7 @@ export const actions: Actions = {
     if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
         userSection: {
-          error: 'You are no admin of this team.',
+          error: 'You are not admin of this team.',
         },
       })
     }
@@ -206,7 +206,7 @@ export const actions: Actions = {
     if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
         invitationSection: {
-          error: 'You are no admin of this team.',
+          error: 'You are not admin of this team.',
         },
       })
     }
@@ -227,7 +227,7 @@ export const actions: Actions = {
     if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
         userSection: {
-          error: 'You are no admin of this team.',
+          error: 'You are not admin of this team.',
         },
       })
     }
@@ -267,7 +267,7 @@ export const actions: Actions = {
     if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
         modelSection: {
-          error: 'You are no admin of this team.',
+          error: 'You are not admin of this team.',
         },
       })
     }
