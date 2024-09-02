@@ -2,9 +2,11 @@
   import { enhance } from '$app/forms'
   import Input from '$lib/components/Input.svelte'
   import InputGroup from '$lib/components/InputGroup.svelte'
+  import TestApiButton from '$lib/components/TestAPIButton.svelte'
   import type { ActionData } from './$types'
 
   export let form: ActionData
+  let testApiKey: string = ''
 </script>
 
 <form
@@ -17,7 +19,7 @@
 >
   <InputGroup
     header="Create a new Team"
-    description={`You need an OpenAI API key to create a team. You can get one at <a href="https://platform.openai.com" target="_blank">https://platform.openai.com</a>`}
+    description={`You need an OpenAI API key to create a team. You can get one at <a href="https://platform.openai.com" target="_blank" class="text-blue-500 underline hover:text-blue-700">https://platform.openai.com</a>`}
     {form}
   >
     <Input
@@ -40,7 +42,13 @@
       type="text"
       class="dark col-span-full"
       placeholder=""
+      on:input={(event) => {
+        testApiKey = event.detail.target.value
+      }}
     />
+    <div class="col-span-full">
+      <TestApiButton {testApiKey} />
+    </div>
 
     <Input
       value={form?.fields?.ollamaBaseUrl}
