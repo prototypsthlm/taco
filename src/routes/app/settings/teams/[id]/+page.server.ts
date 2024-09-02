@@ -5,7 +5,12 @@ import {
   getInvitationById,
   getInvitationsByTeamId,
 } from '$lib/server/entities/invitation'
-import { getTeamByIdWithMembers, getTeamByName, updateTeam } from '$lib/server/entities/team'
+import {
+  getTeamByIdWithMembers,
+  getTeamByName,
+  updateTeam,
+  updateTeamModel,
+} from '$lib/server/entities/team'
 import { getUserWithUserTeamsById, isUserAdmin, isUserInTeam } from '$lib/server/entities/user'
 import { getUserTeamById, removeUserTeam, updateUserTeamRole } from '$lib/server/entities/userTeams'
 import { decrypt } from '$lib/server/utils/crypto'
@@ -14,6 +19,7 @@ import { error, fail } from '@sveltejs/kit'
 import { randomUUID } from 'crypto'
 import { z, ZodError } from 'zod'
 import type { Actions, PageServerLoad } from './$types'
+import { getAvailableModels } from '$lib/server/api/openai'
 
 export const load: PageServerLoad = async ({ params, locals: { currentUser } }) => {
   const user = await getUserWithUserTeamsById(currentUser.id)
@@ -25,6 +31,7 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
   if (!userTeam) throw error(404, "Doesn't belong to this team or the team doesn't exist")
 
   const team = await getTeamByIdWithMembers(teamId)
+  const availableModels = await getAvailableModels(team)
 
   if (team?.openAiApiKey) {
     if (userTeam?.role === Role.MEMBER) {
@@ -43,12 +50,14 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
     team,
     chatCount: countTeamChats(userTeam.teamId),
     invitations,
+    availableModels,
   }
 }
 
 export const actions: Actions = {
   updateTeamDetails: async ({ request, params, locals }) => {
     const fields = Object.fromEntries(await request.formData())
+    console.log(fields)
     const teamId = Number(params.id)
     try {
       const schema = z
@@ -126,7 +135,7 @@ export const actions: Actions = {
     if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
         userSection: {
-          error: 'You are no admin of this team.',
+          error: 'You are not admin of this team.',
         },
       })
     }
@@ -197,7 +206,7 @@ export const actions: Actions = {
     if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
         invitationSection: {
-          error: 'You are no admin of this team.',
+          error: 'You are not admin of this team.',
         },
       })
     }
@@ -218,7 +227,7 @@ export const actions: Actions = {
     if (!(await isUserAdmin(teamId, requestingUserId))) {
       return fail(401, {
         userSection: {
-          error: 'You are no admin of this team.',
+          error: 'You are not admin of this team.',
         },
       })
     }
@@ -246,6 +255,28 @@ export const actions: Actions = {
     return {
       invitationSection: {
         success: `Invitation with id ${invitationId} successfully deleted.`,
+      },
+    }
+  },
+  updateTeamModel: async ({ request, params, locals }) => {
+    const teamId = Number(params.id)
+    const fields = Object.fromEntries(await request.formData())
+    const model = fields.model.toString()
+
+    const requestingUserId = locals.currentUser.id
+    if (!(await isUserAdmin(teamId, requestingUserId))) {
+      return fail(401, {
+        modelSection: {
+          error: 'You are not admin of this team.',
+        },
+      })
+    }
+
+    await updateTeamModel(teamId, model)
+
+    return {
+      modelSection: {
+        success: 'Team model updated successfully.',
       },
     }
   },

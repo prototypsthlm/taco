@@ -15,6 +15,7 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
     return {
       chat: getChatWithRelationsById(chatId),
       models: getAvailableModels(currentUser.activeUserTeam?.team),
+      teamModel: currentUser.activeUserTeam?.team?.teamModel,
     }
   } catch (error) {
     throw redirect(303, '/app')

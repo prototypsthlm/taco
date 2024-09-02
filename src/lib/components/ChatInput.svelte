@@ -3,16 +3,16 @@
   import UsersTyping from '$lib/components/UsersTyping.svelte'
   import type { Model } from '$lib/server/api/openai'
   import type { ChatWithRelations } from '$lib/server/entities/chat'
-  import { Models } from '$lib/types/models'
   import { PaperAirplaneIcon, StopIcon } from '@babeard/svelte-heroicons/solid'
   import { createEventDispatcher, onMount, tick } from 'svelte'
   import autosize from 'svelte-autosize'
 
   export let chat: ChatWithRelations | undefined = undefined
   export let models: Model[]
+  export let teamModel: string
   export let loading = false
 
-  let model = chat?.model || Models.gpt3
+  let model = chat?.model || teamModel
   let temperature = Number(chat?.temperature) || 0.6
   export let question = ''
   let isShiftPressed = false
@@ -45,7 +45,7 @@
 
   let oldChat: ChatWithRelations | undefined = undefined
   $: if (chat !== oldChat) {
-    model = chat?.model || Models.gpt3
+    model = chat?.model || teamModel
     temperature = Number(chat?.temperature) || 0.6
     oldChat = chat
   }

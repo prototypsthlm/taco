@@ -28,6 +28,7 @@
   export let chat: ChatWithRelations | undefined = undefined
   export let models: Model[]
   export let customPersonalities: LlmPersonality[] | null = null
+  export let teamModel: string
 
   let loading = false
   let selectedPersonalityContext: string | null = 'You are a helpful assistant.'
@@ -269,6 +270,7 @@
     {chat}
     {models}
     {loading}
+    {teamModel}
     bind:question
     on:message={handleSubmit}
     on:stop={stopSubmit}
