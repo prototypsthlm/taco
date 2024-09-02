@@ -9,4 +9,5 @@
   customPersonalities={data.llmPersonalities || null}
   models={data.models}
   user={data.user}
+  teamModel={data.teamModel}
 />
