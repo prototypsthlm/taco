@@ -7,6 +7,7 @@
   import { ArrowPathIcon } from '@babeard/svelte-heroicons/solid'
   import { createEventDispatcher } from 'svelte'
   import Markdown from '@magidoc/plugin-svelte-marked'
+  import CodeBlock from './CodeBlock.svelte'
 
   export let message: ChatWithRelations['messages'][number]
   export let loading: boolean
@@ -14,6 +15,10 @@
   export let isDeleting = false
 
   const dispatch = createEventDispatcher()
+
+  const renderers = {
+    code: CodeBlock
+  }
 </script>
 
 <div class="p-4 md:p-8 flex justify-center max-w-full">
@@ -51,7 +56,7 @@
         {#if message?.answer}
           <!-- We need to force prose-invert, which is the dark mode for the prose class due to not having a non dark option -->
           <div class="prose prose-invert overflow-x-hidden prose-pre:overflow-x-auto">
-            <Markdown source={message.answer} />
+            <Markdown source={message.answer} renderers={renderers}   />
           </div>
         {:else}
           <div class="flex items-center justify-center space-x-2">
