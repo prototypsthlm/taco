@@ -3,7 +3,7 @@
   import hljs from 'highlight.js';
   import 'highlight.js/styles/atom-one-dark.css';
   import type { Tokens } from 'marked';
-  import { ClipboardIcon } from '@babeard/svelte-heroicons/solid';
+  import { Square2StackIcon } from '@babeard/svelte-heroicons/solid';
 
   export let token: Tokens.Code;
 
@@ -22,7 +22,7 @@
 
 <div class="relative">
   <button class="absolute top-2 right-2 bg-gray-800 text-white p-1 rounded" on:click={copyToClipboard} aria-label="Copy">
-    <ClipboardIcon class="w-5 h-5 text-white" aria-hidden="true" />
+    <Square2StackIcon class="w-5 h-5 text-white" aria-hidden="true" />
   </button>
   <pre class="lang-{token.lang}"><code bind:this={codeElement}>{token.text}</code></pre>
 </div>
