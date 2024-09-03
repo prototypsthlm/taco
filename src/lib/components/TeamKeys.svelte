@@ -2,10 +2,13 @@
   import Input from '$lib/components/Input.svelte'
   import { enhance } from '$app/forms'
   import InputGroup from '$lib/components/InputGroup.svelte'
+  import TestApiButton from './TestAPIButton.svelte'
 
   export let userTeam: any
   export let team: any
   export let form: any
+
+  let testApiKey: string = team.openAiApiKey
 </script>
 
 <form
@@ -36,7 +39,11 @@
       disabled={userTeam.role === 'MEMBER'}
       value={form?.fields?.openAiApiKey ?? team.openAiApiKey}
       errors={form?.errors?.openAiApiKey}
+      on:input={(event) => {
+        testApiKey = event.detail.target?.value
+      }}
     />
+    <TestApiButton class="col-span-full" {testApiKey} />
     <Input
       class="dark col-span-full"
       name="ollamaBaseUrl"
