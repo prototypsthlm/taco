@@ -1,0 +1,34 @@
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import hljs from 'highlight.js';
+  import 'highlight.js/styles/atom-one-dark.css';
+  import type { Tokens } from 'marked';
+  import { Square2StackIcon } from '@babeard/svelte-heroicons/solid';
+
+  export let token: Tokens.Code;
+
+  let codeElement: HTMLElement;
+
+  function copyToClipboard() {
+    navigator.clipboard.writeText(token.text);
+  }
+
+  onMount(() => {
+    if (codeElement) {
+      hljs.highlightElement(codeElement);
+    }
+  });
+</script>
+
+<div>
+  <div class="bg-gray-800 rounded-t-md flex justify-between items-center px-3 py-2">
+    <div class="text-xs text-white">
+      {token.lang || 'plaintext'}
+    </div>
+    <button class="flex items-center text-gray-400 hover:text-white text-xs" on:click={copyToClipboard} aria-label="Copy">
+      <Square2StackIcon class="w-4 h-4 mr-1" aria-hidden="true" />
+      Copy code
+    </button>
+  </div>
+  <pre class="bg-gray-900 text-gray-300 p-0 rounded-b-md m-0"><code bind:this={codeElement}>{token.text}</code></pre>
+</div>
