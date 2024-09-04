@@ -59,7 +59,7 @@
     "prettier-plugin-svelte": "^2.8.1",
     "prisma": "^5.11.0",
     "remark": "^14.0.3",
-    "remark-html": "^15.0.2",
+    "remark-html": "^16.0.1",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
     "sse.js": "^0.6.1",
