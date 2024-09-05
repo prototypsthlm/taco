@@ -15,7 +15,8 @@
     "test": "dotenv -e .env.test -- prisma migrate deploy && npm run test:integration && npm run test:unit",
     "test:integration": "dotenv -e .env.test -- playwright test",
     "test:unit": "vitest",
-    "seed": "prisma db seed"
+    "seed": "prisma db seed",
+    "data-migration:encrypt-chats": "tsx ./prisma/migrations/20240826081237_add_encrypted_column_to_chat/data-migration.ts"
   },
   "dependencies": {
     "@babeard/svelte-heroicons": "^2.0.0-rc.0",
