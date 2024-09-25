@@ -22,7 +22,7 @@
     "@babeard/svelte-heroicons": "^2.0.0-rc.0",
     "@faker-js/faker": "^8.4.0",
     "@magidoc/plugin-svelte-marked": "^4.1.2",
-    "@playwright/test": "^1.41.2",
+    "@playwright/test": "^1.47.2",
     "@prisma/client": "^5.11.0",
     "@rgossiaux/svelte-headlessui": "^2.0.0",
     "@sentry/sveltekit": "^7.73.0",
