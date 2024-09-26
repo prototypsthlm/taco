@@ -25,10 +25,10 @@
       .filter((x) => x.chat.owner.teamId == user.activeUserTeam?.teamId)
       .map((x) => x.chat) || []),
     ...(user.activeUserTeam?.chats || []),
-  ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+  ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 
   $: chatsGroupedByTime = chats?.reduce((chatObjects: ChatObject[], chat) => {
-    const { key, label, isOpen } = categorizeDate(chat.updatedAt)
+    const { key, label, isOpen } = categorizeDate(chat.createdAt)
     const foundObject = chatObjects.find((obj) => obj.key === key)
     if (foundObject) {
       foundObject.chats.push(chat)
