@@ -56,7 +56,7 @@ async function main() {
 
       console.log('Encrypted chats:', unencryptedChats.length)
     },
-    { timeout: 10000 }
+    { timeout: 1000 * 1000 }
   )
 }
 
