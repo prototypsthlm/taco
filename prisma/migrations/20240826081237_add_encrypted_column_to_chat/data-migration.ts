@@ -12,12 +12,15 @@ async function main() {
         messages: true,
       },
     })
-    for (const chat of unencryptedChats) {
-      const key = process.env.SECRET_KEY
 
-      if (!key) {
-        throw new Error('SECRET_KEY is not set')
-      }
+    const key = process.env.SECRET_KEY
+
+    if (!key) {
+      throw new Error('SECRET_KEY is not set')
+    }
+
+    for (const chat of unencryptedChats) {
+      console.log('Encrypting chat:', chat.id)
       const messages = chat.messages
       const encryptedMessages = messages.map((message) => {
         return {
@@ -43,6 +46,8 @@ async function main() {
         },
       })
     }
+
+    console.log('Encrypted chats:', unencryptedChats.length)
   })
 }
 
