@@ -19,7 +19,7 @@
 </script>
 
 <div>
-  <div class="bg-gray-800 rounded-t-md flex justify-between items-center px-3 py-2">
+  <div class="bg-gray-700 rounded-t-md flex justify-between items-center px-3 py-2">
     <div class="text-xs text-white">
       {token.lang || 'plaintext'}
     </div>
@@ -32,7 +32,7 @@
       Copy code
     </button>
   </div>
-  <pre class="bg-gray-900 text-gray-300 p-4 rounded-b-md m-0" bind:this={codeElement}>
+  <pre class="bg-gray-800 text-gray-300 p-4 rounded-b-md m-0" bind:this={codeElement}>
     <code>
       {token.text}
     </code>
