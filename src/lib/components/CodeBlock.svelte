@@ -1,23 +1,21 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import hljs from 'highlight.js';
-  import 'highlight.js/styles/atom-one-dark.css';
-  import type { Tokens } from 'marked';
-  import { Square2StackIcon } from '@babeard/svelte-heroicons/solid';
+  import hljs from 'highlight.js'
+  import 'highlight.js/styles/atom-one-dark.css'
+  import type { Tokens } from 'marked'
+  import { Square2StackIcon } from '@babeard/svelte-heroicons/solid'
 
-  export let token: Tokens.Code;
+  export let token: Tokens.Code
 
-  let codeElement: HTMLElement;
+  let codeElement: HTMLElement
 
   function copyToClipboard() {
-    navigator.clipboard.writeText(token.text);
+    navigator.clipboard.writeText(token.text)
   }
 
-  onMount(() => {
-    if (codeElement) {
-      hljs.highlightElement(codeElement);
-    }
-  });
+  $: if (token && codeElement) {
+    const result = hljs.highlight(token.text, { language: token.lang || 'plaintext' })
+    codeElement.innerHTML = result.value
+  }
 </script>
 
 <div>
@@ -25,10 +23,18 @@
     <div class="text-xs text-white">
       {token.lang || 'plaintext'}
     </div>
-    <button class="flex items-center text-gray-400 hover:text-white text-xs" on:click={copyToClipboard} aria-label="Copy">
+    <button
+      class="flex items-center text-gray-400 hover:text-white text-xs"
+      on:click={copyToClipboard}
+      aria-label="Copy"
+    >
       <Square2StackIcon class="w-4 h-4 mr-1" aria-hidden="true" />
       Copy code
     </button>
   </div>
-  <pre class="bg-gray-900 text-gray-300 p-0 rounded-b-md m-0"><code bind:this={codeElement}>{token.text}</code></pre>
+  <pre class="bg-gray-900 text-gray-300 p-4 rounded-b-md m-0" bind:this={codeElement}>
+    <code>
+      {token.text}
+    </code>
+  </pre>
 </div>
