@@ -13,8 +13,8 @@ export const load: PageServerLoad = async ({ params, locals: { currentUser } }) 
 
   try {
     return {
-      chat: getChatWithRelationsById(chatId),
-      models: getAvailableModels(currentUser.activeUserTeam?.team),
+      chat: await getChatWithRelationsById(chatId),
+      models: await getAvailableModels(currentUser.activeUserTeam?.team),
       teamModel: currentUser.activeUserTeam?.team?.teamModel,
     }
   } catch (error) {

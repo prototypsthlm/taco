@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ locals: { currentUser } }) => {
   }
   return {
     llmPersonalities: llmPersonalities.length ? llmPersonalities : null,
-    models: getAvailableModels(currentUser.activeUserTeam?.team),
+    models: await getAvailableModels(currentUser.activeUserTeam?.team),
     teamModel: currentUser.activeUserTeam?.team?.teamModel,
   }
 }
