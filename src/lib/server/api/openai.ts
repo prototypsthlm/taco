@@ -45,7 +45,8 @@ export const getAvailableModels = async (team: Team) => {
   let availableModels: Model[] = []
   let allModelsFromOpenAi: any[] = []
   if (!team.openAiApiKey && !team.ollamaBaseUrl) {
-    throw new Error('API Error: Open AI API key is not set for team')
+    console.error('API Error: Open AI API key is not set for team')
+    return []
   }
   if (team.openAiApiKey) {
     try {
@@ -59,14 +60,14 @@ export const getAvailableModels = async (team: Team) => {
       )
       availableModels = updatedModels
     } catch (e) {
-      console.log('Could not fetch OpenAi Models: ', e.status)
+      console.error('Could not fetch OpenAi Models: ', e.status)
     }
   }
   if (team.ollamaBaseUrl) {
     try {
       availableModels = [...availableModels, ...(await getOllamaModelsList(team.ollamaBaseUrl))]
     } catch (e) {
-      console.log('Could not fetch OpenAi Models: ', e.status)
+      console.error('Could not fetch Ollama Models: ', e.status)
     }
   }
   return availableModels
