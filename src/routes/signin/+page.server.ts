@@ -15,7 +15,7 @@ export const actions: Actions = {
       const schema = await z
         .object({
           email: z.string().email(),
-          password: z.string().min(1),
+          password: z.string(),
           remember: z.preprocess((value) => value === 'on', z.boolean()),
           recaptchaToken: z.string().min(1),
         })
