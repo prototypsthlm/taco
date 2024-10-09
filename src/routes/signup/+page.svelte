@@ -17,9 +17,7 @@
   ></script>
 </svelte:head>
 
-<div
-  class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
->
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center sm:px-6 lg:px-8">
   <div class="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center gap-4">
     <div class="text-3xl md:text-5xl">
       <TacoIcon class="h-16 md:h-24" />
@@ -31,7 +29,7 @@
     </h2>
   </div>
 
-  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
+  <div class="sm:mx-auto sm:w-full sm:max-w-[480px]">
     <div class="bg-white dark:bg-gray-900 px-6 py-12 shadow sm:rounded-lg sm:px-12">
       <Alert
         type={(form?.error && 'error') || (form?.success && 'success')}
