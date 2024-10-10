@@ -87,7 +87,7 @@ test.describe('app flow tests', () => {
     await page.goto('/')
     await page.waitForURL('/')
     await page.getByText('Sign in').click()
-    await expect(page).toHaveURL('/signin')
+    await expect(page).toHaveURL('/signin/')
 
     await page.getByLabel('Email').fill(user.email)
     await page.getByLabel('Password', { exact: true }).fill('password')
