@@ -32,7 +32,8 @@ jobs:
       PUBLIC_SENTRY_ENV: test
       PUBLIC_SITE_URL: http://localhost:5173
       DATABASE_URL: postgresql://postgres:postgres@localhost:0432/db
-
+      ORIGIN: ${{ vars.ORIGIN }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.PUBLIC_RECAPTCHA_SITE_KEY }}
       RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
     steps:
