@@ -1,10 +1,12 @@
 <script lang="ts">
-  import Alert from './Alert.svelte'
+  import Alert from '$lib/components/Alert.svelte'
+  import Spinner from '$lib/components/Spinner.svelte'
 
   export let header: string
   export let description: string
   export let buttonText = 'Save'
   export let form: any
+  export let formLoading: boolean = false
 </script>
 
 <div class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 sm:px-6 lg:px-8 py-16 md:grid-cols-3">
@@ -23,9 +25,13 @@
       <button
         data-testid={`${buttonText.toLowerCase()}-button`}
         type="submit"
-        class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+        disabled={formLoading}
+        class="flex rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
       >
-        {buttonText}
+        {#if formLoading}
+          <Spinner />
+        {/if}
+        <span>{buttonText}</span>
       </button>
       <Alert
         type={(form?.error && 'error') || (form?.success && 'success')}

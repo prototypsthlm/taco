@@ -3,10 +3,13 @@
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
   import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
+  import Spinner from '$lib/components/Spinner.svelte'
   import type { ActionData, PageData } from './$types'
 
   export let form: ActionData
   export let data: PageData
+
+  let formLoading = false
 </script>
 
 <svelte:head>
@@ -39,7 +42,11 @@
           method="POST"
           novalidate
           use:enhance={() => {
-            return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
+            formLoading = true
+            return ({ update }) => {
+              formLoading = false
+              update({ reset: false })
+            } // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
           }}
         >
           <Input
@@ -63,8 +70,13 @@
             <div>
               <button
                 type="submit"
+                disabled={formLoading}
                 class="flex w-full justify-center rounded-md bg-indigo-600 dark:bg-indigo-400 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >Reset password
+              >
+                {#if formLoading}
+                  <Spinner />
+                {/if}
+                <span>Reset password</span>
               </button>
             </div>
           </div>
