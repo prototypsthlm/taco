@@ -5,7 +5,11 @@ const config: PlaywrightTestConfig = {
     command: 'npm run build && node server.js',
     url: 'http://localhost:3000',
   },
+  reporter: 'html',
   use: {
+    headless: true,
+    trace: 'on',
+    video: 'retain-on-failure',
     baseURL: 'http://localhost:3000',
   },
   testDir: 'tests',
