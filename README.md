@@ -1,11 +1,46 @@
 # TACO (Team AI Chat pOrtal) 🌮
 
-A helpful frontend for ChatGPT with the possibility to share the API key with the whole team.
+![GitHub Actions Status](https://github.com/prototypsthlm/taco/actions/workflows/test.yml/badge.svg)
 
-## Developing
+TACO is an open-source frontend for ChatGPT built with <b>SvelteKit</b> that allows teams to collaborate effectively by sharing a single API key, providing easy access to AI-powered chat functionality.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install`
-or `yarn`), start a development server:
+Official website: https://www.tacoai.app/
+
+## Table of Contents
+
+-   [Prerequisites](#prerequisites)
+-   [Setup](#setup)
+-   [Usage](#usage)
+-   [Prisma Setup](#prisma-setup)
+-   [Building](#building)
+-   [Testing](#testing)
+-   [Technical Details](#technical-details)
+-   [Contribution](#contribution)
+-   [About Prototyp](#about-prototyp)
+
+## Prerequisites
+
+Before you begin, ensure you have met the following requirements:
+
+-   **Node.js**: Version 16.x or later
+-   **Docker**: For containerized environments (check with `docker --version`)
+
+## Setup
+
+1. Clone the project and install dependencies with `npm install` (or `pnpm install`
+   or `yarn`)
+
+2. Set up environment variables by copying the `.env.example` file to `.env`:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+3. Follow [Prisma setup](#prisma-setup) to add a database for local development
+
+## Usage
+
+To start the development server:
 
 ```bash
 npm run dev
@@ -37,14 +72,7 @@ Follow these steps to initialize Prisma in your project:
     npx prisma migrate dev
     ```
 
-4. (Optional) Seed the database with initial data (no need to manually do it, since it's done
-   automatically by the migrate command):
-
-    ```bash
-    npx prisma db seed
-    ```
-
-5. Your Prisma setup is now complete! You can start using the Prisma client in your application code
+4. Your Prisma setup is now complete! You can start using the Prisma client in your application code
    to interact with the database.
 
 Make sure to configure your database connection details and any other necessary settings in
@@ -76,7 +104,21 @@ You can preview the production build with `npm run preview`.
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for
 > your target environment.
 
-## Tailwind UI
+## Testing
+
+run
+
+```
+npx playwright test
+```
+
+to run the E2E tests.
+
+Use `--debug` or `--headed` flags to run the tests in browser.
+
+## Technical Details
+
+### Tailwind UI
 
 We use Tailwind UI to style the app. Tailwind UI relies on Headless UI in some parts. We use
 a svelte implementation of that library: @rgossiaux/svelte-headlessui. TWUI also relies on
@@ -84,29 +126,21 @@ Heroicons, there is also a svelte port of that icon collection @babeard/svelte-h
 
 You can see all that in action in `src/lib/components/ModalConfirm.svelte`.
 
-## Dark Mode
+### Dark Mode
 
-We changed the default dark mode styling strategy in Tailwind to be class based (see tailwind
-config) instead of based in the system preference only. So now, the site respects user pref on dark
-mode but also allows us to force dark mode where there's no "non-dark" mode implemented. that can be
-done just adding the class `dark` to any part we want to force dark mode. See `Input` component
-usage in sign in and sign up for reference.
+We have changed the default dark mode styling strategy in Tailwind CSS to be class-based (see tailwind.config.ts), rather than relying solely on system preferences. This adjustment allows the site to respect user preferences for dark mode while also enabling us to enforce dark mode in areas where a light mode is not implemented.
 
-We control the dark mode toggling here: `src/routes/+layout.svelte`.
+To force dark mode, simply add the class dark to any element where you want it to take effect. For reference, you can see the usage in the Input component on the sign-in and sign-up pages.
 
-## Form validations
+We manage the dark mode toggling in src/routes/+layout.svelte.
 
-We use zod validation library to validate forms. See settings and auth routes for ref. There is
-probably a good opportunity for an abstraction there given we use everywhere the same pattern.
+### Email provider
 
-## Email provide
-
-As email provider Postmark is used. Email templates are created in some extra ts files. Therefore it should be easy to
-switch to another email provider by just switching out the provider in the email file.
+We utilize <b>Postmark</b> as our email provider. Email templates are created in separate TypeScript files, making it easy to switch to another email provider by simply changing the provider configuration in the email file.
 
 ## Contribution
 
-Your are very welcome to do any kind of contribution that being issue reporting, code contribution or feature requests! Please take a look into the issue section of this repo to make sure your request isn't already existing. If not feel free to create an issue and tag it with suiting labels.
+We welcome all contributions, whether through issue reporting, code contributions, or feature requests! Please check the [Issues](https://github.com/prototypsthlm/taco/issues) section of this repository to ensure your request has not already been submitted. If you don't find an existing issue, feel free to create a new one and tag it with the appropriate labels.
 
 ## About Prototyp
 

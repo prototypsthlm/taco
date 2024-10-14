@@ -25,6 +25,7 @@
   {/if}
   <div class="relative shadow-sm">
     <input
+      data-testid={id}
       {id}
       {name}
       {type}

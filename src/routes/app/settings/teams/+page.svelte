@@ -29,6 +29,7 @@
 >
   <h1 class="text-lg font-semibold leading-7 text-white">Teams</h1>
   <a
+    data-testid="new-team-link"
     href="/app/settings/teams/new"
     class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
   >
@@ -56,6 +57,7 @@
                 on:click={() => {
                   removeFlashNotificationOfCategory('NO_TEAM')
                 }}
+                data-testid="select-team-button"
                 type="submit"
                 class="rounded-md bg-yellow-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >Select</button
