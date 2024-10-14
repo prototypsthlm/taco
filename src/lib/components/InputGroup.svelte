@@ -12,7 +12,7 @@
     <h2 class="text-base font-semibold leading-7 text-white">{header}</h2>
     <p class="mt-1 text-sm leading-6 text-gray-400">
       {@html description}
-    </p>  
+    </p>
   </div>
 
   <div class="md:col-span-2">
@@ -21,6 +21,7 @@
     </div>
     <div class="mt-8 flex gap-4">
       <button
+        data-testid={`${buttonText.toLowerCase()}-button`}
         type="submit"
         class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
       >

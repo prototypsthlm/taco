@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { expect, test } from '@playwright/test'
+import { expect, Page, test } from '@playwright/test'
 import { PrismaClient, Role } from '@prisma/client'
 import pkg from 'bcryptjs'
 import { cleanDatabase } from '../prisma/helpers'
@@ -52,112 +52,176 @@ async function createUser(team: Team) {
   })
 }
 
-test.describe('app flow tests', () => {
-  test.beforeEach(async () => {
-    await cleanDatabase()
-  })
+async function loginFlow(page: Page) {
+  const team = await createTeam('Test Team')
+  const user = await createUser(team)
 
-  test('register flow', async ({ page }) => {
+  await page.goto('/')
+  await page.waitForURL('/')
+  await page.getByTestId('goto-signin').click()
+  await expect(page).toHaveURL(/.*signin.*/)
+
+  await page.getByTestId('email').fill(user.email)
+  await page.getByTestId('password').fill('password')
+  await page.getByTestId('signin-button').click()
+
+  await page.waitForURL('/app/settings/teams')
+
+  await expect(page).toHaveURL('/app/settings/teams')
+}
+
+test.describe('register flow', () => {
+  test('register new user successful', async ({ page }) => {
     const name = faker.person.firstName()
     const email = faker.internet.email()
     const password = faker.internet.password()
 
+    // Navigate to the home page
     await page.goto('/')
-    await page.waitForURL('/')
-    await page.getByText('Register').click()
-    await page.waitForURL('/signup')
-    await expect(page).toHaveURL('/signup')
+    await expect(page).toHaveURL('/')
 
-    await page.getByLabel('Name').fill(name)
-    await page.getByLabel('Email').fill(email)
-    await page.getByLabel('Password', { exact: true }).fill(password)
-    await page.getByLabel('Confirm Password').fill(password)
+    // Click on the Register link
+    await page.getByTestId('goto-signup').click()
+    await expect(page).toHaveURL(/.*signup.*/)
 
-    await page.getByRole('button', { name: 'Sign up' }).click()
+    // Fill out the registration form
+    await page.getByTestId('name').fill(name)
+    await page.getByTestId('email').fill(email)
+    await page.getByTestId('password').fill(password)
+    await page.getByTestId('confirm-password').fill(password)
+
+    await page.getByTestId('signup-button').click()
 
     await page.waitForURL('/app/settings/teams')
-
     await expect(page).toHaveURL('/app/settings/teams')
   })
 
-  test('login flow', async ({ page }) => {
+  test('register new user unsuccessful with email validation error', async ({ page }) => {
+    const name = faker.person.firstName()
+    const invalidEmail = 'invalid-email'
+    const password = faker.internet.password()
+
+    // Navigate to the home page
+    await page.goto('/')
+    await expect(page).toHaveURL('/')
+
+    // Click on the Register link
+    await page.getByTestId('goto-signup').click()
+    await expect(page).toHaveURL(/.*signup.*/)
+
+    // Fill out the registration form
+    await page.getByTestId('name').fill(name)
+    await page.getByTestId('email').fill(invalidEmail)
+    await page.getByTestId('password').fill(password)
+    await page.getByTestId('confirm-password').fill(password)
+
+    // Try to submit the form
+    await page.getByTestId('signup-button').click()
+
+    // Check for Zod email validation error message
+    await expect(page.getByText('Invalid email')).toBeVisible()
+  })
+
+  test('register new user unsuccessful with password validation error', async ({ page }) => {
+    const name = faker.person.firstName()
+    const email = faker.internet.email()
+    const password = faker.internet.password()
+    const password2 = '123'
+
+    // Navigate to the home page
+    await page.goto('/')
+    await expect(page).toHaveURL('/')
+
+    // Click on the Register link
+    await page.getByTestId('goto-signup').click()
+    await expect(page).toHaveURL(/.*signup.*/)
+
+    // Fill out the registration form
+    await page.getByTestId('name').fill(name)
+    await page.getByTestId('email').fill(email)
+    await page.getByTestId('password').fill(password)
+    await page.getByTestId('confirm-password').fill(password2)
+
+    // Try to submit the form
+    await page.getByTestId('signup-button').click()
+
+    // Check for Zod email validation error message
+    await expect(page.getByText(`Passwords don't match`)).toBeVisible()
+  })
+})
+
+test.describe('login flow', () => {
+  test.beforeEach(async () => {
+    await cleanDatabase()
+  })
+  test('login with user successfully', async ({ page }) => {
     const team = await createTeam('Test Team')
     const user = await createUser(team)
 
     await page.goto('/')
     await page.waitForURL('/')
-    await page.getByText('Sign in').click()
-    await expect(page).toHaveURL('/signin/')
+    await page.getByTestId('goto-signin').click()
+    await expect(page).toHaveURL(/.*signin.*/)
 
-    await page.getByLabel('Email').fill(user.email)
-    await page.getByLabel('Password', { exact: true }).fill('password')
-    await page.getByRole('button', { name: 'Sign in' }).click()
+    await page.getByTestId('email').fill(user.email)
+    await page.getByTestId('password').fill('password')
+    await page.getByTestId('signin-button').click()
 
     await page.waitForURL('/app/settings/teams')
 
     await expect(page).toHaveURL('/app/settings/teams')
   })
-
-  test('create a team', async ({ page }) => {
+  test('login with invalid user details unsuccessfully', async ({ page }) => {
     const team = await createTeam('Test Team')
-    const user = await createUser(team)
 
-    //log in
     await page.goto('/')
     await page.waitForURL('/')
-    await page.getByText('Sign in').click()
-    await expect(page).toHaveURL('/signin')
+    await page.getByTestId('goto-signin').click()
+    await expect(page).toHaveURL(/.*signin.*/)
 
-    await page.getByLabel('Email').fill(user.email)
-    await page.getByLabel('Password', { exact: true }).fill('password')
-    await page.getByRole('button', { name: 'Sign in' }).click()
+    await page.getByTestId('email').fill('invalid-email')
+    await page.getByTestId('password').fill('invalid-password')
+    await page.getByTestId('signin-button').click()
 
-    await page.waitForURL('/app/settings/teams')
+    await expect(page.getByText(`Invalid email`)).toBeVisible()
 
-    await expect(page).toHaveURL('/app/settings/teams')
+    await expect(page.getByText(`Wrong credentials`)).toBeVisible()
+  })
+})
+
+test.describe('app setup flow', () => {
+  test.beforeEach(async () => {
+    await cleanDatabase()
+  })
+  test('create a new team', async ({ page }) => {
+    await loginFlow(page)
 
     //close popup
-    await page.getByRole('button', { name: /Close/i }).click()
+    await page.getByTestId('dismiss-notification').click()
 
     //create new team
-    await page.getByText('New Team').click()
+    await page.getByTestId('new-team-link').click()
     await page.waitForURL('/app/settings/teams/new')
     await expect(page).toHaveURL('/app/settings/teams/new')
 
-    await page.getByLabel('Name*').fill('Test Team 2')
-    await page.getByLabel('OpenAI API Key*').fill(process.env.OPENAI_API_KEY || '')
-    await page.getByText('Save').click()
+    await page.getByTestId('name').fill('Test Team 2')
+    await page.getByTestId('openAiApiKey').fill(process.env.OPENAI_API_KEY || '')
+    await page.getByTestId('save-button').click()
 
     await page.waitForURL(new RegExp('app/settings/teams/\\d+'))
     await expect(page).toHaveURL(new RegExp('app/settings/teams/\\d+'))
   })
 
   test('create a chat', async ({ page }) => {
-    const team = await createTeam('Test Team')
-    const user = await createUser(team)
+    await loginFlow(page)
 
-    //log in
-    await page.goto('/')
-    await page.waitForURL('/')
-    await page.getByText('Sign in').click()
-    await page.waitForURL('/signin')
-    await expect(page).toHaveURL('/signin')
-
-    await page.getByLabel('Email').fill(user.email)
-    await page.getByLabel('Password', { exact: true }).fill('password')
-    await page.getByRole('button', { name: 'Sign in' }).click()
-    await page.waitForURL('/app/settings/teams')
-
-    await page.waitForURL('/app/settings/teams')
-
-    await expect(page).toHaveURL('/app/settings/teams')
     //select a team
-    await page.getByRole('button', { name: /Select/i }).click()
+    await page.getByTestId('select-team-button').click()
     await page.waitForURL('/app')
     await expect(page).toHaveURL('/app')
 
     //type
-    await page.getByRole('textbox').fill('Dis a test chat')
+    await page.getByRole('textbox').fill('This is a test chat')
     //send
     await page.locator('button[name="send"]').click()
 

@@ -27,17 +27,14 @@ jobs:
     env:
       POSTMARK_API_KEY: ${{ secrets.POSTMARK_API_KEY }}
       PUBLIC_SITE_NAME: TACO [TEST]
-      EMAIL_SENDER_SIGNATURE: test@tacoai.app
+      EMAIL_SENDER_SIGNATURE: ${{ secrets.EMAIL_SENDER_SIGNATURE }}
       PUBLIC_SENTRY_DSN: ${{ secrets.PUBLIC_SENTRY_DSN }}
       PUBLIC_SENTRY_ENV: test
-      PUBLIC_SITE_URL: http://localhost:5173/
-      DATABASE_URL: postgresql://postgres:postgres@localhost:0432/db
-      NODE_ENV: test
+      PUBLIC_SITE_URL: http://localhost:5173
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/db
+
       PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.PUBLIC_RECAPTCHA_SITE_KEY }}
       RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
-      ORIGIN: http://localhost:3000
-      OPENAI_API_KEY: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
