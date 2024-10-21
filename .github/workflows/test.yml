@@ -27,17 +27,16 @@ jobs:
     env:
       POSTMARK_API_KEY: ${{ secrets.POSTMARK_API_KEY }}
       PUBLIC_SITE_NAME: TACO [TEST]
-      EMAIL_SENDER_SIGNATURE: test@tacoai.app
+      EMAIL_SENDER_SIGNATURE: ${{ secrets.EMAIL_SENDER_SIGNATURE }}
       PUBLIC_SENTRY_DSN: ${{ secrets.PUBLIC_SENTRY_DSN }}
       PUBLIC_SENTRY_ENV: test
-      PUBLIC_SITE_URL: http://localhost:5173/
+      PUBLIC_SITE_URL: http://localhost:5173
       DATABASE_URL: postgresql://postgres:postgres@localhost:0432/db
-      NODE_ENV: test
+      ORIGIN: ${{ vars.ORIGIN }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.PUBLIC_RECAPTCHA_SITE_KEY }}
       RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
-      ORIGIN: http://localhost:3000
-      OPENAI_API_KEY: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -57,4 +56,18 @@ jobs:
         run: npx prisma migrate deploy
 
       - name: Run tests
+        id: test
         run: npx playwright test
+        continue-on-error: true
+
+      - name: Save artifacts
+        if: steps.test.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+
+      - name: Fail if test fails
+        if: steps.test.outcome == 'failure'
+        run: exit 1
