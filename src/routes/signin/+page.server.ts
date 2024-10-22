@@ -7,17 +7,20 @@ import { verifyRecaptcha } from '$lib/utils/recaptcha.server'
 import { fail, redirect } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
+import { PUBLIC_RECAPTCHA_DISABLED } from '$env/static/public'
 
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
     const fields = Object.fromEntries(await request.formData())
+    const enableRecaptcha = PUBLIC_RECAPTCHA_DISABLED !== 'true'
+
     try {
       const schema = await z
         .object({
           email: z.string().email(),
           password: z.string(),
           remember: z.preprocess((value) => value === 'on', z.boolean()),
-          recaptchaToken: z.string().min(1),
+          recaptchaToken: enableRecaptcha ? z.string().min(1) : z.string().optional(),
         })
         .refine(async (data) => doesCredentialsMatch(data.email, data.password), {
           message: 'Wrong credentials',
@@ -25,7 +28,7 @@ export const actions: Actions = {
         })
         .parseAsync(fields)
 
-      await verifyRecaptcha(schema.recaptchaToken)
+      if (enableRecaptcha) await verifyRecaptcha(schema.recaptchaToken)
       const user = await getUserByEmail(schema.email)
 
       if (!user) {

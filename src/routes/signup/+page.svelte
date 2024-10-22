@@ -5,7 +5,7 @@
   import Input from '$lib/components/Input.svelte'
   import { executeRecaptcha } from '$lib/utils/recaptcha.client'
   import type { ActionData } from './$types'
-  import { PUBLIC_RECAPTCHA_SITE_KEY } from '$env/static/public'
+  import { PUBLIC_RECAPTCHA_SITE_KEY, PUBLIC_RECAPTCHA_DISABLED } from '$env/static/public'
   import Spinner from '$lib/components/Spinner.svelte'
 
   export let form: ActionData
@@ -14,9 +14,11 @@
 
 <svelte:head>
   <title>Signup</title>
-  <script
-    src={`https://www.google.com/recaptcha/api.js?render=${PUBLIC_RECAPTCHA_SITE_KEY}`}
-  ></script>
+  {#if PUBLIC_RECAPTCHA_DISABLED !== 'true'}
+    <script
+      src={`https://www.google.com/recaptcha/api.js?render=${PUBLIC_RECAPTCHA_SITE_KEY}`}
+    ></script>
+  {/if}
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center sm:px-6 lg:px-8">
@@ -43,9 +45,11 @@
         method="POST"
         novalidate
         use:enhance={async ({ formData }) => {
-          const recaptchaToken = await executeRecaptcha(window.grecaptcha)
+          if (PUBLIC_RECAPTCHA_DISABLED !== 'true') {
+            const recaptchaToken = await executeRecaptcha(window.grecaptcha)
+            formData.append('recaptchaToken', recaptchaToken)
+          }
           formLoading = true
-          formData.append('recaptchaToken', recaptchaToken)
           return async ({ update }) => {
             formLoading = false
             return update({ reset: false })

@@ -5,10 +5,13 @@ import { fail } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
 import { verifyRecaptcha } from '$lib/utils/recaptcha.server'
+import { PUBLIC_RECAPTCHA_DISABLED } from '$env/static/public'
 
 export const actions: Actions = {
   default: async ({ request, url }) => {
     const fields = Object.fromEntries(await request.formData())
+    const enableRecaptcha = PUBLIC_RECAPTCHA_DISABLED !== 'true'
+
     try {
       const schema = z
         .object({
@@ -17,7 +20,7 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      await verifyRecaptcha(schema.recaptchaToken)
+      if (enableRecaptcha) await verifyRecaptcha(schema.recaptchaToken)
 
       let user = await getUserByEmail(schema.email)
 
