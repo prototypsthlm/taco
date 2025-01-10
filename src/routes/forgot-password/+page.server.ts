@@ -5,6 +5,7 @@ import { fail } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
 import { verifyRecaptcha } from '$lib/utils/recaptcha.server'
+import {PUBLIC_RECAPTCHA_ENABLED} from '$env/static/public'
 
 export const actions: Actions = {
   default: async ({ request, url }) => {
@@ -13,11 +14,11 @@ export const actions: Actions = {
       const schema = z
         .object({
           email: z.string().email().toLowerCase(),
-          recaptchaToken: z.string().min(1),
+          recaptchaToken: z.string().optional(),
         })
         .parse(fields)
 
-      await verifyRecaptcha(schema.recaptchaToken)
+      if (PUBLIC_RECAPTCHA_ENABLED) await verifyRecaptcha(schema.recaptchaToken || '')
 
       let user = await getUserByEmail(schema.email)
 
