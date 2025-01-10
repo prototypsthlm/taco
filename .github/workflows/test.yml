@@ -35,9 +35,9 @@ jobs:
       ORIGIN: ${{ vars.ORIGIN }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.PUBLIC_RECAPTCHA_SITE_KEY }}
-      RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY }}
-      RECAPTCHA_DISABLED: true
+      PUBLIC_RECAPTCHA_SITE_KEY: 'any-value'
+      RECAPTCHA_SECRET_KEY: 'any-value'
+      PUBLIC_RECAPTCHA_ENABLED: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

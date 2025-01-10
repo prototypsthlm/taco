@@ -3,7 +3,7 @@
   import Alert from '$lib/components/Alert.svelte'
   import Input from '$lib/components/Input.svelte'
   import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
-  import { executeRecaptcha } from '$lib/utils/recaptcha.client'
+  import { executeRecaptcha, isRecaptchaEnabled } from "$lib/utils/recaptcha.client";
   import type { ActionData } from './$types'
   import { PUBLIC_RECAPTCHA_SITE_KEY } from '$env/static/public'
   import Spinner from '$lib/components/Spinner.svelte'
@@ -14,9 +14,11 @@
 
 <svelte:head>
   <title>Sign in</title>
-  <script
-    src={`https://www.google.com/recaptcha/api.js?render=${PUBLIC_RECAPTCHA_SITE_KEY}`}
-  ></script>
+  {#if isRecaptchaEnabled}
+    <script
+      src={`https://www.google.com/recaptcha/api.js?render=${PUBLIC_RECAPTCHA_SITE_KEY}`}
+    ></script>
+  {/if}
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center sm:px-6 lg:px-8">
@@ -43,9 +45,12 @@
         method="POST"
         novalidate
         use:enhance={async ({ formData }) => {
-          const recaptchaToken = await executeRecaptcha(window.grecaptcha)
-          formLoading = true
-          formData.append('recaptchaToken', recaptchaToken)
+          if (isRecaptchaEnabled) {
+            const recaptchaToken = await executeRecaptcha(window.grecaptcha)
+            formLoading = true
+            formData.append('recaptchaToken', recaptchaToken)
+          }
+
           return async ({ update }) => {
             formLoading = false
             return update({ reset: false })
