@@ -1,9 +1,6 @@
 import { RECAPTCHA_SECRET_KEY } from '$env/static/private'
-import { env } from '$env/dynamic/private'
 
 export async function verifyRecaptcha(response: string) {
-  if (env.RECAPTCHA_DISABLED === 'true') return
-
   const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
     method: 'POST',
     headers: {
