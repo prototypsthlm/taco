@@ -26,7 +26,7 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      if (PUBLIC_RECAPTCHA_ENABLED) await verifyRecaptcha(schema.recaptchaToken || '')
+      if (PUBLIC_RECAPTCHA_ENABLED === 'true') await verifyRecaptcha(schema.recaptchaToken || '')
 
       const user = await createUser(schema.name, schema.email, schema.password)
 

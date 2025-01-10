@@ -14,7 +14,7 @@
 
 <svelte:head>
   <title>Signup</title>
-  {#if PUBLIC_RECAPTCHA_ENABLED}
+  {#if PUBLIC_RECAPTCHA_ENABLED === 'true'}
     <script
       src={`https://www.google.com/recaptcha/api.js?render=${PUBLIC_RECAPTCHA_SITE_KEY}`}
     ></script>
@@ -45,7 +45,7 @@
         method="POST"
         novalidate
         use:enhance={async ({ formData }) => {
-          if (PUBLIC_RECAPTCHA_ENABLED) {
+          if (PUBLIC_RECAPTCHA_ENABLED === 'true') {
             const recaptchaToken = await executeRecaptcha(window.grecaptcha)
             formLoading = true
             formData.append('recaptchaToken', recaptchaToken)

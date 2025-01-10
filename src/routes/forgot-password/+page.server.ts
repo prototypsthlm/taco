@@ -18,7 +18,7 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      if (PUBLIC_RECAPTCHA_ENABLED) await verifyRecaptcha(schema.recaptchaToken || '')
+      if (PUBLIC_RECAPTCHA_ENABLED === 'true') await verifyRecaptcha(schema.recaptchaToken || '')
 
       let user = await getUserByEmail(schema.email)
 
