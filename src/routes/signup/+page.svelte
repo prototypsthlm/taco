@@ -3,9 +3,9 @@
   import Alert from '$lib/components/Alert.svelte'
   import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
   import Input from '$lib/components/Input.svelte'
-  import { executeRecaptcha } from '$lib/utils/recaptcha.client'
+  import { executeRecaptcha, isRecaptchaEnabled } from '$lib/utils/recaptcha.client'
   import type { ActionData } from './$types'
-  import { PUBLIC_RECAPTCHA_SITE_KEY, PUBLIC_RECAPTCHA_ENABLED } from '$env/static/public'
+  import { PUBLIC_RECAPTCHA_SITE_KEY } from '$env/static/public'
   import Spinner from '$lib/components/Spinner.svelte'
 
   export let form: ActionData
@@ -14,7 +14,7 @@
 
 <svelte:head>
   <title>Signup</title>
-  {#if PUBLIC_RECAPTCHA_ENABLED === 'true'}
+  {#if isRecaptchaEnabled}
     <script
       src={`https://www.google.com/recaptcha/api.js?render=${PUBLIC_RECAPTCHA_SITE_KEY}`}
     ></script>
@@ -45,7 +45,7 @@
         method="POST"
         novalidate
         use:enhance={async ({ formData }) => {
-          if (PUBLIC_RECAPTCHA_ENABLED === 'true') {
+          if (isRecaptchaEnabled) {
             const recaptchaToken = await executeRecaptcha(window.grecaptcha)
             formLoading = true
             formData.append('recaptchaToken', recaptchaToken)

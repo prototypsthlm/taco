@@ -7,7 +7,7 @@ import { verifyRecaptcha } from '$lib/utils/recaptcha.server'
 import { fail, redirect } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
-import { PUBLIC_RECAPTCHA_ENABLED } from '$env/static/public'
+import { isRecaptchaEnabled } from '$lib/utils/recaptcha.client'
 
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
@@ -26,7 +26,7 @@ export const actions: Actions = {
         })
         .parseAsync(fields)
 
-      if (PUBLIC_RECAPTCHA_ENABLED === 'true') await verifyRecaptcha(schema.recaptchaToken || '')
+      if (isRecaptchaEnabled) await verifyRecaptcha(schema.recaptchaToken || '')
 
       const user = await getUserByEmail(schema.email)
 
