@@ -7,7 +7,12 @@ import { webSocketServer } from './webSocketPluginVite'
 
 export default defineConfig({
   plugins: [
-    sentrySvelteKit(),
+    sentrySvelteKit({
+      sourceMapsUploadOptions: {
+        org: 'prototyp-vm',
+        project: 'taco',
+      },
+    }),
     sveltekit(),
     webSocketServer,
     mjmlPluginVite(),
