@@ -59,6 +59,11 @@ Follow these steps to initialize Prisma in your project:
     ```bash
     docker-compose up -d
     ```
+    or, if you're not running docker-compose standalone, but rather with Docker Desktop:
+    
+        ```bash
+    docker compose up -d
+    ```
 
 2. Copy the `.env.example` file to `.env`:
 
