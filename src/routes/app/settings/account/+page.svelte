@@ -3,12 +3,15 @@
   import Input from '$lib/components/Input.svelte'
   import InputGroup from '$lib/components/InputGroup.svelte'
   import ModalConfirm from '$lib/components/ModalConfirm.svelte'
+  import Spinner from '$lib/components/Spinner.svelte'
   import type { ActionData, PageData } from './$types'
 
   export let data: PageData
   export let form: ActionData
 
   let deleteForm: HTMLFormElement
+  let formLoadingPersonal = false
+  let formLoadingPassword = false
 </script>
 
 <!-- Settings forms -->
@@ -17,14 +20,19 @@
     method="post"
     action="?/personal"
     use:enhance={() => {
+      formLoadingPersonal = true
       //<!-- aixo es llença a .ts actions:Actions-->
-      return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
+      return ({ update }) => {
+        formLoadingPersonal = false
+        update({ reset: false })
+      } // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
     }}
   >
     <InputGroup
       header="Personal Information"
       description="Use a permanent address where you can receive mail."
       form={form?.personal}
+      formLoading={formLoadingPersonal}
     >
       <Input
         class="dark col-span-full"
@@ -45,11 +53,23 @@
     </InputGroup>
   </form>
 
-  <form method="post" action="?/password">
+  <form
+    method="post"
+    action="?/password"
+    use:enhance={() => {
+      formLoadingPassword = true
+      //<!-- aixo es llença a .ts actions:Actions-->
+      return ({ update }) => {
+        formLoadingPassword = false
+        update({ reset: false })
+      } // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
+    }}
+  >
     <InputGroup
       header="Change password"
       description="Update your password associated with your account."
       form={form?.password}
+      formLoading={formLoadingPassword}
     >
       <Input
         class="dark col-span-full"
@@ -122,7 +142,8 @@
           type="button"
           slot="trigger"
           class="rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400"
-          >Yes, delete my account
+        >
+          <span>Yes, delete my account</span>
         </button>
         <svelte:fragment slot="title">Are you sure you want to delete your account?</svelte:fragment
         >

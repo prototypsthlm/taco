@@ -7,6 +7,7 @@
 
   export let form: ActionData
   let testApiKey: string = ''
+  let formLoading = false
 </script>
 
 <form
@@ -14,13 +15,18 @@
   action="?/createTeam"
   novalidate
   use:enhance={() => {
-    return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
+    formLoading = true
+    return ({ update }) => {
+      formLoading = false
+      update({ reset: false })
+    } // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
   }}
 >
   <InputGroup
     header="Create a new Team"
     description={`You need an OpenAI API key to create a team. You can get one at <a href="https://platform.openai.com" target="_blank" class="text-blue-500 underline hover:text-blue-700">https://platform.openai.com</a>`}
     {form}
+    {formLoading}
   >
     <Input
       value={form?.fields?.name}

@@ -9,19 +9,25 @@
   export let form: any
 
   let testApiKey: string = team.openAiApiKey
+  let formLoading = false
 </script>
 
 <form
   method="post"
   action="?/updateTeamDetails"
   use:enhance={() => {
-    return ({ update }) => update({ reset: false }) // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
+    formLoading = true
+    return ({ update }) => {
+      formLoading = false
+      update({ reset: false })
+    } // workaround for this known issue: @link: https://github.com/sveltejs/kit/issues/8513#issuecomment-1382500465
   }}
 >
   <InputGroup
     header="Team Details"
     description="The API keys and the Team name which is a unique identifier"
     {form}
+    {formLoading}
   >
     <Input
       class="dark col-span-full"
