@@ -5,16 +5,18 @@
   import TacoIcon from '$lib/components/icons/TacoIcon.svelte'
   import type { ActionData } from './$types'
   import { PUBLIC_RECAPTCHA_SITE_KEY } from '$env/static/public'
-  import { executeRecaptcha } from '$lib/utils/recaptcha.client'
+  import { executeRecaptcha, isRecaptchaEnabled } from '$lib/utils/recaptcha.client'
 
   export let form: ActionData
 </script>
 
 <svelte:head>
   <title>Forgot Password</title>
-  <script
-    src={`https://www.google.com/recaptcha/api.js?render=${PUBLIC_RECAPTCHA_SITE_KEY}`}
-  ></script>
+  {#if isRecaptchaEnabled}
+    <script
+      src={`https://www.google.com/recaptcha/api.js?render=${PUBLIC_RECAPTCHA_SITE_KEY}`}
+    ></script>
+  {/if}
 </svelte:head>
 
 <div
@@ -43,8 +45,11 @@
         method="POST"
         novalidate
         use:enhance={async ({ formData }) => {
-          const recaptchaToken = await executeRecaptcha(window.grecaptcha)
-          formData.append('recaptchaToken', recaptchaToken)
+          if (isRecaptchaEnabled) {
+            const recaptchaToken = await executeRecaptcha(window.grecaptcha)
+            formData.append('recaptchaToken', recaptchaToken)
+          }
+
           return async ({ update }) => {
             return update({ reset: false })
           }

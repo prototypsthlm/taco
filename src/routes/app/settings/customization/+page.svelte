@@ -9,15 +9,28 @@
 
   export let data: PageData
   export let form: ActionData
+
+  let formLoading = false
 </script>
 
 <div class="divide-y divide-white/5">
-  <form method="post" action="?/addPersonality" use:enhance>
+  <form
+    method="post"
+    action="?/addPersonality"
+    use:enhance={() => {
+      formLoading = true
+      return async ({ update }) => {
+        formLoading = false
+        update()
+      }
+    }}
+  >
     <InputGroup
       header="LLM Personality"
       description="Personalities provide a context to the LLM from the start of the conversation."
       form={form?.personalityCreation}
       buttonText="Add Personality"
+      {formLoading}
     >
       <Input
         class="dark col-span-full"

@@ -7,9 +7,9 @@ import type { Team } from '@prisma/client'
 import * as Sentry from '@sentry/sveltekit'
 import OpenAI from 'openai'
 import type {
+  ChatCompletion,
   ChatCompletionCreateParams,
   ChatCompletionMessageParam,
-  ChatCompletion,
 } from 'openai/resources'
 
 export const getClient = (encryptedApiKey: string) => {
@@ -26,7 +26,7 @@ const getOpenAiModels = async (openAiApiKey: string): Promise<any[]> => {
 export const getOllamaModelsList = async (ollamaBaseUrl: string) => {
   const res = await fetch(`${ollamaBaseUrl}/api/tags`)
   const data = await res.json()
-  let modelList: Model[] = []
+  const modelList: Model[] = []
   data.models.map((model: any) => {
     modelList.push({
       id: model.name,
@@ -45,21 +45,30 @@ export const getAvailableModels = async (team: Team) => {
   let availableModels: Model[] = []
   let allModelsFromOpenAi: any[] = []
   if (!team.openAiApiKey && !team.ollamaBaseUrl) {
-    throw new Error('API Error: Open AI API key is not set for team')
+    console.error('API Error: Open AI API key is not set for team')
+    return []
   }
   if (team.openAiApiKey) {
-    allModelsFromOpenAi = [...allModelsFromOpenAi, ...(await getOpenAiModels(team.openAiApiKey))]
-    const updatedModels = MODELS.map(
-      (x) =>
-        ({
-          ...x,
-          enabled: allModelsFromOpenAi.some((y) => x.id === y.id),
-        } as Model)
-    )
-    availableModels = updatedModels
+    try {
+      allModelsFromOpenAi = await getOpenAiModels(team.openAiApiKey)
+      const updatedModels = MODELS.map(
+        (x) =>
+          ({
+            ...x,
+            enabled: allModelsFromOpenAi.some((y) => x.id === y.id),
+          } as Model)
+      )
+      availableModels = updatedModels
+    } catch (e) {
+      console.error('Could not fetch OpenAi Models: ', e.status)
+    }
   }
   if (team.ollamaBaseUrl) {
-    availableModels = [...availableModels, ...(await getOllamaModelsList(team.ollamaBaseUrl))]
+    try {
+      availableModels = [...availableModels, ...(await getOllamaModelsList(team.ollamaBaseUrl))]
+    } catch (e) {
+      console.error('Could not fetch Ollama Models: ', e.status)
+    }
   }
   return availableModels
 }

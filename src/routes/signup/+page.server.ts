@@ -5,6 +5,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { fail, redirect } from '@sveltejs/kit'
 import { z, ZodError } from 'zod'
 import type { Actions } from './$types'
+import { isRecaptchaEnabled } from '$lib/utils/recaptcha.client'
 
 export const actions: Actions = {
   default: async ({ request, cookies, url }) => {
@@ -17,7 +18,7 @@ export const actions: Actions = {
           email: z.string().email().toLowerCase(),
           password: z.string().min(6),
           confirmPassword: z.string().min(6),
-          recaptchaToken: z.string().min(1),
+          recaptchaToken: z.string().optional(),
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: "Passwords don't match",
@@ -25,7 +26,7 @@ export const actions: Actions = {
         })
         .parse(fields)
 
-      await verifyRecaptcha(schema.recaptchaToken)
+      if (isRecaptchaEnabled) await verifyRecaptcha(schema.recaptchaToken || '')
 
       const user = await createUser(schema.name, schema.email, schema.password)
 

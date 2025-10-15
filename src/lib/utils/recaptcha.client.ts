@@ -1,4 +1,4 @@
-import { PUBLIC_RECAPTCHA_SITE_KEY } from '$env/static/public'
+import { PUBLIC_RECAPTCHA_SITE_KEY, PUBLIC_RECAPTCHA_ENABLED } from '$env/static/public'
 
 export interface ReCaptcha {
   ready(callback: () => void): void
@@ -30,3 +30,5 @@ export const executeRecaptcha = async (grecaptcha: ReCaptcha): Promise<string> =
     })
   })
 }
+
+export const isRecaptchaEnabled = PUBLIC_RECAPTCHA_ENABLED === 'true'
