@@ -42,6 +42,20 @@
       <div class="text-5xl md:text-7xl mb-12 md:mb-4 flex justify-center">
         <TacoIcon class="h-28 dark text-8xl" />
       </div>
+      <div class="mb-8 rounded-lg bg-yellow-900/50 border border-yellow-600/50 px-6 py-4 text-left">
+        <p class="text-lg font-semibold text-yellow-200 mb-3 text-center">
+          All good things must come to an end
+        </p>
+        <p class="text-base text-yellow-100 mb-2">
+          After careful consideration, we've made the difficult decision to shut down TACO on December 18th, 2025.
+        </p>
+        <p class="text-base text-yellow-100 mb-2">
+          You can download your data from the settings page before the service shuts down.
+        </p>
+        <p class="text-base text-yellow-100">
+          Thank you for being part of our journey. TACO is open source, and the code will remain publicly available on <a href="https://github.com/prototypsthlm/taco" target="_blank" class="underline hover:text-yellow-50">GitHub</a> for you to fork and self-host if you wish.
+        </p>
+      </div>
       <h2 class="text-base font-semibold leading-7 text-indigo-400">Team AI Chat pOrtal</h2>
       <p class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
         A free and open source ChatGPT frontend
