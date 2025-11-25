@@ -48,7 +48,7 @@
         </p>
         <p class="text-base text-yellow-100 mb-2">
           After careful consideration, we've made the difficult decision to shut down TACO on
-          December 18th, 2025.
+          [DATE].
         </p>
         <p class="text-base text-yellow-100 mb-2">
           You can download your data from the settings page before the service shuts down.
