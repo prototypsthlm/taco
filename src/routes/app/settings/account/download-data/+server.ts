@@ -1,13 +1,9 @@
 import { prisma } from '$lib/server/prisma'
 import { decryptString } from '$lib/server/utils/crypto'
-import { json, error } from '@sveltejs/kit'
+import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 
 export const GET: RequestHandler = async ({ locals }) => {
-  if (!locals.currentUser) {
-    throw error(401, 'Unauthorized')
-  }
-
   const chats = await prisma.chat.findMany({
     where: {
       owner: {
@@ -31,20 +27,12 @@ export const GET: RequestHandler = async ({ locals }) => {
     chats: chats.map((chat) => {
       const shouldDecrypt = chat.encrypted
 
-      const name = chat.name
-        ? shouldDecrypt
-          ? decryptString(chat.name)
-          : chat.name
-        : null
+      const name = chat.name ? (shouldDecrypt ? decryptString(chat.name) : chat.name) : null
 
       const messages = chat.messages.map((msg) => ({
         id: msg.id,
         question: shouldDecrypt ? decryptString(msg.question) : msg.question,
-        answer: msg.answer
-          ? shouldDecrypt
-            ? decryptString(msg.answer)
-            : msg.answer
-          : null,
+        answer: msg.answer ? (shouldDecrypt ? decryptString(msg.answer) : msg.answer) : null,
         createdAt: msg.createdAt,
       }))
 
