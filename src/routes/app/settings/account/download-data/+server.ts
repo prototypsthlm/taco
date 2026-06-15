@@ -59,5 +59,5 @@ export const GET: RequestHandler = async ({ locals }) => {
     }),
   }
 
-  return json(exportData)
+  return json(exportData, { headers: { 'cache-control': 'no-store' } })
 }
