@@ -18,6 +18,7 @@
     downloadingData = true
     try {
       const res = await fetch('/app/settings/account/download-data')
+      if (!res.ok) throw new Error(`Download failed: ${res.status}`)
       const data = await res.json()
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'text/plain' })
       const url = URL.createObjectURL(blob)
@@ -25,7 +26,7 @@
       a.href = url
       a.download = 'my-data.txt'
       a.click()
-      URL.revokeObjectURL(url)
+      setTimeout(() => URL.revokeObjectURL(url), 0)
     } finally {
       downloadingData = false
     }
