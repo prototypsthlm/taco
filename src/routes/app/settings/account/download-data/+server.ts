@@ -4,19 +4,32 @@ import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 
 export const GET: RequestHandler = async ({ locals }) => {
-  const chats = await prisma.chat.findMany({
-    where: {
-      owner: {
-        userId: locals.currentUser.id,
+  const [ownedChats, sharedChats] = await Promise.all([
+    prisma.chat.findMany({
+      where: { owner: { userId: locals.currentUser.id } },
+      include: {
+        messages: {
+          where: { authorId: locals.currentUser.id },
+          orderBy: { createdAt: 'asc' },
+        },
       },
-    },
-    include: {
-      messages: {
-        orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'asc' },
+    }),
+    prisma.chat.findMany({
+      where: { sharedWith: { some: { userId: locals.currentUser.id } } },
+      include: {
+        messages: {
+          where: { authorId: locals.currentUser.id },
+          orderBy: { createdAt: 'asc' },
+        },
       },
-    },
-    orderBy: { createdAt: 'asc' },
-  })
+      orderBy: { createdAt: 'asc' },
+    }),
+  ])
+
+  const chats = [...ownedChats, ...sharedChats].sort(
+    (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+  )
 
   const exportData = {
     exportedAt: new Date().toISOString(),
