@@ -25,8 +25,10 @@
       const a = document.createElement('a')
       a.href = url
       a.download = 'my-data.txt'
+      document.body.appendChild(a)
       a.click()
-      setTimeout(() => URL.revokeObjectURL(url), 0)
+      a.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
     } finally {
       downloadingData = false
     }
