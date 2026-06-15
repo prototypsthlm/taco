@@ -9,6 +9,29 @@
   export let form: ActionData
 
   let deleteForm: HTMLFormElement
+  let formLoadingPersonal = false
+  let formLoadingPassword = false
+  let downloadingData = false
+
+  const downloadData = async () => {
+    downloadingData = true
+    try {
+      const res = await fetch('/app/settings/account/download-data')
+      if (!res.ok) throw new Error(`Download failed: ${res.status}`)
+      const data = await res.json()
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'text/plain' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'my-data.txt'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } finally {
+      downloadingData = false
+    }
+  }
 </script>
 
 <!-- Settings forms -->
@@ -97,6 +120,31 @@
           href="/signout">Log out</a
         >
       </div>
+    </div>
+  </div>
+
+  <div
+    class="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8"
+  >
+    <div>
+      <p class="mt-1 text-sm leading-6 text-gray-400">
+        Export all your chat conversations and messages as a .txt file containing JSON.
+      </p>
+    </div>
+
+    <div class="flex items-start md:col-span-2">
+      <button
+        type="button"
+        disabled={downloadingData}
+        on:click={downloadData}
+        class="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {#if downloadingData}
+          <span>Preparing download…</span>
+        {:else}
+          <span>Download my data</span>
+        {/if}
+      </button>
     </div>
   </div>
 
