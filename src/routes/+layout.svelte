@@ -35,4 +35,11 @@
   <meta property="og:type" content="website" />
 </svelte:head>
 
-<slot />
+<div
+  class="fixed top-0 left-0 right-0 z-[9999] flex items-center justify-center bg-indigo-400 text-black py-2.5 text-sm font-semibold"
+>
+  ⚠️ TACO is shutting down on 2026-07-20
+</div>
+<div class="pt-10">
+  <slot />
+</div>
