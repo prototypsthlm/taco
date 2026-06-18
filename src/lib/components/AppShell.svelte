@@ -15,7 +15,7 @@
   })
 </script>
 
-<div class="flex flex-col justify-between h-screen max-h-[-webkit-fill-available] bg-gray-900">
+<div class="flex flex-col justify-between h-[calc(100vh-2.5rem)] max-h-[-webkit-fill-available] bg-gray-900">
   <TransitionRoot show={sidebarOpen}>
     <div class="relative z-50 lg:hidden">
       <TransitionChild
