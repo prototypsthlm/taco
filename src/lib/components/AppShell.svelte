@@ -15,7 +15,9 @@
   })
 </script>
 
-<div class="flex flex-col justify-between h-[calc(100vh-2.5rem)] max-h-[-webkit-fill-available] bg-gray-900">
+<div
+  class="flex flex-col justify-between h-[calc(100vh-2.5rem)] max-h-[-webkit-fill-available] bg-gray-900"
+>
   <TransitionRoot show={sidebarOpen}>
     <div class="relative z-50 lg:hidden">
       <TransitionChild
@@ -81,7 +83,7 @@
 
   <!-- Static sidebar for desktop -->
   <div
-    class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r-2 border-gray-800"
+    class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r-2 border-gray-800 pt-10"
   >
     <!-- Sidebar component, Desktop -->
     <nav class="flex flex-col justify-between gap-3 bg-gray-900 h-screen p-3">
