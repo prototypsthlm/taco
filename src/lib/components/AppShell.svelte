@@ -15,7 +15,9 @@
   })
 </script>
 
-<div class="flex flex-col justify-between h-[calc(100vh-2.5rem)] max-h-[-webkit-fill-available] bg-gray-900">
+<div
+  class="flex flex-col justify-between h-[calc(100vh-2.5rem)] max-h-[-webkit-fill-available] bg-gray-900"
+>
   <TransitionRoot show={sidebarOpen}>
     <div class="relative z-50 lg:hidden">
       <TransitionChild
@@ -47,7 +49,7 @@
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
+              <div class="absolute left-full top-0 flex w-16 justify-center pt-10">
                 <button
                   type="button"
                   class="-m-2.5 p-2.5"
@@ -60,7 +62,7 @@
             </TransitionChild>
             <!-- Sidebar component, Mobile -->
             <div
-              class="h-screen flex grow flex-col overflow-y-auto bg-gray-900 p-3 ring-1 ring-white/10 gap-3"
+              class="h-screen flex grow flex-col overflow-y-auto bg-gray-900 p-3 ring-1 ring-white/10 gap-3 mt-10"
             >
               <div class="flex items-center">
                 <a class="text-white text-2xl text-left block py-2" href="/app">
@@ -81,7 +83,7 @@
 
   <!-- Static sidebar for desktop -->
   <div
-    class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r-2 border-gray-800"
+    class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col border-r-2 border-gray-800 mt-10"
   >
     <!-- Sidebar component, Desktop -->
     <nav class="flex flex-col justify-between gap-3 bg-gray-900 h-screen p-3">
