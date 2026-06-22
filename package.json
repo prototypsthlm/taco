@@ -64,7 +64,7 @@
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
     "sse.js": "^0.6.1",
-    "svelte": "^3.54.0",
+    "svelte": "^4.2.19",
     "svelte-autosize": "^1.1.0",
     "svelte-check": "^3.0.1",
     "tailwindcss": "^3.3.2",
